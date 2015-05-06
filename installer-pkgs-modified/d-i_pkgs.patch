@@ -1,15 +1,15 @@
 diff -u -r /tmp/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h /tmp/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h
 --- /tmp/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h	2008-12-11 09:36:23.000000000 -0800
 +++ /tmp/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h	2008-12-11 09:36:17.000000000 -0800
-@@ -72,7 +72,7 @@
+@@ -72,6 +72,6 @@
   * @see create_banner()
   */
  #define LOGO_IMAGE_PATH \
 -    BASE_IMAGE_PATH "/logo_installer.png"
 +    BASE_IMAGE_PATH "/logo_untangle.png"
- 
- /** Can the progress be canceled within the current frontend run? */
- #define CAN_CANCEL_PROGRESS(Frontend) \
+ #define LOGO_DARK_IMAGE_PATH \
+     BASE_IMAGE_PATH "/logo_installer_dark.png"
+
 diff -u -r /tmp/rootskel-gtk/src/etc/gtk-2.0/gtkrc /tmp/rootskel-gtk/src/etc/gtk-2.0/gtkrc
 --- /tmp/rootskel-gtk/src/etc/gtk-2.0/gtkrc	2008-12-11 09:40:09.000000000 -0800
 +++ /tmp/rootskel-gtk/src/etc/gtk-2.0/gtkrc	2008-12-11 09:40:16.000000000 -0800
