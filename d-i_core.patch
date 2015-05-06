@@ -1,0 +1,121 @@
+diff --git a/isotools-wheezy/d-i/build/Makefile b/isotools-wheezy/d-i/build/Makefile
+index 54a2fde..3c2da84 100644
+--- a/isotools-wheezy/d-i/build/Makefile
++++ b/isotools-wheezy/d-i/build/Makefile
+@@ -496,7 +496,7 @@ ifndef ONLY_KLIBC
+ 		-L $(TREE)/usr/lib/cdebconf/frontend \
+ 		$(addprefix -l,$(notdir $(wildcard $(TREE)/usr/lib/cdebconf/frontend/*.so))) \
+ 		`find $(TEMP) -type f -a \( -perm +0111 -o -name '*.so' -o -name '*.so.*' \) | \
+-		 grep -v udeblibs | grep -v 'usr/lib/xorg/modules/.*\.so'`
++		 grep -v udeblibs | grep -v 'usr/lib/xorg/modules/.*\.so'`| grep -v 'ld\.so\.8\.gz'
+ 
+ ifeq ($(DEB_HOST_ARCH),armhf)
+ 	# armhf has two linkers for now, while the world gets sorted
+diff --git a/isotools-wheezy/d-i/build/config/amd64/hd-media.cfg b/isotools-wheezy/d-i/build/config/amd64/hd-media.cfg
+index 9e1e49c..e3ace1d 100644
+--- a/isotools-wheezy/d-i/build/config/amd64/hd-media.cfg
++++ b/isotools-wheezy/d-i/build/config/amd64/hd-media.cfg
+@@ -4,7 +4,7 @@ FLAVOUR_SUPPORTED = "" gtk
+ # netinst iso in (being able to fit the full CD on it is just a bonus..),
+ # and small enough to fit on a low-end memory stick, such as those
+ # advertised as being 1 gigabyte in size.
+-FLOPPY_SIZE = 976560
++FLOPPY_SIZE = 750000
+ 
+ DISK_LABEL = "bootable drive"
+ MEDIA_TYPE = bootable drive
+diff --git a/isotools-wheezy/d-i/build/config/armel.cfg b/isotools-wheezy/d-i/build/config/armel.cfg
+index e8fd439..ae39c68 100644
+--- a/isotools-wheezy/d-i/build/config/armel.cfg
++++ b/isotools-wheezy/d-i/build/config/armel.cfg
+@@ -1,4 +1,4 @@
+-SUBARCH_SUPPORTED = iop32x kirkwood orion5x versatile ads
++SUBARCH_SUPPORTED = versatile
+ 
+ KERNELMAJOR = 2.6
+ KERNELVERSION = 3.2.0-4
+diff --git a/isotools-wheezy/d-i/build/config/common b/isotools-wheezy/d-i/build/config/common
+index 9145ead..cac37e4 100644
+--- a/isotools-wheezy/d-i/build/config/common
++++ b/isotools-wheezy/d-i/build/config/common
+@@ -91,7 +91,8 @@ LSB_DISTRIB_RELEASE="$(DEBIAN_VERSION) - installer build $(BUILD_DATE)"
+ 
+ # This keyring is only used to verify udeb downloads using apt. Since the
+ # build process does not run as root, apt cannot read /etc/apt/trusted.gpg.
+-KEYRING=/usr/share/keyrings/debian-archive-keyring.gpg
++#KEYRING=/usr/share/keyrings/debian-archive-keyring.gpg
++KEYRING=/etc/apt/trusted.gpg
+ 
+ # All images that include cdebconf should include symbols needed by these
+ # plugins.
+diff --git a/isotools-wheezy/d-i/build/config/i386/hd-media.cfg b/isotools-wheezy/d-i/build/config/i386/hd-media.cfg
+index 9e1e49c..e3ace1d 100644
+--- a/isotools-wheezy/d-i/build/config/i386/hd-media.cfg
++++ b/isotools-wheezy/d-i/build/config/i386/hd-media.cfg
+@@ -4,7 +4,7 @@ FLAVOUR_SUPPORTED = "" gtk
+ # netinst iso in (being able to fit the full CD on it is just a bonus..),
+ # and small enough to fit on a low-end memory stick, such as those
+ # advertised as being 1 gigabyte in size.
+-FLOPPY_SIZE = 976560
++FLOPPY_SIZE = 750000
+ 
+ DISK_LABEL = "bootable drive"
+ MEDIA_TYPE = bootable drive
+diff --git a/isotools-wheezy/d-i/debian/rules b/isotools-wheezy/d-i/debian/rules
+index 232e195..60e2f41 100755
+--- a/isotools-wheezy/d-i/debian/rules
++++ b/isotools-wheezy/d-i/debian/rules
+@@ -10,7 +10,7 @@ TRANSSTATUS=
+ BOOTMENU_BEEP=n
+ else
+ USE_UDEBS_FROM=wheezy
+-USE_PROPOSED_UPDATES=1
++USE_PROPOSED_UPDATES=0
+ TRANSSTATUS=translation-status
+ BOOTMENU_BEEP=y
+ endif
+diff --git a/isotools-wheezy/debian-cd/tools/boot/wheezy/boot-x86 b/isotools-wheezy/debian-cd/tools/boot/wheezy/boot-x86
+index 426c996..ecaead6 100644
+--- a/isotools-wheezy/debian-cd/tools/boot/wheezy/boot-x86
++++ b/isotools-wheezy/debian-cd/tools/boot/wheezy/boot-x86
+@@ -347,6 +347,12 @@ if [ -n "$KERNEL_PARAMS" ]; then
+ 	done
+ fi
+ 
++rm -fr boot$N/isolinux/*{cfg,png}
++cp ../../../cd-root/isolinux-$(dpkg-architecture -qDEB_BUILD_ARCH).cfg boot$N/isolinux/isolinux.cfg
++rm -fr CD$N/README.*
++cp -r ../../../cd-root/* CD$N/
++
++
+ case "$ORIG_DESKTOP" in
+ 	all)
+ 		modify_for_all_desktop ;;
+diff --git a/isotools-wheezy/debian-cd/tools/boot/wheezy/x86-desktop.sh b/isotools-wheezy/debian-cd/tools/boot/wheezy/x86-desktop.sh
+index 07abb3f..90b0f09 100644
+--- a/isotools-wheezy/debian-cd/tools/boot/wheezy/x86-desktop.sh
++++ b/isotools-wheezy/debian-cd/tools/boot/wheezy/x86-desktop.sh
+@@ -48,8 +48,8 @@ create_desktop_dir() {
+ 
+ modify_for_single_desktop() {
+ 	# Cleanup
+-	rm boot$N/isolinux/dtmenu.cfg
+-	rm -r boot$N/isolinux/desktop
++	rm -f boot$N/isolinux/dtmenu.cfg
++	rm -fr boot$N/isolinux/desktop
+ 
+ 	# Set default desktop, or remove if not applicable
+ 	if [ "$DESKTOP" ]; then
+diff --git a/isotools-wheezy/debian-cd/CONF.sh b/isotools-wheezy/debian-cd/CONF.sh
+index 11c613d..ffea236 100644
+--- a/isotools-wheezy/debian-cd/CONF.sh
++++ b/isotools-wheezy/debian-cd/CONF.sh
+@@ -59,7 +59,7 @@ export BASEDIR=`pwd`
+ # export CDNAME=debian
+ 
+ # Building wheezy cd set ...
+-export CODENAME=squeeze
++export CODENAME=wheezy
+ 
+ # By default use Debian installer packages from $CODENAME
+ if [ -z "$DI_CODENAME" ]; then

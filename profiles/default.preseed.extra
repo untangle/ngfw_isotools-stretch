@@ -1,0 +1,14 @@
+d-i ethdetect/module_select select no ethernet card
+d-i netcfg/choose_interface select lo
+d-i netcfg/disable_dhcp boolean true
+d-i netcfg/dhcp_failed note
+d-i netcfg/dhcp_options select Configure network manually
+# Static network configuration.
+d-i netcfg/get_nameservers string 10.100.100.100
+d-i netcfg/get_ipaddress string 10.100.100.100
+d-i netcfg/get_netmask string 255.255.255.255
+d-i netcfg/get_gateway string 10.100.100.100
+d-i netcfg/confirm_static boolean true
+d-i mirror/http/hostname string debian
+d-i mirror/http/directory string /debian
+d-i apt-setup/use_mirror boolean false

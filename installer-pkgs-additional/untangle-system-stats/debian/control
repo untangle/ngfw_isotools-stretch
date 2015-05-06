@@ -1,0 +1,12 @@
+Source: untangle-system-stats
+Section: debian-installer
+Priority: standard
+Maintainer: Sebastien Delafond <seb@untangle.com>
+Build-Depends: debhelper (>= 4.1.13), po-debconf
+
+Package: untangle-system-stats
+Architecture: all
+#Depends: ${misc:Depends}, configured-network, di-utils
+XC-Package-Type: udeb
+XB-Installer-Menu-Item: 2650
+Description: Untangle system stats + warning

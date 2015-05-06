@@ -1,0 +1,6 @@
+kill-all-dhcp bin
+print-dhcp6c-info lib/netcfg
+print-dhcpv6-info lib/netcfg
+netcfg bin
+base-installer.d usr/lib
+finish-install.d usr/lib

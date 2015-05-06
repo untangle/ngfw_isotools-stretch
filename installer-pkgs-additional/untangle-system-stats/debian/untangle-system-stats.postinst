@@ -1,0 +1,114 @@
+#!/bin/sh -x
+
+. /usr/share/debconf/confmodule
+
+log() {
+  logger -t untangle-system-stats "$@"
+}
+
+db_get untangle-system-stats/system-stats-great
+GREAT=$RET
+db_get untangle-system-stats/system-stats-ok
+OK=$RET
+db_get untangle-system-stats/system-stats-insufficient
+INSUFFICIENT=$RET
+db_get untangle-system-stats/system-stats-insufficient-on-64-bit
+INSUFFICIENT_ON_64BIT=$RET
+db_get untangle-system-stats/disk-extra-warning
+DISK_EXTRA_WARNING=$RET
+
+MEMORY_MIN_MEGS=475
+MEMORY_MIN_MEGS_DISPLAY=512
+MEMORY_GOOD_MEGS=1000
+MEMORY_GREAT_MEGS=2000
+CPU_MIN_MHZ=750
+CPU_GOOD_MHZ=1600
+CPU_GREAT_MHZ=3000
+# DISK_MIN_GIGS=20
+# DISK_GOOD_GIGS=40
+# DISK_GREAT_GIGS=80
+# NICS_MIN_COUNT=1
+# NICS_GREAT_COUNT=3
+
+cpuCount=`egrep '^processor' /proc/cpuinfo | wc -l`
+cpuSpeed=`egrep '^cpu MHz' /proc/cpuinfo | head -n 1 | sed -e 's/.* \([0-9]\+\)\..*/\1/'`
+# nicCount=`wc -l /etc/network/devnames | sed -e 's/.*\([0-9]\+\).*/\1/'`
+memory=`egrep '^MemTotal' /proc/meminfo | sed -e 's/.* \([0-9]\+\) .*/\1/'`
+# diskSpace=1234
+
+case $cpuCount in # we'll divide by 10 later
+  1) multiplier=10 ;;
+  2) multiplier=15 ;;
+  4) multiplier=25 ;;
+  *) multiplier=30 ;;
+esac
+
+cpuLogicalSpeed=$(( $multiplier * $cpuSpeed / 10 ))
+
+memory=$(( $EXTRA_MEMORY + ( $memory / 1000 ) ))
+
+# if [ $nicCount -gt $NICS_GREAT_COUNT ] ; then
+#   nicsStatus=$GREAT
+# elif [ $nicCount -lt $NICS_MIN_COUNT ] ; then
+#   nicsStatus=$INSUFFICIENT
+# else
+#   nicsStatus=$OK
+# fi
+
+if [ $cpuLogicalSpeed -gt $CPU_GREAT_MHZ ] ; then
+  cpuStatus=$GREAT
+elif [ $cpuLogicalSpeed -lt $CPU_MIN_MHZ ] ; then
+  cpuStatus=$INSUFFICIENT
+else
+  cpuStatus=$OK
+fi
+
+if uname -a | grep -q amd64 ; then
+  if [ $memory -gt $MEMORY_GREAT_MEGS ] ; then
+    memoryStatus=$GREAT
+  else
+    memoryStatus=$INSUFFICIENT_ON_64BIT
+  fi
+else
+  if [ $memory -gt $MEMORY_GREAT_MEGS ] ; then
+    memoryStatus=$GREAT
+  elif [ $memory -lt $MEMORY_MIN_MEGS ] ; then
+    memoryStatus=$INSUFFICIENT
+  else
+    memoryStatus=$OK
+  fi
+fi
+
+# if [ $diskSpace -gt $DISK_GREAT_GIGS ] ; then
+#   diskStatus=$GREAT
+# elif [ $diskSpace -lt $DISK_MIN_GIGS ] ; then
+#   diskStatus=$INSUFFICIENT
+# else
+#   diskStatus=$OK
+# fi
+
+# db_subst untangle-system-stats/system-stats nics $nicCount
+# db_subst untangle-system-stats/system-stats cpu $cpuLogicalSpeed
+# db_subst untangle-system-stats/system-stats memory $memory
+# db_subst untangle-system-stats/system-stats disk $diskSpace
+# db_subst untangle-system-stats/system-stats nics_status $nicsStatus
+db_subst untangle-system-stats/system-stats cpu_status $cpuStatus
+db_subst untangle-system-stats/system-stats memory_status $memoryStatus
+# db_subst untangle-system-stats/system-stats disk_status $diskStatus
+
+db_input critical untangle-system-stats/system-stats
+db_go
+
+db_input critical untangle-system-stats/disk-warning
+db_go
+db_get untangle-system-stats/disk-warning
+
+while [ $RET = "false" ] ; do # keep asking it with an extra warning
+  db_reset untangle-system-stats/disk-warning
+  db_subst untangle-system-stats/disk-warning extra_warning $DISK_EXTRA_WARNING
+  db_input critical untangle-system-stats/disk-warning
+  db_go
+  db_get untangle-system-stats/disk-warning
+done
+
+exit 0

@@ -1,0 +1,7 @@
+pkgsel         wheezy
+cdebconf       wheezy
+$sleep 40
+rootskel-gtk   wheezy
+netcfg         wheezy
+base-installer wheezy
+grub-installer wheezy

@@ -1,0 +1,11 @@
+untangle-system-stats (0.2) unstable; urgency=low
+
+  * Bump up version.
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 05 Oct 2012 03:45:59 -0700
+
+untangle-system-stats (0.1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Sebastien Delafond <seb@untangle.com>  Tue, 14 Oct 2008 12:37:51 -0700

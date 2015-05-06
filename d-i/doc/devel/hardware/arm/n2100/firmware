@@ -1,0 +1,98 @@
+Thecus ships their firmware as a file ending with .bin that is encrypted
+with DES.  They use the "des" utility and use a string as the key.  Kurt
+Roeckx found out that you can convert this string to a proper OpenSSL
+key with DES_string_to_key.
+
+The key is:
+  n2100 (7A9816A4C275D557) for the Thecus N2100 and derivates
+  n4100 (2A8A312F46D5D64C) for the Thecus N4100 and derivates
+  n4100pro (76B3EC2FBA49707F) for the Thecus N4100+ and derivates
+
+You can decrypt a firmware image this way:
+
+    openssl enc -d -des -in n2100upgrade.2.1.01.bin -out firmware.tar.gz \
+        -K 7A9816A4C275D557 -iv 0 -nosalt -nopad
+
+You can encrypt it using:
+
+    openssl enc -e -des -in firmware.tar.gz -out n2100.bin \
+        -K 7A9816A4C275D557 -iv 0 -nosalt
+
+When you unpack this file, you get a directory called "upgrade" in which a
+number of files are put.  Most notably, you need two files:
+
+ - upgrade/up.sh
+
+   This is a shell script which is started by the upgrade CGI script,
+   /img/htdocs/adm/setupdfw.html
+
+ - upgrade/version
+
+   This contains the version of the firmware, e.g. 2.1.00.  I think it
+   needs to have 3 dot-separated numbers, and letters at the end of the
+   last number are stripped off.
+
+The upgrade process:
+
+/img/htdocs/adm/setupdfw.html will decrypt the .bin firmware image, unpack
+it into /upgrade and then run /upgrade/up.sh.  This shell script can then
+basically do whatever it wants; e.g. the official firmware image only
+upgrades RedBoot if your current firmware version is older than a specific
+version.  For Debian, we basically just need to flash the ramdisk and the
+kernel.
+
+While up.sh is running, /img/htdocs/adm/setupdfw.html will show a progress
+bar.  It will also scan the file /tmp/upgrade/message and look for the
+strings "fail" or "success".  Only once such a string is found will the
+upgrade process terminate.
+
+The up.sh script should at the beginning create the lock file
+/var/lock/upgrade.lock and remove it at the end.  Since the web upgrade
+says that the upgrade progress will finish with a beep, the up.sh should
+ideally run the following commands towards the end:
+
+    echo "Buzzer 0" > /proc/thecus_io
+    sleep 1
+    echo "Buzzer 1" > /proc/thecus_io
+
+
+Information and tools:
+
+The file /app/manifest.txt contains information about the machine, e.g.
+
+type	n2100
+producer	THECUS
+
+In general, /app contains the configuration data.  For example,
+/app/cfg/conf.db is a SQLite database of the configuration data ("sqlite
+/app/cfg/conf.db 'select * from conf'" will show all entries).
+
+There is a tool /sbin/fcp to write something to flash (e.g. "/sbin/fcp -v
+ramdisk.arm /dev/mtd1") but "cat" will work as well.
+
+
+Known manifest files:
+
+n2100 compatible machines:
+
+type	n2100
+producer	THECUS
+
+type	all6500
+producer	ALLNET
+
+type	Mbox
+producer	Evesham
+
+
+n4100 compatible machines:
+
+type	n4100
+producer	THECUS
+
+type	all6400
+producer	ALLNET
+
+type	PlatinumNAS v1.0
+producer	Micronet
+

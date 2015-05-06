@@ -1,0 +1,6 @@
+if [ "$DEBIAN_FRONTEND" = gtk ] && [ -z "$LIVE_INSTALLER_MODE" ]; then
+	trap : SIGUSR1
+	(trap '' SIGUSR1; exec Xorg -noreset -nolisten tcp) &
+	wait
+	export DISPLAY=:0
+fi

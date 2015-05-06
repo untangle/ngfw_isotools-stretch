@@ -1,0 +1,97 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: untangle-system-stats@packages.debian.org\n"
+"POT-Creation-Date: 2009-02-04 14:17-0800\n"
+"PO-Revision-Date: 2009-03-08 19:13-0700\n"
+"Last-Translator: Nito Kazunori <kazu.nito@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Pootle 1.1.0\n"
+
+#. Type: text
+#. Description
+#. Main menu item
+#. :sl1:
+#: ../untangle-system-stats.templates:1001
+msgid "Untangle system"
+msgstr "Untangleシステム"
+
+#. Type: note
+#. Description
+#. :sl1:
+#: ../untangle-system-stats.templates:2001
+msgid "Summary:."
+msgstr "サマリー："
+
+#. Type: note
+#. Description
+#. :sl1:
+#: ../untangle-system-stats.templates:2001
+msgid ""
+" Total memory:    ${memory}MB -> ${memory_status}\n"
+" Processor speed: ${cpu}MHz -> ${cpu_status}\n"
+" Network cards:   ${nics} -> ${nics_status}"
+msgstr ""
+"トータルメモリー：${memory}MB ->${memory_status}\n"
+"プロセッサースピード：${CPU}MHZ -> ${cpu_status}\n"
+"ネットワークカード：${nics} -> ${nics_status}"
+
+#. Type: boolean
+#. Description
+#. :sl1:
+#: ../untangle-system-stats.templates:3001
+msgid "Do you want to proceed and format your disk?"
+msgstr "次に、ディスクをフォーマットしますか？"
+
+#. Type: boolean
+#. Description
+#. :sl1:
+#: ../untangle-system-stats.templates:3001
+msgid ""
+" Untangle must format the disk to continue\n"
+" WARNING: ALL DATA ON YOUR DISK WILL BE LOST!\n"
+" ${extra_warning}"
+msgstr ""
+"続行するためにUntangleがディスクをフォーマットする必要があります。警告：ディスクにあるすべてのデータが消去されます。${extra_warnin"
+"g}"
+
+#. Type: string
+#. Default
+#. :sl1:
+#: ../untangle-system-stats.templates:5001
+msgid "insufficient"
+msgstr "不十分"
+
+#. Type: string
+#. Default
+#. :sl1:
+#: ../untangle-system-stats.templates:6001
+msgid "ok"
+msgstr "ok"
+
+#. Type: string
+#. Default
+#. :sl1:
+#: ../untangle-system-stats.templates:7001
+msgid "great"
+msgstr "素晴らしい"
+
+#. Type: string
+#. Default
+#. :sl1:
+#: ../untangle-system-stats.templates:8001
+msgid ""
+"If you do not want to format your disk, simply reboot your machine and take "
+"the CD out of the drive."
+msgstr "ディスクのフォーマットをしたくなければ、パソコンを再起動させ、CDをドライブから取り出してください。"
+
+#~ msgid "Warning"
+#~ msgstr "警告"

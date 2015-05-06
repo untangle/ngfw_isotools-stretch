@@ -1,0 +1,38 @@
+#!/bin/sh
+
+OUTDIR=$1
+ARCH=$2
+RESULTS=$3
+
+OUTFILE=$OUTDIR/$ARCH/HEADER.html
+
+grep -q WARNING $OUTFILE
+if [ $? -ne 0 ] ; then
+    echo >> $OUTFILE
+    echo "<p><strong>WARNING:</strong>" >>  $OUTFILE
+    echo "This build is not up to date; it is the most recent successful build.</p>" >> $OUTFILE
+    echo >> $OUTFILE
+    echo "<p>Later weekly builds failed with errors:</p>" >> $OUTFILE
+fi
+
+echo "<hr>" >> $OUTFILE
+echo "<ul>" >> $OUTFILE
+for RESULT in $RESULTS; do
+    TYPE=`echo $RESULT | awk -F / '{print $1}'`
+    ERROR=`echo $RESULT | awk -F / '{print $2}'`
+    DATE=`echo $RESULT | awk -F / '{print $3}'`
+    case $TYPE in
+        CDFAIL)
+            echo "<li>Full CD build failed with error $ERROR at $DATE" >> $OUTFILE ;;
+        DVDFAIL)
+            echo "<li>DVD build failed with error $ERROR at $DATE" >> $OUTFILE ;;
+        BDFAIL)
+            echo "<li>Blu-ray build failed with error $ERROR at $DATE" >> $OUTFILE ;;
+        KDECDFAIL)
+            echo "<li>KDE CD build failed with error $ERROR at $DATE" >> $OUTFILE ;;
+        LIGHTCDFAIL)
+            echo "<li>XFCE/lxde CD build failed with error $ERROR at $DATE" >> $OUTFILE ;;
+    esac
+done
+echo "</ul>" >> $OUTFILE
+

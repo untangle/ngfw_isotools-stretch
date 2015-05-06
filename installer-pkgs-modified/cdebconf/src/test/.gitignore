@@ -1,0 +1,9 @@
+configtest
+dbtest
+
+foo.log
+*.dat
+test.argh
+test.config.mine
+test.templates
+

@@ -1,0 +1,50 @@
+Template: debian-installer/untangle-system-stats/title
+Type: text
+#  Main menu item
+# :sl1:
+_Description: Untangle system
+
+Template: untangle-system-stats/system-stats
+Type: note
+# :sl1:
+_Description: Summary:.
+  Total memory:    ${memory_status}
+  Processor speed: ${cpu_status}
+
+Template: untangle-system-stats/disk-warning
+Type: boolean
+Default: false
+# :sl1:
+_Description: Do you want to proceed and format your disk?
+  Untangle must format the disk to continue
+  WARNING: ALL DATA ON YOUR DISK WILL BE LOST!
+  ${extra_warning}
+
+# below are strings used only for substitution, so they do not have
+# descriptions
+
+Template: untangle-system-stats/system-stats-insufficient
+Type: string
+# :sl1:
+_Default: insufficient
+
+Template: untangle-system-stats/system-stats-insufficient-on-64-bit
+Type: string
+# :sl1:
+_Default: insufficient on 64-bit
+
+Template: untangle-system-stats/system-stats-ok
+Type: string
+# :sl1:
+_Default: ok
+
+Template: untangle-system-stats/system-stats-great
+Type: string
+# :sl1:
+_Default: great
+
+Template: untangle-system-stats/disk-extra-warning
+Type: string
+# :sl1:
+_Default:  If you do not want to format your disk, simply reboot your machine and take the CD out of the drive.
+Description: Extra warning

@@ -1,0 +1,100 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: untangle-system-stats@packages.debian.org\n"
+"POT-Creation-Date: 2009-02-04 14:17-0800\n"
+"PO-Revision-Date: 2009-02-24 05:06-0800\n"
+"Last-Translator: Thierry D'AMBROSIO <thierry@dambrosio.fr>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Pootle 1.1.0\n"
+
+#. Type: text
+#. Description
+#. Main menu item
+#. :sl1:
+#: ../untangle-system-stats.templates:1001
+msgid "Untangle system"
+msgstr "Système Untangle"
+
+#. Type: note
+#. Description
+#. :sl1:
+#: ../untangle-system-stats.templates:2001
+msgid "Summary:."
+msgstr "Sommaire:."
+
+#. Type: note
+#. Description
+#. :sl1:
+#: ../untangle-system-stats.templates:2001
+msgid ""
+" Total memory:    ${memory}MB -> ${memory_status}\n"
+" Processor speed: ${cpu}MHz -> ${cpu_status}\n"
+" Network cards:   ${nics} -> ${nics_status}"
+msgstr ""
+"Mémoire totale:       ${memory}Mo -> ${memory_status}\n"
+"Vitesse du Processeur: ${cpu}MHz -> ${cpu_status}\n"
+"Cartes réseaux:      ${nics} -> ${nics_status}"
+
+#. Type: boolean
+#. Description
+#. :sl1:
+#: ../untangle-system-stats.templates:3001
+msgid "Do you want to proceed and format your disk?"
+msgstr "Voulez-vous procéder et formater votre disque?"
+
+#. Type: boolean
+#. Description
+#. :sl1:
+#: ../untangle-system-stats.templates:3001
+#, fuzzy
+msgid ""
+" Untangle must format the disk to continue\n"
+" WARNING: ALL DATA ON YOUR DISK WILL BE LOST!\n"
+" ${extra_warning}"
+msgstr ""
+"Untangle doit formater le disque pour poursuivre AVERTISSEMENT: TOUTES LES "
+"DONNÉES SUR VOTRE DISQUE SERONT PERDUES! ${extra_warning}"
+
+#. Type: string
+#. Default
+#. :sl1:
+#: ../untangle-system-stats.templates:5001
+msgid "insufficient"
+msgstr "insuffisant(e)"
+
+#. Type: string
+#. Default
+#. :sl1:
+#: ../untangle-system-stats.templates:6001
+msgid "ok"
+msgstr "ok"
+
+#. Type: string
+#. Default
+#. :sl1:
+#: ../untangle-system-stats.templates:7001
+msgid "great"
+msgstr "super"
+
+#. Type: string
+#. Default
+#. :sl1:
+#: ../untangle-system-stats.templates:8001
+msgid ""
+"If you do not want to format your disk, simply reboot your machine and take "
+"the CD out of the drive."
+msgstr ""
+"Si vous ne voulez pas formater votre disque dur, il suffit de redémarrer "
+"votre machine et de retirer le CD du lecteur."
+
+#~ msgid "Warning"
+#~ msgstr "Alerte"

@@ -1,0 +1,217 @@
+#!/bin/sh
+set -e
+
+if [ -z "$CODENAME" ]; then
+    echo "update_tasks: codename not specified" >&2
+    exit 1
+fi
+
+if [ "$MIRROR"x = ""x ] ; then
+    echo "update_tasks: mirror dir not specified" >&2
+    exit 1
+fi
+
+if [ "$BDIR"x = ""x ] ; then
+    echo "update_tasks: temp dir not specified" >&2
+    exit 1
+fi
+TDIR=$BDIR/update_tasks
+mkdir -p $TDIR
+
+# Sort primary and secondary tasks and add language tasks for both
+# Secondary tasks are indicated by a "-" suffix in the task.list file
+# When adding language tasks, 'desktop' is sorted before '*-desktop'
+expand_task_list () {
+    outbase=$1
+    tasklist=$2
+    langlist=$3
+
+    # Filter out comments, empty lines and secondary tasks
+    task_primary="$(grep -Ev "^(#.*)?(.*-)?[[:space:]]*$" $tasklist)"
+    # Select only secondary tasks
+    task_secondary="$(grep -Ev "^(#.*)?[[:space:]]*$" $tasklist | \
+        grep -E "(.*-)[[:space:]]*$" | sed "s/[[:space:]]\+-.*$//")"
+
+    echo "# Primary main tasks" >$outbase.primary
+    echo "$task_primary" >>$outbase.primary
+
+    echo >>$outbase.primary
+    echo "# Primary language tasks" >>$outbase.primary
+    for task in "" $(echo "$task_primary" | grep "^desktop" || true) \
+                $(echo "$task_primary" | grep -- "-desktop" || true); do
+        for language in $(cat $langlist); do
+            echo $language${task:+-$task}
+        done
+    done >>$outbase.primary
+
+    rm -f $outbase.secondary
+    if [ "$task_secondary" ]; then
+        echo "# Secondary main tasks" >$outbase.secondary
+        echo "$task_secondary" >>$outbase.secondary
+
+        echo >>$outbase.secondary
+        echo "# Secondary language tasks" >>$outbase.secondary
+        for task in $(echo "$task_secondary" | grep "^desktop" || true) \
+                    $(echo "$task_secondary" | grep -- "-desktop" || true); do
+            for language in $(cat $langlist); do
+                echo $language-$task
+            done
+        done >>$outbase.secondary
+    fi
+}
+
+update_full_list () {
+    file=$1
+    tasklist=$2
+    pkgfile=$3
+
+    (grep -Ev "^(#.*)?[[:space:]]*$" $tasklist ; echo DONE ; cat $pkgfile) | mawk '
+    /DONE/ {
+        in_packages = 1
+        next
+    }
+    /.*/ {
+        if (!in_packages) {
+            tasklist[$1] = num_tasks
+            num_tasks++
+        }
+    }
+    /^Package: / {
+        if (in_packages) {
+            pkgname = $2
+            next
+        }
+    }
+    /^Task: / {
+        if (in_packages) {
+            # Parse the Tasks: line, splitting into array "these"
+            gsub("Task: ", "", $0)
+            gsub(",", "", $0)
+            split($0, these)
+
+            # And see if we have any matches
+            for (task in these) {
+                for (taskname in tasklist) {
+                    if (these[task] == taskname) {
+                        printf("%d:%s\n", tasklist[taskname], pkgname)
+                        next
+                    }
+                }
+            }
+        }
+        next
+    }' | sort -n | cut -d: -f2 >> $file
+}
+
+update_essential_list () {
+    file=$1
+    tasklist=$2
+    tasksel=$3
+
+    (grep -Ev "^(#.*)?[[:space:]]*$" $tasklist ;
+		echo DONE ;
+		cat $tasksel/usr/share/tasksel/debian-tasks.desc) | mawk '
+
+    /DONE/ {
+        in_tasks = 1
+        next
+    }
+    /^ / {
+        if (in_key) {
+            printf("%d:%s\n", tasklist[cur_task], $1)
+            next
+        }
+    }
+    /.*/ {
+        if (!in_tasks) {
+            tasklist[$1] = num_tasks
+            num_tasks++
+        }
+        if (in_key) {
+            in_key = 0
+        }
+    }
+    /^Task: / {
+        if (in_tasks) {
+            cur_task = $2
+            next
+        }
+    }
+    /^Key: / {
+        if (in_tasks) {
+            for (taskname in tasklist) {
+                if (taskname == cur_task) {
+                    in_key = 1
+                }
+            }
+        }
+        next
+    }' | sort -s -n -k1 | cut -d: -f2 >> $file
+}
+
+# Look for the coreutils package (which should exist in all archs, and is
+# a non -all package) to determine a valid arch for the rest of this
+# script
+arch=$(which_deb $MIRROR $CODENAME coreutils binary | sed -e "s/\.deb//" -e "s/.*_//")
+# We need to gunzip a copy of the appropriate Packages.gz file(s)
+TMP_PKG=$TDIR/Packages
+zcat $MIRROR/dists/$CODENAME/main/binary-$arch/Packages.gz > $TMP_PKG
+if [ -n "$LOCAL" ] ; then
+    if [ -n "$LOCALDEBS" ] ; then
+        zcat $LOCALDEBS/dists/$CODENAME/local/binary-$arch/Packages.gz >> $TMP_PKG
+    else
+        zcat $MIRROR/dists/$CODENAME/local/binary-$arch/Packages.gz >> $TMP_PKG
+    fi
+fi
+
+# Now grab the appropriate tasksel package
+TASKSEL_DEB=$MIRROR/`mawk '
+    /^Package: tasksel-data$/ { found=1 }
+    /^Filename:/              { if (found==1) { print $2; exit } }' $TMP_PKG`
+
+# For testing purposes - set up FORCE_SID_TASKSEL to force us to use
+# sid's tasksel data even if we're using stable/testing.
+if [ "$FORCE_SID_TASKSEL"x = "1"x ] ; then
+    echo "update_tasks: forcing use of the sid tasksel-data tasks"
+    TASKSEL_DEB=$MIRROR/$(which_deb $MIRROR sid tasksel-data binary)
+fi
+
+dpkg -x $TASKSEL_DEB $TDIR/tasksel
+
+[ -e task.languages ] || exit 1
+grep -Ev "^(#.*)?[[:space:]]*$" task.languages > $TDIR/languages
+
+for tlist in task.list.*; do
+    variant=${tlist##*.}
+
+    expand_task_list task.gen.$variant $tlist $TDIR/languages
+
+    # Create (empty) output files
+    : >task-essential-$variant
+    : >task-full-$variant
+
+    update_essential_list \
+        task-essential-$variant \
+        task.gen.$variant.primary \
+        $TDIR/tasksel
+
+    update_full_list \
+        task-full-$variant \
+        task.gen.$variant.primary \
+        $TMP_PKG
+
+    # Now add packages for secondary tasks; start with Key packages again
+    if [ -e task.gen.$variant.secondary ]; then
+        update_essential_list \
+            task-full-$variant \
+            task.gen.$variant.secondary \
+            $TDIR/tasksel
+
+        update_full_list \
+            task-full-$variant \
+            task.gen.$variant.secondary \
+            $TMP_PKG
+    fi
+done
+
+rm -rf $TDIR

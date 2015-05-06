@@ -1,0 +1,695 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Debian GNU/Linux -- The Universal Operating System</title>
+  <meta name="Description" content="Debian GNU/Linux is a free distribution of the GNU/Linux operating system. It is maintained and updated through the work of many users who volunteer their time and effort.">
+  <meta name="Keywords" content="debian, GNU, linux, unix, open source, free, DFSG">
+  <meta name="Language" content="English">
+  <meta name="Author" content="J.A. Bezemer, debian-boot@lists.debian.org">
+  <link rev="made" href="mailto:debian-boot@lists.debian.org">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+  <!-- The HTML and TEXT file are NOT the actual source code. -->
+  <!-- For that, see http://svn.debian.org/wsvn/debian-cd -->
+#if 0
+        If you read THIS, you're viewing the actual source file ;-)
+#endif
+
+#undef i386
+#undef amd64
+#undef alpha
+#undef powerpc
+#undef ppc
+#undef sparc
+#undef ultrasparc
+#undef m68k
+#undef arm
+#undef binary
+#undef bin
+#undef source
+#undef src
+
+#if OUTPUTtext
+#define	  href  nothing
+#endif
+
+#include <README.diskdefines>
+
+
+#if OUTPUThtml
+<div align=right>
+(<a href="README.txt">Text version</a>)
+</div>
+<table border="0" cellpadding="3" cellspacing="0" align="center" summary="">
+<tr>
+<td>
+<img src="pics/logo-50.jpg" border="0" hspace="0" vspace="0" alt="" width="50" height="61">
+<img src="pics/debian.jpg" border="0" hspace="0" vspace="0" alt="Debian" width="179" height="61">
+</td>
+</tr>
+</table>
+#endif 
+#if OUTPUTtext
+<div align=right>
+(HTML version in README.html)
+</div>
+#endif
+
+
+<table bgcolor="#DF0451" border="0" cellpadding="0" cellspacing="0"
+  width="100%" summary="">
+<tr>
+<td valign="top">
+<img src="pics/red-upperleft.png" align="left" border="0" hspace="0"
+  vspace="0" alt="" width="15" height="16">
+</td>
+<td rowspan="2" align="center">
+
+ <table align="center" border="0" cellpadding="2" cellspacing="0">
+ <tr><td bgcolor="#000084">
+ <div align="center"><font color="#FFFFFF" face="helvetica,arial"><B>&nbsp;&nbsp;
+ DISKNAME
+ &nbsp;&nbsp;</B></font></div>
+ </td></tr>
+ </table>
+
+</td>
+<td valign="top">
+<img src="pics/red-upperright.png" align="right" border="0" hspace="0"
+  vspace="0" alt="" width="16" height="16">
+</td>
+</tr>
+<tr>
+<td valign="bottom">
+<img src="pics/red-lowerleft.png" align="left" border="0" hspace="0"
+  vspace="0" alt="" width="16" height="16">
+</td>
+<td valign="bottom">
+<img src="pics/red-lowerright.png" align="right" border="0" hspace="0"
+vspace="0" alt="" width="15" height="16">
+</td>
+</tr>
+</table>
+
+<table border="0" cellpadding="2" cellspacing="0" width="100%" summary="">
+<tr>
+        <td></td>
+</tr>
+</table>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%" summary="">
+<tr>
+        <td colspan="3" valign="top" width="20%" bgcolor="#BBDDFF">
+          <img src="pics/blue-upperleft.png" align="left" border="0"
+            hspace="0" vspace="0" alt="" width="16" height="16">
+          <img src="pics/blue-upperright.png" align="right" border="0"
+            hspace="0" vspace="0" alt="" width="16" height="16">
+        </td>
+</tr>
+<tr>
+        <td bgcolor="#BBDDFF">&nbsp;&nbsp;</td>
+
+        <td valign="TOP" bgcolor="#BBDDFF">
+
+<font face="Arial,Helvetica">
+
+#if OUTPUThtml
+<P><B><A href="http://www.debian.org/">Debian home&nbsp;page</A></B></P>
+#endif
+
+&nbsp;<br>
+<P>
+
+#if OUTPUTtext
+&nbsp;<br>
+CONTENTS:
+<br>
+&nbsp;<br>
+<UL>
+#endif
+
+#if OUTPUTtext
+<LI>
+#endif
+
+<A href="#intro">Intro</A>
+<P>
+
+#if OUTPUTtext
+</LI><LI>
+#endif
+
+<A href="#thisdisc">About This Disc</A>
+<P>
+
+#if OUTPUTtext
+</LI><LI>
+#endif
+
+<A href="#install">Installing</A>
+<P>
+
+#if OUTPUTtext
+</LI><LI>
+#endif
+
+#ifndef UNOFFEXTRAS
+<A href="#lastmin">Last-Minute Notes</A>
+<P>
+
+#if OUTPUTtext
+</LI><LI>
+#endif
+#endif
+
+#if TYPEbinary
+ <A href="#apt">Using CDs/DVDs with apt</A>
+ <P>
+
+#if OUTPUTtext
+  </LI><LI>
+#endif
+#endif
+
+#ifndef UNOFFEXTRAS
+<A href="#cdmanuf">CD/DVD Manufacturers</A>
+<P>
+
+#if OUTPUTtext
+</LI><LI>
+#endif
+#endif
+
+<A href="#other">More Information</A>
+
+<P>
+
+#if OUTPUThtml
+&nbsp;<P>
+<A href=".">Browse This Disc</A></P>
+<P>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt>
+</P>
+#endif
+
+
+</font>
+
+#if OUTPUTtext
+</LI>
+</UL>
+#endif
+
+
+        </td>
+        <td bgcolor="#BBDDFF">&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+
+  <td valign="TOP" width="80%">
+
+<div align="center">
+<big><big><B><I>
+Welcome to the exciting world of
+</I></B></big></big>
+<br>
+<big><big><big><B><I>
+Debian GNU/Linux!
+</I></B></big></big></big>
+</div>
+
+<P><H2><A name="intro">
+Intro
+#if OUTPUTtext
+<br>
+=====
+#endif
+</H2>
+</a>
+<p>
+This is one disc in a set containing the
+<a href="http://www.debian.org/">Debian GNU/Linux</a>
+distribution. Debian is a
+very extensive collection of software. But it is more. It is a complete
+Operating System (OS) for your computer. And it is
+<A href="http://www.debian.org/intro/free">free</A>
+(as in &quot;freedom&quot;).
+<P>
+An operating system is the set of basic programs
+and utilities that make your computer run. At the core of an operating
+system is the kernel. The kernel is the most fundamental program on the
+computer, which does all the basic housekeeping and lets you start other
+programs.
+Debian is kernel independent. It currently uses the
+<A href="http://www.linux.org/">Linux</A> kernel but work is
+in progress to provide Debian for other kernels, using
+<A href="http://www.gnu.org/software/hurd/hurd.html">the Hurd</A>.
+Most of the basic operating system tools
+come from the <a href="http://www.gnu.org/">GNU project</A>; hence the name
+GNU/Linux.
+<P>
+
+Debian is available for various kinds of computers
+(&quot;architectures&quot;), like
+&quot;IBM-compatible&quot; PCs (<i>i386</i>),
+Compaq's <i>Alpha</i>,
+Sun's <i>Sparc</i>,
+Motorola/IBM's <i>PowerPC</i>, and <i>(Strong)ARM</i> processors.
+Check the <A href="http://www.debian.org/ports">ports</A> page
+#if OUTPUTtext
+(http://www.debian.org/ports)
+#endif
+for more information.
+<P>
+
+#if OUTPUTtext
+Read more at <P>
+&nbsp; http://www.debian.org/intro/about
+#endif
+#if OUTPUThtml
+<A href="http://www.debian.org/intro/about">Read more...</A>
+#endif
+
+#if OUTPUTtext
+<P>&nbsp;<P><H2><A name="thisdisc">
+#endif
+#if OUTPUThtml
+<P><HR><P><H2><A name="thisdisc">
+#endif
+About This Disc
+#if OUTPUTtext
+<br>
+=============
+#endif
+</H2>
+</a>
+<p>
+This disc is labeled
+<P>
+<tt>&nbsp;
+  DISKNAME
+</tt>
+<P>
+#ifndef UNOFFEXTRAS
+#if COMPLETE
+which means that this disc is number DISKNUM of a set of TOTALNUM discs.
+#else
+This image does not contain all packages needed to install a standard Debian
+system. During the installation you will be prompted for the location of a
+network mirror from where additional packages will be retrieved.
+#endif
+#if TYPEbinary
+The packages on this disc contain programs ("binaries") for 'ARCH' computers.
+#if ARCHia64 && !ARCHamd64
+<P><strong>Note:</strong> this image only supports systems based on
+Intel Itanium processors; for the more common Intel EM64T processors,
+please see the Debian amd64 architecture.
+#endif
+<P>
+#if COMPLETE
+The packages on the Binary discs are ordered by popularity. The Binary-1 disc
+contains the most popular programs and the installation tools; it is possible
+to install and run Debian with only the Binary-1 disc.
+#if TOTALNUM > 1
+It is unlikely that you will need all of the TOTALNUM discs in the set. The
+higher the number in the set, the less likely it is that you will use any of
+the packages on that disc; higher-number images contain mostly special-interest
+programs.
+#endif
+<P>
+#endif
+#if OMIT_RELEASE_NOTES
+The Release Notes for "etch" are available on the <A
+href="http://www.debian.org/releases/etch/releasenotes">Debian web
+site</A>.
+#else
+#if DISKNUM == 1
+The Release Notes for Debian GNU/Linux "etch" are included on this disc
+in <A href=%%""doc/release-notes/%%"">/doc/release-notes/</a>, in
+several languages. Additional translations and updated versions for
+the Release Notes may be available from the <A
+href="http://www.debian.org/releases/etch/releasenotes">Debian web
+site</A>.
+#else
+See the first disc in this set for the "etch" Release Notes.
+#endif
+#endif
+#endif
+#if TYPEsource
+This set includes the source code of programs in the Debian OS.
+#endif
+#else
+#include <unoffextrascd.html.in>
+#endif
+
+
+#if OUTPUTtext
+<P>&nbsp;<P><H2><A name="install">
+#endif
+#if OUTPUThtml
+<P><HR><P><H2><A name="install">
+#endif
+Installing
+#if OUTPUTtext
+<br>
+==========
+#endif
+</H2>
+</a>
+<p>
+#if TYPEbinary
+
+ Because Debian is a complete Operating System, the installation procedure
+ may seem a bit unusual. You can install Debian GNU/Linux either
+ <i>alongside</i> your current OS, or as the <i>only</i> OS on your computer.
+#if OMIT_MANUAL
+ <P>
+ An <b>Installation Guide</b> for this disc is available from
+ <A href="http://www.debian.org/releases/etch/installmanual">the Debian web site</a>.
+#else
+ <P>
+ An <b>Installation Guide</b> is included on this disc at
+ <P>
+ <tt>&nbsp;
+ <A href="doc/manual/en/index.html">doc/manual/en/index.html</a> &nbsp;&nbsp;&nbsp; (English version)</tt>
+ <P>
+ Several translations of the Installation Guide are included on this disc in
+ the <tt><A href="doc">doc/</a></tt> directory, along with various other documents.
+ <br>
+ Note: additional translations, other formats (like PDF and TXT) and updated 
+ versions for the Installation Guide are available from
+ <A href="http://www.debian.org/releases/etch/installmanual">the Debian web site</a>.
+#endif
+ <P>
+
+#if ARCHi386 || ARCHamd64 || ARCHia64 || ARCHalpha || ARCHpowerpc || ARCHsparc
+  <P>
+  For the impatient ones:
+#endif
+
+#if ARCHi386 || ARCHamd64 || ARCHalpha || ARCHsparc
+  you can start the installation program easily by booting off this disc.
+  Note that not all (esp. older) systems support this. 
+  <P>
+#endif
+
+#if ARCHi386 || ARCHamd64 || ARCHpowerpc
+   You can examine the
+  <P>
+  <tt>&nbsp;
+  <a href="install/">/install</a>
+  </tt>
+  <P>
+  directory; you might be able to start the installation system directly
+  from there. 
+#endif
+
+#else
+ The installation tools of the Debian Operating System are located on the
+ Binary-1 disc.
+ See the README on that disc for more info.
+#endif
+
+#ifndef UNOFFEXTRAS
+#if OUTPUTtext
+<P>&nbsp;<P><H2><A name="lastmin">
+#endif
+#if OUTPUThtml
+<P><HR><P><H2><A name="lastmin">
+#endif
+Last-Minute Notes
+#if OUTPUTtext
+<br>
+=================
+#endif
+</H2>
+</a>
+<p>
+<UL>
+
+#if OFFICIAL_VAL == 0
+<LI>
+You should keep in mind that this is an unofficial disc of the Debian
+system. This means that all sorts of bugs may be present anywhere in
+the system. Please report any bugs you find to the person that gave
+you this disc, not Debian.
+#endif
+#if OFFICIAL_VAL == 1
+<LI>You should keep in mind that this is a beta disc of the current
+development version of the Debian system. This means that all sorts of
+bugs may be present anywhere in the system. Please report any bugs you
+find in the Debian Bug Tracking System; details at <A
+HREF="http://bugs.debian.org/">bugs.debian.org</A>.
+<LI>If you're reporting bugs against this disc or the installation
+system, please also mention the version of this disc; this can be
+found in the file <a href="./.disk/info">/.disk/info</a>.
+#endif
+#if OFFICIAL_VAL == 2
+<LI>This is an official release of the Debian system. Please report any
+bugs you find in the Debian Bug Tracking System; details at <A
+HREF="http://bugs.debian.org/">bugs.debian.org</A>.
+<LI>If you're reporting bugs against this disc or the installation
+system, please also mention the version of this disc; this can be
+found in the file <a href="./.disk/info">/.disk/info</a>.
+#endif
+
+<br>&nbsp;
+</LI>
+
+</UL>
+#endif
+
+#if TYPEbinary
+#if OUTPUTtext
+  <P>&nbsp;<P><H2><A name="apt">
+#endif
+#if OUTPUThtml
+  <P><HR><P><H2><A name="apt">
+#endif
+ Using Apt
+#if OUTPUTtext
+  <br>
+  =============
+#endif
+ </H2>
+ </a>
+ <p>
+ After installing or upgrading, Debian's packaging system can use CDs, DVDs,
+ local collections, or networked servers (FTP, HTTP) to automatically
+ install software from (<tt>.deb</tt> <i>packages</i>). This is done
+ preferably with the 'apt' and 'aptitude' programs. 
+
+ <P>
+
+ You can install packages from the commandline using
+ <tt>aptitude</tt>. For example, if you want to install the packages
+ 'commprog' and 'maxgame', you can give the command
+ <P>
+ <tt>&nbsp;
+   aptitude install commprog maxgame
+ </tt>
+ <P>
+ Note that you don't have to enter the complete path, or the
+ '<tt>.deb</tt>' extension. 'Apt' will figure this out itself. 
+ <P>
+ Or enter just <tt>aptitude</tt> to interactively select available Debian
+ packages using a full screen user interface.
+ 
+#endif
+
+
+#ifndef UNOFFEXTRAS
+#if OUTPUTtext
+<P>&nbsp;<P><H2><A name="cdmanuf">
+#endif
+#if OUTPUThtml
+<P><HR><P><H2><A name="cdmanuf">
+#endif
+CD/DVD Manufacturers
+#if OUTPUTtext
+<br>
+================
+#endif
+</H2>
+</a>
+<p>
+You are completely free to manufacture and re-distribute CDs/DVDs of the
+Debian GNU/Linux Operating System, like this one. There is no charge from
+us (but of course donations are always welcome). 
+
+<P>
+
+For all needed information and contact addresses, please refer to
+<P>
+<tt>&nbsp;
+  <a href="http://www.debian.org/CD/">http://www.debian.org/CD/</a>
+</tt>
+#endif
+
+#if OUTPUTtext
+<P>&nbsp;<P><H2><A name="other">
+#endif
+#if OUTPUThtml
+<P><HR><P><H2><A name="other">
+#endif
+More Information
+#if OUTPUTtext
+<br>
+================
+#endif
+</H2>
+</a>
+<p>
+#if DISKNUM1 && TYPEbinary
+
+There is much more information present on this disc. Besides the already
+mentioned installation and upgrading procedures, this is the most
+interesting:  <P>
+
+<UL>
+<LI>
+
+#if OUTPUTtext
+/doc/FAQ
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#endif
+<A href="doc/FAQ/">Debian FAQ</a>
+
+</LI>
+<LI>
+
+#if OUTPUTtext
+/doc/constitution.txt
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#endif
+<A href="doc/constitution.txt">The Debian Constitution</a>
+
+</LI>
+<LI>
+
+#if OUTPUTtext
+/doc/debian-manifesto
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#endif
+<A href="doc/debian-manifesto">The Debian Manifesto</a>
+
+</LI>
+<LI>
+
+#if OUTPUTtext
+/doc/social-contract.txt
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#endif
+<A href="doc/social-contract.txt">Debian's Social Contract</a>
+
+</LI>
+<LI>
+
+#if OUTPUTtext
+/doc/bug-reporting.txt
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#endif
+<A href="doc/bug-reporting.txt">Bug reporting instructions</a>
+
+</LI>
+</UL>
+
+#else
+
+The Binary-1 disc contains much more information about various aspects
+of the Debian Operating System and the Debian organization.
+ See the README on that disc for more info.
+
+#endif
+
+<P>
+Also on the Internet are many resources. To name a few:
+<P>
+
+<UL>
+<LI>
+
+#if OUTPUTtext
+http://www.debian.org
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#endif
+<A href="http://www.debian.org/">The Debian homepage</a>
+
+</LI>
+<LI>
+
+#if OUTPUTtext
+http://www.debian.org/doc
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#endif
+<A href="http://www.debian.org/doc/">Debian Documentation</a>
+
+</LI>
+<LI>
+
+#if OUTPUTtext
+http://www.debian.org/support
+ &nbsp;
+#endif
+<A href="http://www.debian.org/support">Debian User Support</a>
+
+</LI>
+<LI>
+
+#if OUTPUTtext
+http://www.tldp.org
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#endif
+<A href="http://www.tldp.org/">The Linux Documentation Project</a>
+
+</LI>
+<LI>
+
+#if OUTPUTtext
+http://www.linux.org
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#endif
+<A href="http://www.linux.org/">General Linux homepage</a>
+
+</LI>
+</UL>
+
+<P>
+
+<DIV align="center">
+
+#if OUTPUTtext
+&nbsp;<br>
+&nbsp;<br>
+#endif
+#if OUTPUThtml
+<HR>
+#endif
+
+<SMALL>See the Debian
+<A href="http://www.debian.org/contact">contact page</A>
+
+#if OUTPUTtext
+(http://www.debian.org/contact)
+#endif
+
+for information on contacting us.
+	</SMALL><P>
+</DIV>
+
+  </td>
+  </tr>
+  <tr>
+        <td colspan="3" valign="bottom" width="20%" bgcolor="#BBDDFF">
+          <img src="pics/blue-lowerleft.png" align="left" border="0"
+            hspace="0" vspace="0" alt="" width="17" height="16">
+          <img src="pics/blue-lowerright.png" align="right" border="0"
+            hspace="0" vspace="0" alt="" width="16" height="16">
+        </td>
+  </tr>
+  </table>
+
+</body>
+</html>

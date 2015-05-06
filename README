@@ -1,0 +1,48 @@
+d-i is the debian installer; it is used mostly untouched, so the
+Untangle changes are applied via 'make patch' (using d-i.patch), that
+way moving to a new installer shouldn't be too hard.
+
+d-i *packages sources* take up a lot of space, so I removed them from
+the d-i/ directory altogether; packages we modified are built from
+source from installer-pkgs-modified/, while installer-pkgs-original/
+holds the binary versions of those packages we use untouched.
+
+Diffs for those modified packages live in d-i_pkgs.patch, but as there
+are binary changes in there (namely an additional GTK theme, manual
+patching can possibly be required at some point).
+
+simple-cdd profiles are stored in profiles. We use the current
+simple-cdd from Debian, so I did not put it in SVN; instead it needs
+to be installed on the build machine.
+
+debian-cd is very slightly modified (I haven't made those a patch yet,
+but I plan to):
+
+  - replace debian's isolinux.cfg and HTML files dynamically in
+    debian-cd/tools/boot/sid/boot-x86
+  - echo >| debian-cd/data/wheezy/exclude-udebs-{i386,amd64}
+
+Note: no matter what distribution you build an ISO from, you need to
+link a wheezy alias for it on mephisto. You also need to link updates
+to .:
+
+    ~ftp/lenny/dists # ll                             [seb @ mephisto]
+  [...]
+  lrwxrwxrwx 1 root root   17 2009-02-07 08:21 lenny -> nightly-release61/
+  drwxr-xr-x 7 root root 4.0K 2009-02-07 09:06 nightly-release61/
+  lrwxrwxrwx 1 root root   17 2009-02-07 08:21 sid -> nightly-release61/
+  [...]
+  ~ftp/lenny/dists # ll nightly-release61             [seb @ mephisto]
+  [...]
+  lrwxrwxrwx 1 root root    1 2009-02-07 09:06 updates -> ./
+  [...]
+
+This is now taken care of, directly in the Makefile, by the dynamic
+duo of mephisto-proxy.sh and create-di-links.sh.
+
+The list of packages needed to be able to build is maintained in the
+puppet module "build-slave" (internal/puppet).
+
+--Seb  Sat, 17 May 2014 19:30:16 +0200
+
+
