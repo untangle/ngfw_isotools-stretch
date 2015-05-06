@@ -4,7 +4,6 @@ untangle-gateway
 grub-legacy
 
 popularity-contest
-localization-config
 #console-tools
 
 usbutils
