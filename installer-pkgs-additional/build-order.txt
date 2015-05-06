@@ -1,2 +1,2 @@
-untangle-system-stats	lenny,squeeze,wheezy
+untangle-system-stats	jessie
 
