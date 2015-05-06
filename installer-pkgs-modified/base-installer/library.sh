@@ -23,7 +23,7 @@ case $KERNEL_NAME in
 	hurd)		KERNEL_NAME=gnumach ; KERNEL_MAJOR="$(uname -v | cut -d ' ' -f 2 | cut -d . -f 1)" ;;
 esac
 KERNEL_VERSION="$(uname -r | cut -d - -f 1)"
-KERNEL_ABI="$(uname -r | cut -d - -f 1,2)"
+KERNEL_ABI="$(uname -r | cut -d - -f 1,2)-untangle"
 KERNEL_FLAVOUR=$(uname -r | cut -d - -f 3-)
 MACHINE="$(uname -m)"
 NUMCPUS=$(cat /var/numcpus 2>/dev/null) || true

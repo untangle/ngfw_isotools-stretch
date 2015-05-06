@@ -2,6 +2,7 @@ dir = usr/share/themes
 
 files = \
 	Clearlooks/gtk-2.0/gtkrc \
+	ClearlooksGreen/gtk-2.0/gtkrc \
 	dark/gtk-2.0/gtkrc
 
 #  I should put Makefiles in all intermediate directories, let's get lazy

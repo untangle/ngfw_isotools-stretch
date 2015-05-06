@@ -3,6 +3,7 @@ dir = usr/share/graphics
 files = \
 	logo_debian.png \
 	logo_debian_dark.png \
+	logo_untangle.png \
 	note_icon.png \
 	warning_icon.png
 
