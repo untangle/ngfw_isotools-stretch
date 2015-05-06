@@ -20,10 +20,10 @@ diff -u -r /tmp/rootskel-gtk/src/etc/gtk-2.0/gtkrc /tmp/rootskel-gtk/src/etc/gtk
 diff -u -r /tmp/rootskel-gtk/src/usr/share/graphics/Makefile /tmp/rootskel-gtk/src/usr/share/graphics/Makefile
 --- /tmp/rootskel-gtk/src/usr/share/graphics/Makefile	2008-12-11 09:40:09.000000000 -0800
 +++ /tmp/rootskel-gtk/src/usr/share/graphics/Makefile	2008-12-11 09:40:16.000000000 -0800
-@@ -2,6 +2,7 @@
- 
+@@ -3,6 +3,7 @@
  files = \
  	logo_debian.png \
+ 	logo_debian_dark.png \
 +	logo_untangle.png \
  	note_icon.png \
  	warning_icon.png
