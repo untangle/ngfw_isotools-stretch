@@ -123,20 +123,3 @@ index 027eb76..bf9d462 100755
 +touch /target/etc/default/google-chrome
 +
  load_install_cd
-diff --git a/isotools-wheezy/installer-pkgs-modified/grub-installer/grub-installer b/isotools-wheezy/installer-pkgs-modified/grub-installer/grub-installer
-index b3183b1..f47aa0c 100755
---- /tmp/grub-installer/grub-installer
-+++ /tmp/grub-installer/grub-installer
-@@ -320,9 +320,9 @@ case "$frtype:$bootfstype:$bootfslabel:$grub_package" in
- 	fi
- 	;;
-     *:ext4:*:grub)
--	# We boot from ext4, requires grub2
--	grub_package="grub-pc"
--	;;
-+	# We boot from ext4, but we built grub-legacy with ext4
-+	# patches so we're OK
-+	: ;;
-     *:*:*:grub)
- 	db_get grub-installer/grub2_instead_of_grub_legacy
- 	if [ "$RET" = true ]; then

@@ -20,10 +20,10 @@ but I plan to):
 
   - replace debian's isolinux.cfg and HTML files dynamically in
     debian-cd/tools/boot/sid/boot-x86
-  - echo >| debian-cd/data/wheezy/exclude-udebs-{i386,amd64}
+  - echo >| debian-cd/data/jessie/exclude-udebs-{i386,amd64}
 
 Note: no matter what distribution you build an ISO from, you need to
-link a wheezy alias for it on mephisto. You also need to link updates
+link a jessie alias for it on mephisto. You also need to link updates
 to .:
 
     ~ftp/lenny/dists # ll                             [seb @ mephisto]

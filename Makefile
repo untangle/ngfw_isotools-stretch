@@ -2,7 +2,7 @@ ISOTOOLS_DIR := $(shell dirname $(MAKEFILE_LIST))
 
 ## overridables
 # repository
-REPOSITORY ?= wheezy
+REPOSITORY ?= jessie
 # distribution to draw packages from
 DISTRIBUTION ?= testing
 # upstream d-i

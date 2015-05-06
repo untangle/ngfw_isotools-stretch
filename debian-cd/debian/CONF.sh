@@ -58,8 +58,8 @@ export BASEDIR=`pwd`
 # Name of the distribution for the image filename (Defaults to 'debian')
 # export CDNAME=debian
 
-# Building wheezy cd set ...
-export CODENAME=wheezy
+# Building jessie cd set ...
+export CODENAME=jessie
 
 # By default use Debian installer packages from $CODENAME
 if [ -z "$DI_CODENAME" ]; then

@@ -2,7 +2,7 @@ OVA_DIR := $(shell dirname $(MAKEFILE_LIST))
 
 ## overridables
 # repository
-REPOSITORY ?= wheezy
+REPOSITORY ?= jessie
 # distribution to draw packages from
 DISTRIBUTION ?= nightly
 # architecture
@@ -14,7 +14,7 @@ HOST := $(shell hostname -s)
 NETBOOT_HOST := netboot-server
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 VERSION := $(shell cat $(OVA_DIR)/../resources/VERSION)
-VMDK_REFERENCE_NAME := wheezy.vmdk
+VMDK_REFERENCE_NAME := jessie.vmdk
 VMDK_REFERENCE_URL := $(NETBOOT_HOST)/$(VMDK_REFERENCE_NAME)
 VMDK_NAME := untangle.vmdk
 QCOW2_NAME := untangle.qcow2
@@ -23,14 +23,14 @@ OVA_NAME := Untangle.ova
 FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST).ova
 
 ## targets
-.PHONY: all clean download-wheezy-vmdk vmdk ova push
+.PHONY: all clean download-jessie-vmdk vmdk ova push
 
-all: download-wheezy-vmdk vmdk ova push
+all: download-jessie-vmdk vmdk ova push
 
 clean:
 	rm -fr $(VMDK_REFERENCE_NAME) $(QCOW2_NAME) $(VMDK_NAME) *.ova
 
-download-wheezy-vmdk: $(VMDK_REFERENCE_NAME)
+download-jessie-vmdk: $(VMDK_REFERENCE_NAME)
 $(VMDK_REFERENCE_NAME):
 	curl -s -o $@ $(VMDK_REFERENCE_URL)
 

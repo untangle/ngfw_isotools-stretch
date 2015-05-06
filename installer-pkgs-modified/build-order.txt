@@ -1,7 +1,7 @@
-pkgsel         wheezy
-cdebconf       wheezy
+pkgsel         jessie
+cdebconf       jessie
 $sleep 40
-rootskel-gtk   wheezy
-netcfg         wheezy
-base-installer wheezy
-grub-installer wheezy
+rootskel-gtk   jessie
+netcfg         jessie
+base-installer jessie
+
