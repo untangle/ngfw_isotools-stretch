@@ -20,7 +20,7 @@ e2fslibs
 e2fsprogs
 findutils
 findutils
-gcc-4.7-base
+gcc-4.8-base
 grep
 grub-legacy
 gzip
