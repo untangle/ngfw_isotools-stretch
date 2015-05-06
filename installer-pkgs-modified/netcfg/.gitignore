@@ -1,8 +1,0 @@
-netcfg
-netcfg-dhcp
-netcfg-static
-ethtool-lite
-build-stamp
-a.out
-*.o
-test/run

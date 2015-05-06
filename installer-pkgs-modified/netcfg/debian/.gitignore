@@ -1,8 +1,0 @@
-*.debhelper*
-*.substvars
-files
-netcfg
-netcfg-dhcp
-netcfg-st
-netcfg-static
-

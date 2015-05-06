@@ -1,7 +1,0 @@
-*.debhelper*
-*.substvars
-base-installer
-bootstrap-base
-files
-templates.gen
-

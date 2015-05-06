@@ -1,9 +1,0 @@
-dcf-common.c
-dcf-skelimpl.c
-dcf-skels.c
-dcf-stubs.c
-dcf-text
-dcf.h
-*.opic
-*.so
-
