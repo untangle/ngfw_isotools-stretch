@@ -48,6 +48,9 @@ case "$language" in
     ko)
 	FONT_NAME="UnDotum"
 	;;
+    pa)
+	FONT_NAME="Lohit Punjabi"
+	;;
     ta)
 	FONT_NAME="TSCu_Paranar"
 	FONT_SIZE=$(($FONT_SIZE + 2))

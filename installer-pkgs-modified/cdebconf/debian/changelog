@@ -1,3 +1,126 @@
+cdebconf (0.192) unstable; urgency=low
+
+  * Drop cdebconf-slang-udeb from debian/control instead of using the
+    "Architecture: disabled" hack (not supported by dak)
+
+  [ Updated translations ]
+  * Danish (da.po) by Joe Hansen
+
+ -- Christian Perrier <bubulle@debian.org>  Tue, 09 Sep 2014 08:39:44 +0200
+
+cdebconf (0.191) unstable; urgency=low
+
+  [ Updated translations ]
+  * Bosnian (bs.po) by Amila Valjevčić
+
+ -- Christian Perrier <bubulle@debian.org>  Wed, 14 May 2014 06:43:40 +0200
+
+cdebconf (0.190) unstable; urgency=medium
+
+  * Resize banner when window width and banner width don't match
+    (Closes: #745359).
+
+ -- Cyril Brulebois <kibi@debian.org>  Mon, 28 Apr 2014 13:10:14 +0200
+
+cdebconf (0.189) unstable; urgency=medium
+
+  [ Regis Boudin ]
+  * Only try to convert the debconf frontend to the cdebconf equivalent if it
+    is defined.
+
+  [ Updated translations ]
+  * Simplified Chinese (zh_CN.po) by YunQiang Su
+
+ -- Christian Perrier <bubulle@debian.org>  Fri, 21 Mar 2014 06:56:57 +0100
+
+cdebconf (0.188) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * Re-introduce -lpthread for being able to load gtk dynamically on hurd-any.
+
+  [ Cyril Brulebois ]
+  * Add support for loading an alternate banner when the GTK theme name
+    is "dark" (Closes: #740358). Fall back to the regular one if it's
+    not available (See: #696969).
+  * Adjust clean to remove all Makefile files generated from Makefile.in
+    (3 out of 7 weren't cleaned yet).
+
+ -- Cyril Brulebois <kibi@debian.org>  Fri, 28 Feb 2014 21:49:31 +0300
+
+cdebconf (0.187) unstable; urgency=medium
+
+  * Convert library packages to multiarch.
+
+ -- Colin Watson <cjwatson@debian.org>  Fri, 10 Jan 2014 15:46:49 +0000
+
+cdebconf (0.186) unstable; urgency=low
+
+  [ Updated translations ]
+  * Bosnian (bs.po) by Amila Valjevčić
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 15 Dec 2013 14:13:01 +0100
+
+cdebconf (0.185) unstable; urgency=low
+
+  * Drop useless shlibs.local file. Thanks to Sven Joachim
+    for pointing this. Closes: #720972
+ 
+  [ Updated translations ]
+  * Tajik (tg.po) by Victor Ibragimov
+ 
+ -- Christian Perrier <bubulle@debian.org>  Fri, 30 Aug 2013 07:12:16 +0200
+
+cdebconf (0.184) unstable; urgency=low
+
+  [ Updated translations ]
+  * Tajik (tg.po) by Victor Ibragimov
+
+ -- Christian Perrier <bubulle@debian.org>  Thu, 15 Aug 2013 22:25:51 +0200
+
+cdebconf (0.183) unstable; urgency=low
+
+  [ Cyril Brulebois ]
+  * Specify three arguments for all AC_DEFINE{,_UNQUOTED} calls, since
+    autoheader doesn't like having only 1 or 2 arguments there. Use
+    “[1]” as the second argument when there was only one, since that's
+    the default when it's not specified.
+  * Run autoreconf as build time:
+    - Add dh-autoreconf as a build-dep.
+    - Call dh_autoreconf before dh_auto_configure through an extra
+      configure target and dependencies from */config.status.
+    - Call dh_autoreconf_clean in the clean target.
+  * Remove the following files from git accordingly:
+    - aclocal.m4
+    - configure
+    - src/config.h.in
+  * Wrap Build-Depends and Uploaders fields.
+  * Add myself to Uploaders.
+
+  [ Colin Watson ]
+  * Ignore some automake-related configure options, silencing warnings from
+    dh_auto_configure.
+
+  [ Christian Perrier ]
+  * Fix spelling error in a former changelog entry in "Explicitly".
+    This will save us from a lintian warning.
+  * Update Standards to 3.9.4 (checked)
+
+  [ Dmitrijs Ledkovs ]
+  * Set Vcs-* to canonical format.
+  * Simply use (>= 9) version specifier for debhelper.
+
+  [ Regis Boudin ]
+  * Link with -Wl,--as-needed, avoiding many indirect dependencies from GTK.
+  * Explicitly link the passthrough module with libdebian-installer.
+  * Use @DI_LIBS@ instead of -ldebian-installer in Makefile.in.
+  * Check that the return of getenv() is not NULL before trying to use the
+    result. Thanks to the Mayhem Team for running their tests.
+  * Let dpkg-preconfigure only run as root, just like dpkg-reconfigure.
+  * Rework database saving to store the old versions.
+  * Fix a typo to correctly recognise password options.
+
+ -- Christian Perrier <bubulle@debian.org>  Tue, 16 Jul 2013 20:29:00 +0200
+
 cdebconf (0.182) unstable; urgency=low
 
   [ Updated translations ]
@@ -1004,7 +1127,7 @@ cdebconf (0.123) unstable; urgency=low
 
 cdebconf (0.122) unstable; urgency=medium
 
-  * Explcitly link gtk frontend to libdebian-installer.
+  * Explicitly link gtk frontend to libdebian-installer.
 
  -- Joey Hess <joeyh@debian.org>  Wed, 19 Sep 2007 19:14:30 -0400
 

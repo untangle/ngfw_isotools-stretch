@@ -1,11 +1,2 @@
 #!/bin/sh
-if grep -q netboot /proc/cmdline ; then
-  exec netcfg
-else
-  echo -e 'auto lo\niface lo inet loopback' > /etc/network/interfaces
-  echo -e '127.0.0.1\tlocalhost' > /etc/hosts
-  ip link set lo up
-  ip addr flush dev lo
-  ip addr add 127.0.0.1/8 dev lo
-fi
-exit 0
+exec netcfg

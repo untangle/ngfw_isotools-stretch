@@ -118,10 +118,15 @@ static struct package *extract(const char *file)
 static int extracttemplates_available()
 {
     int retval = 1;
-    char *path = strdup(getenv("PATH"));
-    char *fp = NULL;
+    char *fp = NULL, *p;
     int flen = 0;
-    char *p = path;
+    char *path = getenv("PATH");
+
+    if (!path)
+        return 1;
+
+    path = strdup(path);
+    p = path;
     while (p && retval)
     {
         char *n = strchr(p, ':');
@@ -167,6 +172,9 @@ int main(int argc, char **argv)
     
     setlocale(LC_ALL, "");
     
+	if (getuid() != 0)
+		DIE("%s must be run as root", argv[0]);
+
     config = config_new();
 
     while ((c = getopt_long(argc, argv, "", options, NULL)) >= 0)

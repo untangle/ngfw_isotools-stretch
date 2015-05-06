@@ -1,10 +1,201 @@
-netcfg (1.108+deb7u1) wheezy; urgency=low
+netcfg (1.131) unstable; urgency=medium
+
+  * Kill the DHCP client on Linux again and keep it running on kFreeBSD.
+    This unbreaks network configuration on Linux when a DHCPv6 server is
+    present on the network segment. However it also means that the
+    DHCPv4 lease is no longer being refreshed (not a regression over
+    stable). (Closes: #768188)
+
+ -- Philipp Kern <pkern@debian.org>  Tue, 24 Mar 2015 21:48:00 +0100
+
+netcfg (1.130) unstable; urgency=medium
+
+  [ Colin Watson ]
+  * Don't build the compilation date and time into the binary.  This made
+    the build unreproducible.
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 14 Mar 2015 08:34:09 +0100
+
+netcfg (1.129) unstable; urgency=medium
+
+  [ Colin Watson ]
+  * Pacify GCC 5 misdetecting link_waits as uninitialised (closes: #778023).
+
+  [ Updated translations ]
+  * Danish (da.po) by Joe Hansen
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 08 Mar 2015 07:53:02 +0100
+
+netcfg (1.127) unstable; urgency=medium
+
+  * Add support for /etc/network/interfaces.d/ by adding a "source"
+    directive (Closes: #770078). It can be replaced with a
+    "source-directory" one during the next release cycle.
+
+ -- Cyril Brulebois <kibi@debian.org>  Sun, 04 Jan 2015 22:48:47 +0100
+
+netcfg (1.126) unstable; urgency=low
+
+  [ Updated translations ]
+  * Spanish (es.po) by Javier Fernández-Sanguino Peña
+  * Simplified Chinese (zh_CN.po) by YunQiang Su
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 07 Dec 2014 21:36:11 +0100
+
+netcfg (1.125) unstable; urgency=medium
+
+  * Re-upload without stray files.
+
+ -- Cyril Brulebois <kibi@debian.org>  Tue, 25 Nov 2014 11:35:43 +0100
+
+netcfg (1.124) unstable; urgency=low
+
+  [ Updated translations ]
+  * Galician (gl.po) by Jorge Barreiro
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 15 Nov 2014 07:47:55 +0100
+
+netcfg (1.123) unstable; urgency=medium
+
+  * Fix missing bounds check on nameserver array iteration, leading to a
+    crash when 4 (or more) nameservers are available (Closes: #768218).
+    Thanks, Kjell Braden, for the bug report, patch, and tests!
+
+ -- Cyril Brulebois <kibi@debian.org>  Thu, 06 Nov 2014 13:49:31 +0100
+
+netcfg (1.122) unstable; urgency=medium
+
+  * netcfg-static.c: call netcfg_interface_init() on struct
+    netcfg_interface before using it to avoid calling free() on a random
+    pointer.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 29 Sep 2014 07:02:57 +0200
+
+netcfg (1.121) unstable; urgency=low
+
+  [ Updated translations ]
+  * Turkish (tr.po) by Mert Dirik
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 20 Sep 2014 10:14:09 +0200
+
+netcfg (1.120) unstable; urgency=medium
+
+  [ Steven Chamberlain ]
+  * Do not kill_dhcp_client after setting the hostname and domain,
+    otherwise Linux udhcpc will stop renewing its lease, and on other
+    platforms dhclient will de-configure the network interface
+    (Closes: #757711, #757988)
+
+ -- Cyril Brulebois <kibi@debian.org>  Fri, 05 Sep 2014 23:40:24 +0200
+
+netcfg (1.119) unstable; urgency=medium
+
+  [ Colin Watson ]
+  * Don't copy /etc/network/interfaces to /target if
+    netcfg/target_network_config=ifupdown; it's already been copied by the
+    base-installer hook earlier, and copying it again makes it hard to
+    modify /target/etc/network/interfaces in a preseed file (closes:
+    #709017, LP: #1361902).
+  * Fix BOOTIF detection to handle the newline at the end of a line read
+    from /proc/cmdline (LP: #1350302).
+
+  [ Updated translations ]
+  * Estonian (et.po) by Mattias Põldaru
+
+ -- Colin Watson <cjwatson@debian.org>  Thu, 28 Aug 2014 20:26:09 +0100
+
+netcfg (1.118) unstable; urgency=high
+
+  * Fix support for entering an ESSID manually, it was previously
+    getting ignored (Closes: #757478). Thanks to James Cowgill for the
+    report and the patch!
+
+ -- Cyril Brulebois <kibi@debian.org>  Sat, 09 Aug 2014 21:47:27 +0200
+
+netcfg (1.117) unstable; urgency=low
+
+  * Add lintian overrides for untranslatable debconf templates. I like
+    when packages are lintian-clean...
+
+  [ Updated translations ]
+  * Bosnian (bs.po) by Amila Valjevčić
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 11 May 2014 12:40:57 +0200
+
+netcfg (1.116) unstable; urgency=medium
+
+  [ Colin Watson ]
+  * Substitute hostname rather than client->value in netcfg_get_hostname, to
+    avoid substituting nonsense like "value set" in some cases.
+  * Don't issue duplicate error messages if the hostname fails both the
+    valid_domain and valid_hostname tests.
+
+ -- Christian Perrier <bubulle@debian.org>  Wed, 02 Apr 2014 09:35:55 +0200
+
+netcfg (1.115) unstable; urgency=medium
+
+  [ Updated translations ]
+  * Hungarian (hu.po) by Judit Gyimesi
+
+ -- Cyril Brulebois <kibi@debian.org>  Fri, 14 Mar 2014 17:25:08 +0100
+
+netcfg (1.114) unstable; urgency=low
+
+  * Make netcfg Arch: any again. This reverts a change made in version
+    0.23 over a decade ago, intended to omit s390, which apparently
+    is no longer needed.
+
+ -- dann frazier <dannf@debian.org>  Thu, 12 Dec 2013 15:02:28 -0700
+
+netcfg (1.113) unstable; urgency=low
+
+  * Add arm64 to the Architecture field.
+
+ -- dann frazier <dannf@debian.org>  Thu, 12 Dec 2013 10:47:25 -0700
+
+netcfg (1.112) unstable; urgency=low
+
+  [ Updated translations ]
+  * Tajik (tg.po) by Victor Ibragimov
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 09 Nov 2013 19:16:58 +0100
+
+netcfg (1.111) unstable; urgency=high
+
+  [ Dmitrijs Ledkovs ]
+  * Bump debhelper compat level to 9.
+  * Set Vcs-* to canonical format.
+
+  [ Samuel Thibault ]
+  * Add -lm after -lcheck, since libcheck.a needs some maths functions.
+    (Closes: Bug#713616)
+
+  [ Cyril Brulebois ]
+  * Also add -lpthread and -lrt.
+  * Set urgency to high for the bugfix below and the upcoming d-i release.
 
   [ Philipp Kern ]
   * Wrap dpkg-query call to check for network-manager with sh.
     Thanks to Michael Biebl for the patch. (Closes: #717449)
 
- -- Cyril Brulebois <kibi@debian.org>  Tue, 08 Oct 2013 01:04:51 +0200
+ -- Cyril Brulebois <kibi@debian.org>  Thu, 10 Oct 2013 17:49:45 +0200
+
+netcfg (1.110) unstable; urgency=low
+
+  [ Colin Watson ]
+  * Use correct compiler when cross-building.
+
+ -- Christian Perrier <bubulle@debian.org>  Wed, 15 May 2013 17:56:14 +0200
+
+netcfg (1.109) unstable; urgency=low
+
+  [ Samuel Thibault ]
+  * Fix build on hurd-i386.
+
+  [ Updated translations ]
+  * Croatian (hr.po) by Tomislav Krznar
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 12 May 2013 17:38:57 +0200
 
 netcfg (1.108) unstable; urgency=low
 

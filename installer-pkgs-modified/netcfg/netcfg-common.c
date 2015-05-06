@@ -640,7 +640,7 @@ static char *get_bootif(void)
             char *subst;
 
             s += sizeof("BOOTIF=") - 1;
-            bootif_len = strcspn(s, " ");
+            bootif_len = strcspn(s, " \n");
             if (bootif_len != (ETH_ALEN * 3 - 1) + 3)
                 continue;
             bootif = strndup(s + 3, bootif_len - 3); /* skip hardware type */
@@ -1032,7 +1032,7 @@ int netcfg_get_hostname(struct debconfclient *client, char *template, char *host
         if (!valid_domain(hostname)) {
             di_info("%s is an invalid domain", hostname);
             debconf_subst(client, "netcfg/invalid_hostname",
-                          "hostname", client->value);
+                          "hostname", hostname);
             snprintf(buf, sizeof(buf), "%i", MAXHOSTNAMELEN);
             debconf_subst(client, "netcfg/invalid_hostname",
                       "maxhostnamelen", buf);
@@ -1040,6 +1040,7 @@ int netcfg_get_hostname(struct debconfclient *client, char *template, char *host
             debconf_go(client);
             debconf_set(client, template, "debian");
             *hostname = '\0';
+            continue;
         }
 
         if (accept_domain && (s = strchr(hostname, '.'))) {
@@ -1057,7 +1058,7 @@ int netcfg_get_hostname(struct debconfclient *client, char *template, char *host
         if (!valid_hostname(hostname)) {
             di_info("%s is an invalid hostname", hostname);
             debconf_subst(client, "netcfg/invalid_hostname",
-                          "hostname", client->value);
+                          "hostname", hostname);
             snprintf(buf, sizeof(buf), "%i", MAXHOSTNAMELEN);
             debconf_subst(client, "netcfg/invalid_hostname",
                       "maxhostnamelen", buf);
@@ -1468,7 +1469,7 @@ int netcfg_detect_link(struct debconfclient *client, const struct netcfg_interfa
 {
     char arping[256];
     int count, rv = 0;
-    int link_waits;
+    int link_waits = 12;  /* default for netcfg/link_wait_timeout times 4 */
     int gw_tries = NETCFG_GATEWAY_REACHABILITY_TRIES;
     const char *if_name = interface->name;
     const char *gateway = interface->gateway;

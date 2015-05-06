@@ -20,8 +20,9 @@ http://ftp.gnome.org/pub/GNOME/sources/gnome-themes/2.14/gnome-themes-2.14.3.tar
 It is written by Bill Haneman, based on Standard theme by T. Liebeck,
 and released under LGPL 2.1.
 
-src/usr/share/graphics/debian_logo_joy.svg is copyright 2012 by
-Adrien Aubourg, licensed under the GNU GPL version 2.
+src/usr/share/graphics/debian_logo_lines.svg is copyright 2014 by
+Juliette Taka BELIN <juliettetaka.belin@gmail.com>, licensed under the GNU GPL
+version 2, or later.
 
 On Debian systems, the complete text of the GNU GPL version 2 can be found in
 /usr/share/common-licenses/GPL-2, and the complete text of the GNU LGPL 2.1

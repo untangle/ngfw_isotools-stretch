@@ -88,7 +88,8 @@ void nm_write_static_ipvX(FILE *config_file, nm_ipvX ipvx)
     /* Get DNS in printable format. */
     memset(buffer, 0, NM_MAX_LEN_BUF);
 
-    for (i = 0; !empty_str(ipvx.nameservers[i]); i++) {
+    for (i = 0; (i < NETCFG_NAMESERVERS_MAX) &&
+               (!empty_str(ipvx.nameservers[i])); i++) {
         strcat(buffer, ipvx.nameservers[i]);
         strcat(buffer, ";");
     }

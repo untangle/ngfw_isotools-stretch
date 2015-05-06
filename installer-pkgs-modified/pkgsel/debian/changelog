@@ -1,3 +1,47 @@
+pkgsel (0.43) unstable; urgency=low
+
+  [ Updated translations ]
+  * Danish (da.po) by Joe Hansen
+
+ -- Christian Perrier <bubulle@debian.org>  Mon, 09 Mar 2015 07:49:15 +0100
+
+pkgsel (0.42) unstable; urgency=low
+
+  * Drop last use of aptitude. Thanks to Daniel Hartwig for the patch
+    and his tests.
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 02 Feb 2014 16:17:31 +0100
+
+pkgsel (0.41) unstable; urgency=low
+
+  [ Updated translations ]
+  * Hungarian (hu.po) by Judit Gyimesi
+
+ -- Christian Perrier <bubulle@debian.org>  Thu, 19 Dec 2013 20:16:18 +0100
+
+pkgsel (0.40) unstable; urgency=low
+
+  [ Updated translations ]
+  * Tajik (tg.po) by Victor Ibragimov
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 17 Aug 2013 08:36:05 +0200
+
+pkgsel (0.39) unstable; urgency=low
+
+  [ Dmitrijs Ledkovs ]
+  * Set debian source format to '3.0 (native)'.
+  * Bump debhelper compat level to 9.
+  * Set Vcs-* to canonical format.
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 13 Jul 2013 13:40:53 +0200
+
+pkgsel (0.38) unstable; urgency=low
+
+  [ Updated translations ]
+  * Croatian (hr.po) by Tomislav Krznar
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 19 May 2013 18:21:03 +0200
+
 pkgsel (0.37) unstable; urgency=low
 
   [ Updated translations ]

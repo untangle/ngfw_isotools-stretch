@@ -10,7 +10,7 @@
 # Debian Installer translators, please read the D-I i18n documentation
 # in doc/i18n/i18n.txt
 # Contributor:
-# Kartik Mistry <kartik.mistry@gmail.com>, 2006-2011
+# Kartik Mistry <kartik.mistry@gmail.com>, 2006-2013
 #
 #
 # Translations from iso-codes:
@@ -232,8 +232,7 @@ msgid ""
 "If your WEP key is in the format of a passphrase, prefix it with "
 "'s:' (without quotes)."
 msgstr ""
-"જો તમારી  WEP કી  પાસફ્રેઝનાં બંધારણમાં હોય તો, તેને 's:' પૂર્વગ લગાડો (અવતરણચિહ્નો "
-"વગર)."
+"જો તમારી WEP કી પાસફ્રેઝનાં બંધારણમાં હોય તો, તેને 's:' પૂર્વગ લગાડો (અવતરણચિહ્નો વગર)."
 
 #. Type: string
 #. Description

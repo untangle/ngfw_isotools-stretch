@@ -25,8 +25,8 @@ msgstr ""
 "Project-Id-Version: eu\n"
 "Report-Msgid-Bugs-To: netcfg@packages.debian.org\n"
 "POT-Creation-Date: 2012-11-03 22:02+0000\n"
-"PO-Revision-Date: 2012-05-06 15:56+0200\n"
-"Last-Translator: Piarres Beobide <pi@beobide.net>\n"
+"PO-Revision-Date: 2012-10-19 19:41+0200\n"
+"Last-Translator: Iñaki Larrañaga Murgoitio <dooteo@zundan.com>\n"
 "Language-Team: debian-l10n-eu@lists.debian.org\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -678,7 +678,7 @@ msgstr "Konfiguratu sarea"
 #. :sl3:
 #: ../netcfg-common.templates:50001
 msgid "Waiting time (in seconds) for link detection:"
-msgstr "Lotura antzemateko itxoiteko denbora (segundutan):"
+msgstr "Lotura antzemateko itxoiteko denbora (segundotan):"
 
 #. Type: string
 #. Description
@@ -704,8 +704,8 @@ msgid ""
 "The value you have provided is not valid. The maximum waiting time (in "
 "seconds) for network link detection must be a positive integer."
 msgstr ""
-"Ezarri duzun balioa ez da zuzena. Sare konexioa antzemateko gehienzko "
-"denbora muga (segundutan) zenbaki oso positibo bat izan behar da."
+"Ezarri duzun balioa ez da zuzena. Sare konexioa antzemateko gehienezko "
+"denbora muga (segundotan) zenbaki oso positibo bat izan behar da."
 
 #. Type: select
 #. Choices
@@ -727,9 +727,7 @@ msgstr "Haririk gabeko sarea:"
 #. :sl1:
 #: ../netcfg-common.templates:52002
 msgid "Select the wireless network to use during the installation process."
-msgstr ""
-"Hautatu instalazio prozesuan erabili behar den haririk gabeko sarearein "
-"izena:"
+msgstr "Hautatu instalazio prozesuan erabili behar den haririk gabeko sarea."
 
 #. Type: string
 #. Description
@@ -937,7 +935,7 @@ msgstr "IPv6 konfigurazio aitomatikoa saiatzen..."
 #. :sl2:
 #: ../netcfg-dhcp.templates:13001
 msgid "Waiting for link-local address..."
-msgstr "Lotura-lokal hbidea itxoiten..."
+msgstr "Lotura-lokal helbidea itxoiten..."
 
 #. Type: text
 #. Description
@@ -1123,7 +1121,7 @@ msgid ""
 "IPv6 addresses cannot be configured on point-to-point links.  Please use an "
 "IPv4 address, or go back and select a different network interface."
 msgstr ""
-"Ezinda IPv6 helbiderik konfigruatu puntuz-puntuko loturaretan. Mesedez IPv4 "
+"Ezinda IPv6 helbiderik konfigruatu puntuz-puntuko loturetan. Mesedez IPv4 "
 "helbide bat erabili edo atzera joan eta beste sare interfaze bat hautatu."
 
 #. Type: boolean

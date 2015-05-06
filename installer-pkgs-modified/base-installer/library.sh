@@ -23,7 +23,7 @@ case $KERNEL_NAME in
 	hurd)		KERNEL_NAME=gnumach ; KERNEL_MAJOR="$(uname -v | cut -d ' ' -f 2 | cut -d . -f 1)" ;;
 esac
 KERNEL_VERSION="$(uname -r | cut -d - -f 1)"
-KERNEL_ABI="$(uname -r | cut -d - -f 1,2)-untangle"
+KERNEL_ABI="$(uname -r | cut -d - -f 1,2)"
 KERNEL_FLAVOUR=$(uname -r | cut -d - -f 3-)
 MACHINE="$(uname -m)"
 NUMCPUS=$(cat /var/numcpus 2>/dev/null) || true
@@ -173,6 +173,16 @@ APT::Get::AllowUnauthenticated "true";
 Aptitude::CmdLine::Ignore-Trust-Violations "true";
 EOT
 	fi
+
+	if [ "$PROTOCOL" = https ] && db_get debian-installer/allow_unauthenticated_ssl && [ "$RET" = true ]; then
+		# This file will be left in place on the installed system.
+		cat > $APT_CONFDIR/00AllowUnauthenticatedSSL << EOT
+Acquire::https::Verify-Host "false";
+Acquire::https::Verify-Peer "false";
+EOT
+	fi
+
+	[ ! -d "$DPKG_CONFDIR" ] && mkdir -p "$DPKG_CONFDIR"
 
 	# Disable all syncing; it's unnecessary in an installation context,
 	# and can slow things down quite a bit.
@@ -498,10 +508,6 @@ install_kernel_linux () {
 	else
 		warning "Failed to get debconf answer 'base-installer/kernel/linux/initrd'."
 		do_initrd=yes
-	fi
-
-	if [ `archdetect` = mipsel/loongson-2f ]; then
-	    do_initrd=yes
 	fi
 
 	if db_get base-installer/kernel/linux/link_in_boot ; then

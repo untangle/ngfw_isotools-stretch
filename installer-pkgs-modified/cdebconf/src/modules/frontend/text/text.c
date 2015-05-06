@@ -195,7 +195,7 @@ show_help (struct frontend *obj, struct question *q)
 		printf(" %s\n", question_get_text(obj, "debconf/text-help-goback", "Go back to previous question"));
 	}
 	if (strcmp(q->template->type, "string") == 0 ||
-	    strcmp(q->template->type, "passwd") == 0 ||
+	    strcmp(q->template->type, "password") == 0 ||
 	    strcmp(q->template->type, "multiselect") == 0) {
 		printf(" ");
 		printf(question_get_text(obj, "debconf/text-help-keystroke", "'%c'"), CHAR_CLEAR);

@@ -415,6 +415,42 @@ void rfc822db_template_dump(const void *node, const VISIT which, const int depth
     }
 }
 
+static int rfc822db_save(const void *root, const char *path,
+                          void (*action)(const void *nodep, const VISIT which,
+                                       const int depth))
+{
+    char *newpath;
+    newpath = malloc(strlen(path) + strlen("-new") + 1);
+    sprintf(newpath, "%s-new", path);
+
+    if ((outf = fopen(newpath, "w")) == NULL)
+    {
+        INFO(INFO_ERROR, "Cannot open file %s: %s",
+            newpath, strerror(errno));
+        free(newpath);
+        return DC_NOTOK;
+    }
+
+    twalk(root, action);
+
+    if (fclose(outf) == EOF)
+        perror("fclose");
+    else
+    {
+        char *oldpath = malloc(strlen(path) + strlen("-old") + 1);
+        sprintf(oldpath, "%s-old", path);
+
+        rename(path, oldpath);
+        free(oldpath);
+
+        rename(newpath, path);
+    }
+    outf = NULL;
+    free(newpath);
+
+    return DC_OK;
+}
+
 static int rfc822db_template_save(struct template_db *db)
 {
     struct template_db_cache *dbdata = db->data;
@@ -442,19 +478,7 @@ static int rfc822db_template_save(struct template_db *db)
         return DC_OK;
     }
 
-    if ((outf = fopen(path, "w")) == NULL)
-    {
-        INFO(INFO_ERROR, "Cannot open template file %s: %s",
-            path, strerror(errno));
-        return DC_NOTOK;
-    }
-
-    twalk(dbdata->root, rfc822db_template_dump);
-
-    if (fclose(outf) == EOF)
-        perror("fclose");
-    outf = NULL;
-    return DC_OK;
+    return rfc822db_save(dbdata->root, path, rfc822db_template_dump);
 }
 
 static struct template *rfc822db_template_get(struct template_db *db, 
@@ -736,20 +760,7 @@ static int rfc822db_question_save(struct question_db *db)
         return DC_OK;
     }
 
-    if ((outf = fopen(path, "w")) == NULL)
-    {
-        INFO(INFO_ERROR, "Cannot open question file %s: %s",
-            path, strerror(errno));
-        return DC_NOTOK;
-    }
-
-    twalk(dbdata->root, rfc822db_question_dump);
-
-    if (fclose(outf) == EOF)
-        perror("fclose");
-    outf = NULL;
-
-    return DC_OK;
+    return rfc822db_save(dbdata->root, path, rfc822db_question_dump);
 }
 
 static struct question *rfc822db_question_get(struct question_db *db, 

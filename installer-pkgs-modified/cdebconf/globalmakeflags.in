@@ -1,15 +1,20 @@
 prefix=@prefix@
+exec_prefix=@exec_prefix@
 etcdir=@sysconfdir@
-bindir=${prefix}/bin
-sbindir=${prefix}/sbin
-libdir=${prefix}/lib
-moddir=${libdir}/cdebconf
-sharedir=${prefix}/share/debconf
-mandir=${prefix}/share/man
+bindir=@bindir@
+sbindir=@sbindir@
+libdir=@libdir@
+libexecdir=@libexecdir@
+moddir=${libexecdir}/cdebconf
+datarootdir=@datarootdir@
+sharedir=${datarootdir}/debconf
+mandir=@mandir@
 incdir=${prefix}/include/cdebconf
 
 srcdir=@TOPDIR@
 builddir=@BUILDDIR@
+
+TARGET=@TARGET@
 
 DB_MODULES=@DB_MODULES@
 FRONTEND_MODULES=@FRONTEND_MODULES@

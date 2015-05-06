@@ -5,6 +5,8 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+export DEB_LDFLAGS_MAINT_APPEND=-lpthread -Wl,--as-needed
+
 debbuild=debian/build-deb
 udebbuild=debian/build-udeb
 
@@ -33,9 +35,13 @@ build: build-deb build-udeb
 build-arch: build
 build-indep: build
 
-$(debbuild)/config.status:
+configure:
+	dh_autoreconf
+
+$(debbuild)/config.status: configure
 	CFLAGS="$(CFLAGS) $(SPEEDOPTFLAG)" \
 	dh_auto_configure -B$(debbuild) -- \
+		--libexecdir=\$${prefix}/lib \
 		--without-rpath \
 		--with-db="textdb rfc822db stack" \
 		--with-frontend="$(DEB_FRONTENDS)" \
@@ -49,9 +55,10 @@ build-deb-stamp: $(debbuild)/config.status
 	dh_auto_build -B$(debbuild)
 	touch $@
 
-$(udebbuild)/config.status:
+$(udebbuild)/config.status: configure
 	CFLAGS="$(CFLAGS) $(SIZEOPTFLAG) -fomit-frame-pointer" \
 	dh_auto_configure -B$(udebbuild) -- \
+		--libexecdir=\$${prefix}/lib \
 		--enable-d-i \
 		--without-rpath --with-db="rfc822db stack" \
 		--with-frontend="$(UDEB_FRONTENDS)" \
@@ -74,6 +81,7 @@ clean:
 	dh_auto_clean -B$(udebbuild)
 	[ ! -f globalmakeflags ] || $(MAKE) -C src/test clean
 	dh_auto_clean
+	dh_autoreconf_clean
 	dh_clean
 
 install: install-arch install-indep
@@ -82,10 +90,8 @@ install-arch: build
 	dh_testdir
 	dh_testroot
 	dh_prep
-	$(MAKE) -C $(debbuild) install DESTDIR=$(CURDIR)/debian/tmp/deb \
-		TARGET=deb
-	$(MAKE) -C $(udebbuild) install DESTDIR=$(CURDIR)/debian/tmp/udeb \
-		TARGET=udeb
+	$(MAKE) -C $(debbuild) install DESTDIR=$(CURDIR)/debian/tmp/deb
+	$(MAKE) -C $(udebbuild) install DESTDIR=$(CURDIR)/debian/tmp/udeb
 	dh_install -a
 
 install-indep:

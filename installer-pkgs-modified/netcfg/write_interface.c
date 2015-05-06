@@ -30,6 +30,7 @@ static int nc_wi_header(FILE *fd)
 {
 	fprintf(fd, "# This file describes the network interfaces available on your system\n");
 	fprintf(fd, "# and how to activate them. For more information, see interfaces(5).\n");
+	fprintf(fd, "\nsource /etc/network/interfaces.d/*\n");
 	
 	return 1;
 }

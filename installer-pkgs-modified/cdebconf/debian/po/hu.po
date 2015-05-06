@@ -20,21 +20,28 @@
 #   Gabor Kelemen <kelemeng@gnome.hu>, 2006, 2007.
 #   Kalman Kemenczy <kkemenczy@gmail.com>, 2010.
 #   Andras TIMAR <timar@gnome.hu>, 2000-2001.
+# SZERVÁC Attila <sas@321.hu>, 2012.
+# Dr. Nagy Elemér Károly <eknagy@omikk.bme.hu>, 2012.
+# Judit Gyimesi <judit.gyimesi.x@gmail.com>, 2013.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: cdebconf@packages.debian.org\n"
 "POT-Creation-Date: 2012-10-18 06:02+0000\n"
-"PO-Revision-Date: 2012-04-21 09:24+0100\n"
-"Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
+"PO-Revision-Date: 2013-11-18 21:15+0100\n"
+"Last-Translator: Judit Gyimesi <judit.gyimesi.x@gmail.com>\n"
 "Language-Team: Debian L10n Hungarian <debian-l10n-hungarian@lists.debian."
 "org>\n"
-"Language: \n"
+"Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;\n"
 
+# Type: select
+# Choices
+# :sl2:
 #. Type: select
 #. Choices
 #. :sl2:
@@ -42,6 +49,9 @@ msgstr ""
 msgid "critical"
 msgstr "kritikus"
 
+# Type: select
+# Choices
+# :sl2:
 #. Type: select
 #. Choices
 #. :sl2:
@@ -49,6 +59,9 @@ msgstr "kritikus"
 msgid "high"
 msgstr "magas"
 
+# Type: select
+# Choices
+# :sl2:
 #. Type: select
 #. Choices
 #. :sl2:
@@ -56,6 +69,9 @@ msgstr "magas"
 msgid "medium"
 msgstr "közepes"
 
+# Type: select
+# Choices
+# :sl2:
 #. Type: select
 #. Choices
 #. :sl2:
@@ -63,13 +79,20 @@ msgstr "közepes"
 msgid "low"
 msgstr "alacsony"
 
+# Type: select
+# Description
+# :sl2:
 #. Type: select
 #. Description
 #. :sl2:
 #: ../cdebconf-udeb.templates:2002
 msgid "Ignore questions with a priority less than:"
-msgstr "A kevésbé fontos kérdések kihagyása mint:"
+msgstr ""
+"Figyelmen kívül hagyni azokat a kérdéseket, amelyek kevésbé fontosak, mint:"
 
+# Type: select
+# Description
+# :sl2:
 #. Type: select
 #. Description
 #. :sl2:
@@ -79,9 +102,13 @@ msgid ""
 "might ask you. Only questions with a certain priority or higher are actually "
 "shown to you; all less important questions are skipped."
 msgstr ""
-"A debconf-os csomagok kérdéseiket osztályozzák. Csak egy adottnál magasabb "
-"fontossági szintű kérdéseket teszik fel; a kevésbé fontosakat kihagyják."
+"A debconf-os csomagok kérdéseiket osztályozzák. Csak az egy adottnál "
+"magasabb fontossági szintű kérdéseket teszik fel; a kevésbé fontosakat "
+"kihagyják."
 
+# Type: select
+# Description
+# :sl2:
 #. Type: select
 #. Description
 #. :sl2:
@@ -95,12 +122,16 @@ msgid ""
 " - 'low' is for trivial items that have defaults that will work in\n"
 "   the vast majority of cases."
 msgstr ""
-"Kiválasztható, mi legyen a legkisebb kérdés:\n"
-" - a 'kritikus'-ak a rendszer helyes működését biztosítják\n"
+"Kiválasztható, mi legyen a legkisebb fontosságú kérdés, ami megjelenjen:\n"
+" - a 'kritikus'-ak felhasználói beavatkozást igényelnek.\n"
 " - a 'magas'-aknak nincs jó általános alapértéke\n"
 " - a 'közepes'-ekre van jó alapérték.\n"
-" - az 'alacsony'-ak alapértékei szinte mindig tökéletesek."
+" - az 'alacsony'-ak triviálisak, melyek alapértékei szinte mindig "
+"tökéletesek."
 
+# Type: select
+# Description
+# :sl2:
 #. Type: select
 #. Description
 #. :sl2:
@@ -112,6 +143,9 @@ msgstr ""
 "E kérdés például közepes fontosságú, ha a fontossági szint most 'magas' vagy "
 "'kritikus' lenne, nem látszódna."
 
+# Type: text
+# Description
+# :sl2:
 #. Type: text
 #. Description
 #. :sl2:

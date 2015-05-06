@@ -528,7 +528,6 @@ int cdebconf_gtk_go(struct frontend * fe)
 {
     struct frontend_data * fe_data = fe->data;
     GtkWidget * question_box;
-    GtkWidget * screenshot_button = NULL;
     struct question * question;
     int ret;
 
@@ -543,7 +542,7 @@ int cdebconf_gtk_go(struct frontend * fe)
 #ifdef DI_UDEB
     /* XXX: rename */
     cdebconf_gtk_di_run_dialog(fe);
-    screenshot_button = cdebconf_gtk_create_screenshot_button(fe);
+    cdebconf_gtk_create_screenshot_button(fe);
 #endif /* DI_UDEB */
     if (NULL != fe_data->progress_data) {
         cdebconf_gtk_hide_progress(fe);
@@ -583,7 +582,6 @@ int cdebconf_gtk_go(struct frontend * fe)
 
     cdebconf_gtk_show_target_box(fe);
     cdebconf_gtk_show_buttons(fe);
-    gtk_widget_hide(GTK_WIDGET(screenshot_button));
     gdk_threads_leave();
 
     /* frontend blocked here until a button has been pressed */

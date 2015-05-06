@@ -12,7 +12,7 @@ OBJS = cdebconf_gtk.opic \
        ui.opic \
        align_text_renderer.opic
 
-ifneq ($(strip $(filter -DDI_UDEB, $(CFLAGS))),)
+ifeq ($(TARGET),udeb)
 OBJS += screenshot.opic di.opic
 endif
 

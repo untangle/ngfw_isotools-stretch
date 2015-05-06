@@ -66,6 +66,8 @@ struct frontend_data
      */
     int logo_width;
     int logo_height;
+    bool logo_adjusted;
+    GtkWidget * logo_widget;
 
     /** Internal data of the handler of progress commands.
      *

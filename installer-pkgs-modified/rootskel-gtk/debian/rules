@@ -2,7 +2,7 @@
 %:
 	dh $@
 
-build build-arch: debian/templates
+build-arch: debian/templates
 
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 

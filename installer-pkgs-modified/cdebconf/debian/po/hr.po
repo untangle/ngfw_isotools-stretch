@@ -15,14 +15,14 @@
 #   Krunoslav Gernhard, 2004
 #   Vladimir Vuksan <vuksan@veus.hr>, 2000.
 #   Vlatko Kosturjak, 2001
-# Tomislav Krznar <tomislav.krznar@gmail.com>, 2012.
+# Tomislav Krznar <tomislav.krznar@gmail.com>, 2012, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Debian-installer 1st-stage master file HR\n"
 "Report-Msgid-Bugs-To: cdebconf@packages.debian.org\n"
 "POT-Creation-Date: 2012-10-18 06:02+0000\n"
-"PO-Revision-Date: 2012-10-20 09:31+0200\n"
+"PO-Revision-Date: 2013-04-17 18:08+0200\n"
 "Last-Translator: Tomislav Krznar <tomislav.krznar@gmail.com>\n"
 "Language-Team: Croatian <lokalizacija@linux.hr>\n"
 "Language: hr\n"
@@ -30,7 +30,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. Type: select
 #. Choices
@@ -77,8 +77,8 @@ msgid ""
 "shown to you; all less important questions are skipped."
 msgstr ""
 "Paketi koji rabe debconf za podešavanje dijele pitanja koja vam upućuju "
-"prema razini važnosti. Samo pitanja važnosti koju vi odredite, ili višlje, "
-"bit će vam postavljena; sva niže važna pitanja bit će preskočena."
+"prema razini važnosti. Samo pitanja važnosti koju vi odredite, ili više, će "
+"vam biti postavljena. Sva pitanja niže važnosti će se preskočiti."
 
 #. Type: select
 #. Description
@@ -174,7 +174,7 @@ msgstr "Otkaži"
 #. :sl1:
 #: ../cdebconf-newt-udeb.templates:6001
 msgid "<Tab> moves; <Space> selects; <Enter> activates buttons"
-msgstr "<Tab> za pomicanje; <Space> odabire; <Enter> aktivira dugmad"
+msgstr "<Tab> za pomicanje, <Space> bira, <Enter> aktivira dugmad"
 
 #. Type: text
 #. Description
@@ -184,7 +184,7 @@ msgstr "<Tab> za pomicanje; <Space> odabire; <Enter> aktivira dugmad"
 #: ../cdebconf-newt-udeb.templates:7001
 msgid "<F1> for help; <Tab> moves; <Space> selects; <Enter> activates buttons"
 msgstr ""
-"<F1> za pomoć; <Tab> za pomicanje; <Space> odabire; <Enter> aktivira dugmad"
+"<F1> za pomoć, <Tab> za pomicanje, <Space> bira, <Enter> aktivira dugmad"
 
 #. Type: text
 #. Description
@@ -214,7 +214,7 @@ msgstr "LTR"
 #. :sl1:
 #: ../cdebconf-gtk-udeb.templates:7001
 msgid "Screenshot"
-msgstr "Snimak ekrana"
+msgstr "Snimka ekrana"
 
 #. Type: text
 #. Description
@@ -224,7 +224,7 @@ msgstr "Snimak ekrana"
 #: ../cdebconf-gtk-udeb.templates:8001
 #, no-c-format
 msgid "Screenshot saved as %s"
-msgstr "Snimak ekrana spremljena kao %s"
+msgstr "Snimka ekrana spremljena kao %s"
 
 #. Type: text
 #. Description
@@ -232,7 +232,7 @@ msgstr "Snimak ekrana spremljena kao %s"
 #: ../cdebconf-text-udeb.templates:1001
 #, no-c-format
 msgid "!! ERROR: %s"
-msgstr "!! POGREŠKA: %s"
+msgstr "!! GREŠKA: %s"
 
 #. Type: text
 #. Description
@@ -317,7 +317,7 @@ msgid ""
 "You can select the type of user interface they use."
 msgstr ""
 "Paketi koji koriste debconf za postavke dijele zajednički izgled i način "
-"rada. Možete odabrati vrstu korisničkog sučelja koji oni koriste."
+"rada. Možete izabrati vrstu korisničkog sučelja koji oni koriste."
 
 #. Type: string
 #. Description

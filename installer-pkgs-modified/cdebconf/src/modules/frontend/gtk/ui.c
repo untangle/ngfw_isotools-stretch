@@ -40,6 +40,8 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include <string.h>
+
 #include "frontend.h"
 #include "question.h"
 
@@ -101,6 +103,30 @@ static gboolean handle_exposed_banner(GtkWidget * widget,
     gchar * message;
     char * text;
 
+    /* There's no way to get the window size before it's realized, so
+     * defer (possibly) adjusting the logo size until the first expose
+     * event.
+     */
+    if (TRUE != fe_data->logo_adjusted) {
+        fprintf(stderr, "Checking the need for logo adjustment.\n");
+
+        /* If logo and window widths differ, scale. */
+        GtkAllocation allocation;
+        gtk_widget_get_allocation(fe_data->window, &allocation);
+        if (fe_data->logo_width != allocation.width) {
+            fprintf(stderr, "Logo needs scaling: width from %d to %d pixels.\n", fe_data->logo_width, allocation.width);
+            GdkPixbuf * scaled_pixbuf = gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(fe_data->logo_widget)),
+                                                                allocation.width,
+                                                                fe_data->logo_height,
+                                                                GDK_INTERP_BILINEAR);
+            gtk_image_set_from_pixbuf(GTK_IMAGE(fe_data->logo_widget), scaled_pixbuf);
+            fe_data->logo_width = allocation.width;
+        } else {
+            fprintf(stderr, "Logo needs no scaling: width stays at %d pixels.\n", allocation.width);
+        }
+        fe_data->logo_adjusted = TRUE;
+    }
+
     if (NULL != fe->info) {
         text = q_get_description(fe, fe->info);
         message = g_strdup_printf(
@@ -125,6 +151,25 @@ static gboolean handle_exposed_banner(GtkWidget * widget,
     return FALSE;
 }
 
+/* Query the gtk theme currently in use
+ *
+ * Currently it is likely to be either "Clearlooks" (default) or "dark"
+ * (for better accessibility).
+ *
+ * The caller is responsible for freeing the returned value.
+ */
+static char * get_gtk_theme_name()
+{
+    GtkSettings * settings;
+    gchar * theme_name;
+
+    settings = gtk_settings_get_default();
+    g_return_val_if_fail(settings != NULL, NULL);
+    g_object_get(settings, "gtk-theme-name", &theme_name, NULL);
+
+    return theme_name;
+}
+
 /** Create the banner with the logo inside the given container.
  *
  * The logo will be centered in the banner.
@@ -132,6 +177,7 @@ static gboolean handle_exposed_banner(GtkWidget * widget,
  * @param fe cdebconf frontend
  * @param container container in which the banner will be added
  * @see LOGO_IMAGE_PATH
+ * @see LOGO_DARK_IMAGE_PATH
  */
 static void create_banner(struct frontend * fe, GtkWidget * container)
 {
@@ -139,10 +185,26 @@ static void create_banner(struct frontend * fe, GtkWidget * container)
     GtkWidget * banner;
     GtkWidget * logo;
     GdkPixbuf * pixbuf;
+    const char * banner_path = LOGO_IMAGE_PATH;
+    char * theme_name;
+
+    /* Switch to an alternative banner for theme=dark; don't do
+     * anything in case of errors.
+     */
+    theme_name = get_gtk_theme_name();
+    if ((theme_name != NULL) && !strcmp(theme_name, "dark")) {
+        if (g_file_test(LOGO_DARK_IMAGE_PATH, G_FILE_TEST_EXISTS) == TRUE) {
+            fprintf(stderr, "theme=dark detected, switching to alternate banner\n");
+            banner_path = LOGO_DARK_IMAGE_PATH;
+        } else {
+            fprintf(stderr, "theme=dark detected, not switching to alternate banner (not available)\n");
+        }
+    }
+    g_free(theme_name);
 
     /* XXX: check NULL! */
     banner = gtk_event_box_new();
-    logo = gtk_image_new_from_file(LOGO_IMAGE_PATH);
+    logo = gtk_image_new_from_file(banner_path);
     gtk_misc_set_alignment(GTK_MISC(logo), 0.5 /* center */, 0 /* top */);
     gtk_misc_set_padding(GTK_MISC(logo), 0, 0);
     gtk_container_add(GTK_CONTAINER(banner), logo);
@@ -151,6 +213,8 @@ static void create_banner(struct frontend * fe, GtkWidget * container)
     pixbuf = gtk_image_get_pixbuf(GTK_IMAGE(logo));
     fe_data->logo_width = gdk_pixbuf_get_width(pixbuf);
     fe_data->logo_height = gdk_pixbuf_get_height(pixbuf);
+    fe_data->logo_adjusted = FALSE;
+    fe_data->logo_widget = logo;
 
     g_signal_connect_after(G_OBJECT(banner), "expose_event",
                            G_CALLBACK(handle_exposed_banner), fe);

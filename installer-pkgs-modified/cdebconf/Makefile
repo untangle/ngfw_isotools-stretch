@@ -26,9 +26,12 @@ distclean: clean
 	rm -f config.status config.log config.cache globalmakeflags
 	rm -rf autom4te.cache
 	rm -f src/cdebconf.conf-dist src/Makefile src/config.h man/Makefile
+	rm -f src/modules/db/rfc822db/Makefile
 	rm -f src/modules/frontend/gtk/Makefile
 	rm -f src/modules/frontend/ncurses/Makefile
 	rm -f src/modules/frontend/newt/Makefile
+	rm -f src/modules/frontend/passthrough/Makefile
 	rm -f src/modules/frontend/slang/Makefile
+	rm -f src/modules/frontend/text/Makefile
 
 .PHONY: cdebconf clean distclean

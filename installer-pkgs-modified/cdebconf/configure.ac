@@ -9,8 +9,8 @@ CFLAGS="-Wall $CFLAGS -D_GNU_SOURCE"
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADER([src/config.h:src/config.h.in])
 
-AC_DEFINE([DEBCONF_VERSION], [2.0])
-AC_DEFINE([PACKAGE], ["cdebconf"])
+AC_DEFINE([DEBCONF_VERSION], [2.0], [debconf version])
+AC_DEFINE([PACKAGE], ["cdebconf"], [package name])
 
 dnl Checks for programs.
 AC_PROG_MAKE_SET
@@ -46,10 +46,15 @@ if test "$TOPDIR" != "$BUILDDIR"; then
 	done
 fi
 
+dnl dh_auto_configure may pass these options, used by some automake macros.
+dnl Ignore them.
+AC_ARG_ENABLE([maintainer-mode], [])
+AC_ARG_ENABLE([dependency-tracking], [])
+
 dnl Enable debugging?
 AC_ARG_WITH([debug], [AS_HELP_STRING([--without-debug], [turn off debugging?])])
 if test "$with_debug" != "no"; then
-  AC_DEFINE([DODEBUG])
+  AC_DEFINE([DODEBUG], [1], [turn on debugging])
   CFLAGS="$CFLAGS -g -D_DEBUG_"
 fi
 
@@ -77,7 +82,7 @@ AC_ARG_WITH([conffile], [AS_HELP_STRING([--with-conffile=PATH], [cdebconf config
   "") AC_MSG_ERROR([invalid conffile specified]) ;;
   *) DEBCONFCONFIG="$withval" ;;
  esac])
-AC_DEFINE_UNQUOTED([DEBCONFCONFIG], ["$DEBCONFCONFIG"])
+AC_DEFINE_UNQUOTED([DEBCONFCONFIG], ["$DEBCONFCONFIG"], [cdebconf config file])
 
 DEFAULT_FRONTEND=text
 AC_ARG_WITH([default-frontend], [AS_HELP_STRING([--with-default-frontend], [default frontend to use [text]])],
@@ -91,7 +96,7 @@ dnl whether to use libtextwrap
 AC_ARG_WITH([textwrap], [AS_HELP_STRING([--with-textwrap], [use libtextwrap for line-folding])],
 [if test "x$withval" = "xyes" ; then
    AC_CHECK_LIB([textwrap], [textwrap_init],
-      [AC_DEFINE([HAVE_LIBTEXTWRAP],[1])
+      [AC_DEFINE([HAVE_LIBTEXTWRAP],[1],[use libtextwrap for line-folding])
          TEXTWRAP_LIBS="-ltextwrap"])
  fi])
 AC_SUBST([TEXTWRAP_LIBS])
@@ -99,12 +104,17 @@ AC_SUBST([TEXTWRAP_LIBS])
 dnl logging to syslog (should be configurable in config file
 AC_ARG_WITH([syslog-logging], [AS_HELP_STRING([--with-syslog-logging], [enable logging to syslog])],
 [if test "x$withval" = "xyes"; then
-   AC_DEFINE([SYSLOG_LOGGING])
+   AC_DEFINE([SYSLOG_LOGGING], [1], [enable logging to syslog])
  fi])
 
+TARGET=deb
 dnl compile cdebconf udeb?
 AC_ARG_ENABLE([d_i], [AS_HELP_STRING([--enable-d-i], [build cdebconf for the debian-installer])],
-[test "$enableval" = "yes" && CFLAGS="$CFLAGS -DDI_UDEB"])
+[if test "$enableval" = "yes"; then
+   CFLAGS="$CFLAGS -DDI_UDEB"
+   TARGET=udeb
+ fi])
+AC_SUBST([TARGET])
 
 dnl Check for libraries
 PKG_CHECK_MODULES([DI],[libdebian-installer])
@@ -169,9 +179,11 @@ AC_CHECK_FUNCS([socket strdup strstr strtol])
 AC_CONFIG_FILES([globalmakeflags src/cdebconf.conf-dist
  src/Makefile
  man/Makefile
+ src/modules/db/rfc822db/Makefile
  src/modules/frontend/gtk/Makefile
  src/modules/frontend/ncurses/Makefile
  src/modules/frontend/newt/Makefile
+ src/modules/frontend/passthrough/Makefile
  src/modules/frontend/slang/Makefile
  src/modules/frontend/text/Makefile
 ])

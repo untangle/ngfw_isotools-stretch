@@ -26,14 +26,14 @@ msgstr ""
 "Project-Id-Version: debian-installer_packages_po_sublevel1_bs\n"
 "Report-Msgid-Bugs-To: cdebconf@packages.debian.org\n"
 "POT-Creation-Date: 2012-10-18 06:02+0000\n"
-"PO-Revision-Date: 2012-03-16 13:07+0100\n"
-"Last-Translator: Armin Besirovic <armin@linux.org.ba>\n"
+"PO-Revision-Date: 2014-05-12 13:38+0100\n"
+"Last-Translator: Amila Valjevčić <valjevcic.amila@gmail.com>\n"
 "Language-Team: Bosnian <lokal@linux.org.ba>\n"
 "Language: bs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: 3\n"
+"Plural-Forms: 3;\n"
 
 #. Type: select
 #. Choices
@@ -80,8 +80,8 @@ msgid ""
 "shown to you; all less important questions are skipped."
 msgstr ""
 "Programski paketi koji koriste debconf za konfiguraciju daju nivoe "
-"prioriteta pitanjima koje vam mogu postaviti. Samo ona pitanja s određenim "
-"nivoom prioriteta ili većim se zapravo postavljaju vama; sva pitanja manjeg "
+"prioriteta pitanjima koje Vam mogu postaviti. Samo ona pitanja s određenim "
+"nivoom prioriteta ili većim se zapravo postavljaju Vama; sva pitanja manjeg "
 "nivoa prioriteta se izostavljaju."
 
 #. Type: select
@@ -117,7 +117,7 @@ msgid ""
 "For example, this question is of medium priority, and if your priority were "
 "already 'high' or 'critical', you wouldn't see this question."
 msgstr ""
-"Naprimjer, ovo pitanje je srednjeg nivoa prioriteta i da je vaš nivo "
+"Naprimjer, ovo pitanje je srednjeg nivoa prioriteta i da je Vaš nivo "
 "prioriteta već bio podešen na 'visoki' ili 'kritični', ne biste vidjeli ovo "
 "pitanje."
 
@@ -183,7 +183,7 @@ msgstr "Prekini"
 #. :sl1:
 #: ../cdebconf-newt-udeb.templates:6001
 msgid "<Tab> moves; <Space> selects; <Enter> activates buttons"
-msgstr "<Tab> pomiče; <Space> odabire; <Enter> aktivira dugmad"
+msgstr "<Tab> pomiče; <Space> odabire; <Enter> aktivira tipke"
 
 #. Type: text
 #. Description
@@ -340,7 +340,7 @@ msgstr "Nijedno"
 #. :sl4:
 #: ../cdebconf.templates:2001
 msgid "'None' will never ask you any question."
-msgstr ""
+msgstr "'Nijedno' Vam neće postavljati pitanja."
 
 #. Type: string
 #. Description

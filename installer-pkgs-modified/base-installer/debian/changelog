@@ -1,3 +1,205 @@
+base-installer (1.154) unstable; urgency=low
+
+  [ Updated translations ]
+  * Kazakh (kk.po) by Baurzhan Muftakhidinov
+
+ -- Christian Perrier <bubulle@debian.org>  Fri, 10 Apr 2015 13:29:28 +0200
+
+base-installer (1.153) unstable; urgency=low
+
+  [ Updated translations ]
+  * Danish (da.po) by Joe Hansen
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 07 Mar 2015 18:59:33 +0100
+
+base-installer (1.152) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * Add 586 flavour to i386 kernel selection
+  * Filter out linux-image-*-dbg packages from kernel selection
+    (Closes: #762907)
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 02 Nov 2014 08:05:33 +0100
+
+base-installer (1.151) unstable; urgency=medium
+
+  * Team upload
+
+  [ Ian Campbell ]
+  * Default to MODULES=most for initramfs on armhf. (Related to #762634).
+
+ -- Christian Perrier <bubulle@debian.org>  Wed, 22 Oct 2014 08:30:34 +0200
+
+base-installer (1.150) unstable; urgency=low
+
+  [ Updated translations ]
+  * Turkish (tr.po) by Mert Dirik
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 20 Sep 2014 09:33:52 +0200
+
+base-installer (1.149) unstable; urgency=medium
+
+  [ Updated translations ]
+  * Danish (da.po) by Joe Hansen
+  * Estonian (et.po) by Mattias Põldaru
+
+  [ Aurelien Jarno ]
+  * Remove s390 support.
+
+  [ Frederic Bonnard ]
+  * Add ppc64el support.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 30 Aug 2014 00:05:48 +0200
+
+base-installer (1.148) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * Group Loongson 3A and 3B in the same loongson-3 subarchitecture.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 12 Jul 2014 16:50:58 +0200
+
+base-installer (1.147) unstable; urgency=medium
+
+  [ Ian Campbell ]
+  * Add support for arm64, based loosely on 1.144ubuntu1.
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 12 Jul 2014 07:41:04 +0200
+
+base-installer (1.146) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * Always enable initrd on mips and mipsel.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 30 Jun 2014 23:32:03 +0200
+
+base-installer (1.145) unstable; urgency=medium
+
+  [ Updated translations ]
+  * Simplified Chinese (zh_CN.po) by YunQiang Su
+
+ -- Cyril Brulebois <kibi@debian.org>  Fri, 14 Mar 2014 14:12:18 +0100
+
+base-installer (1.144) unstable; urgency=medium
+
+  [ Colin Watson ]
+  * Remove some unused variables from tests.
+  * Set Acquire::https::Verify-Host "false" as well as
+    Acquire::https::Verify-Peer "false" if
+    debian-installer/allow_unauthenticated_ssl=true, to match the behaviour
+    of "wget --no-check-certificate" (thanks to Mark Russell for the
+    report).
+
+  [ Paul Wise ]
+  * Allow preseeding the debootstrap variant to use
+
+  [ Adam Conrad ]
+  * Add POWER7+ and POWER8 support to powerpc64.
+
+ -- Colin Watson <cjwatson@debian.org>  Thu, 27 Feb 2014 10:15:15 +0000
+
+base-installer (1.143) unstable; urgency=medium
+
+  * Add HTTPS support: pass --no-check-certificate to debootstrap if
+    debian-installer/allow_unauthenticated_ssl=true, set https_proxy if
+    necessary, and copy any certificates that exist in d-i into the target
+    system (LP: #1135163).
+
+ -- Colin Watson <cjwatson@debian.org>  Thu, 13 Feb 2014 13:59:27 +0000
+
+base-installer (1.142) unstable; urgency=medium
+
+  * pkgdetails.c: Only interpret percentages following whitespace, to cope
+    with GNU wget outputting the local file name (which may contain "%" due
+    to URL-encoding) after it finishes the download (LP: #1172101).
+
+ -- Colin Watson <cjwatson@debian.org>  Fri, 07 Feb 2014 16:17:36 +0000
+
+base-installer (1.141) unstable; urgency=low
+
+  [ Ian Campbell ]
+  * armhf: Support armmp kernel flavour on mx5 and express and as default on
+    generic platforms.
+  * armhf: Select armmp-lpae kernel flavour on generic platforms when the
+    hardware feature is available.
+
+ -- Colin Watson <cjwatson@debian.org>  Mon, 27 Jan 2014 17:10:49 +0000
+
+base-installer (1.140) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * mips: fix octeon cpuinfo.
+
+ -- Christian Perrier <bubulle@debian.org>  Mon, 30 Dec 2013 14:57:43 +0100
+
+base-installer (1.139) unstable; urgency=medium
+
+  * mips: Drop support for non-supported architectures.
+  * mips: Add support for octeon kernels.
+  * mipsel: Drop support for non-supported architectures
+  * mipsel: Add support for loongson-3a kernels.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Fri, 27 Dec 2013 21:23:37 +0100
+
+base-installer (1.138) unstable; urgency=low
+
+  [ Updated translations ]
+  * Bosnian (bs.po) by Amila Valjevčić
+  * Hungarian (hu.po) by Judit Gyimesi
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 15 Dec 2013 08:37:55 +0100
+
+base-installer (1.137) unstable; urgency=low
+
+  [ Updated translations ]
+  * Turkish (tr.po) by Mert Dirik
+  * Ukrainian (uk.po) by Yuri Chornoivan
+
+ -- Christian Perrier <bubulle@debian.org>  Thu, 07 Nov 2013 18:58:07 +0100
+
+base-installer (1.136) unstable; urgency=low
+
+  [ Updated translations ]
+  * Tajik (tg.po) by Victor Ibragimov
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 14 Sep 2013 09:39:23 +0200
+
+base-installer (1.135) unstable; urgency=low
+
+  [ Updated translations ]
+  * Tajik (tg.po) by Victor Ibragimov
+
+ -- Christian Perrier <bubulle@debian.org>  Fri, 06 Sep 2013 06:17:11 +0200
+
+base-installer (1.134) unstable; urgency=low
+
+  [ Updated translations ]
+  * Tajik (tg.po) by Victor Ibragimov
+
+ -- Christian Perrier <bubulle@debian.org>  Thu, 15 Aug 2013 22:04:16 +0200
+
+base-installer (1.133) unstable; urgency=low
+
+  [ Dmitrijs Ledkovs ]
+  * Set debian source format to '3.0 (native)'.
+  * Bump debhelper compat level to 9.
+  * Set Vcs-* to canonical format.
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 13 Jul 2013 13:47:55 +0200
+
+base-installer (1.132) unstable; urgency=low
+
+  [ Colin Watson ]
+  * Use correct compiler and strip when cross-building.
+
+ -- Christian Perrier <bubulle@debian.org>  Fri, 17 May 2013 15:00:00 +0200
+
+base-installer (1.131) unstable; urgency=low
+
+  [ Updated translations ]
+  * Croatian (hr.po) by Tomislav Krznar
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 12 May 2013 20:09:34 +0200
+
 base-installer (1.130) unstable; urgency=low
 
   [ Milan Kupcevic ]
