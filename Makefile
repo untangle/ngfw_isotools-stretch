@@ -57,6 +57,7 @@ clean: unpatch
 	cd $(ISOTOOLS_DIR)/d-i ; fakeroot debian/rules clean
 	rm -fr $(ISOTOOLS_DIR)/tmp $(ISO_DIR) $(ISOTOOLS_DIR)/debian-installer*
 	rm -f $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
+	rm -f $(ISOTOOLS_DIR)/debian-cd/CONF.sh.orig
 	rm -f installer-stamp
 
 patch: patch-stamp
