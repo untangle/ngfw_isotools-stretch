@@ -113,8 +113,8 @@ index 11c613d..ffea236 100644
 @@ -59,7 +59,7 @@ export BASEDIR=`pwd`
  # export CDNAME=debian
  
- # Building jessie cd set ...
--export CODENAME=squeeze
+ # Building wheezy cd set ...
+-export CODENAME=wheezy
 +export CODENAME=jessie
  
  # By default use Debian installer packages from $CODENAME
