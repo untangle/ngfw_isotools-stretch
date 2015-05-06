@@ -17,8 +17,8 @@ endif
 
 # constants
 ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
-KERNELS_i386 := "linux-image-3.2.0-4-untangle-686-pae"
-KERNELS_amd64 := "linux-image-3.2.0-4-untangle-amd64"
+KERNELS_i386 := "linux-image-3.16.0-4-untangle-686-pae"
+KERNELS_amd64 := "linux-image-3.16.0-4-untangle-amd64"
 ISO_DIR := $(ISOTOOLS_DIR)/images
 VERSION = $(shell cat $(ISOTOOLS_DIR)/resources/VERSION)
 ISO_IMAGE := $(ISO_DIR)/UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_`date --iso-8601=seconds`_`hostname -s`.iso
