@@ -92,7 +92,7 @@ repoint-stable:
 
 image:
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
-	build-simple-cdd --force-root --profiles default,expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro ; \
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --profiles default,expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro ; \
 	mv $(ISO_DIR)/debian-`perl -pe 's/(\d\.\d).*/\1/' /etc/debian_version`-$(ARCH)-CD-1.iso $(ISO_IMAGE)
 
 usb:
