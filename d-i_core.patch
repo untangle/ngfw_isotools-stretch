@@ -1,16 +1,16 @@
-diff --git a/isotools-jessie/d-i/build/Makefile b/isotools-jessie/d-i/build/Makefile
-index 54a2fde..3c2da84 100644
---- a/isotools-jessie/d-i/build/Makefile
-+++ b/isotools-jessie/d-i/build/Makefile
-@@ -496,7 +496,7 @@ ifndef ONLY_KLIBC
- 		-L $(TREE)/usr/lib/cdebconf/frontend \
- 		$(addprefix -l,$(notdir $(wildcard $(TREE)/usr/lib/cdebconf/frontend/*.so))) \
- 		`find $(TEMP) -type f -a \( -perm +0111 -o -name '*.so' -o -name '*.so.*' \) | \
--		 grep -v udeblibs | grep -v 'usr/lib/xorg/modules/.*\.so'`
-+		 grep -v udeblibs | grep -v 'usr/lib/xorg/modules/.*\.so'`| grep -v 'ld\.so\.8\.gz'
+# diff --git a/isotools-jessie/d-i/build/Makefile b/isotools-jessie/d-i/build/Makefile
+# index 54a2fde..3c2da84 100644
+# --- a/isotools-jessie/d-i/build/Makefile
+# +++ b/isotools-jessie/d-i/build/Makefile
+# @@ -496,7 +496,7 @@ ifndef ONLY_KLIBC
+#  		-L $(TREE)/usr/lib/cdebconf/frontend \
+#  		$(addprefix -l,$(notdir $(wildcard $(TREE)/usr/lib/cdebconf/frontend/*.so))) \
+#  		`find $(TEMP) -type f -a \( -perm +0111 -o -name '*.so' -o -name '*.so.*' \) | \
+# -		 grep -v udeblibs | grep -v 'usr/lib/xorg/modules/.*\.so'`
+# +		 grep -v udeblibs | grep -v 'usr/lib/xorg/modules/.*\.so'`| grep -v 'ld\.so\.8\.gz'
  
- ifeq ($(DEB_HOST_ARCH),armhf)
- 	# armhf has two linkers for now, while the world gets sorted
+#  ifeq ($(DEB_HOST_ARCH),armhf)
+#  	# armhf has two linkers for now, while the world gets sorted
 diff --git a/isotools-jessie/d-i/build/config/amd64/hd-media.cfg b/isotools-jessie/d-i/build/config/amd64/hd-media.cfg
 index 9e1e49c..e3ace1d 100644
 --- a/isotools-jessie/d-i/build/config/amd64/hd-media.cfg
@@ -61,19 +61,19 @@ index 9e1e49c..e3ace1d 100644
  
  DISK_LABEL = "bootable drive"
  MEDIA_TYPE = bootable drive
-diff --git a/isotools-jessie/d-i/debian/rules b/isotools-jessie/d-i/debian/rules
-index 232e195..60e2f41 100755
---- a/isotools-jessie/d-i/debian/rules
-+++ b/isotools-jessie/d-i/debian/rules
-@@ -10,7 +10,7 @@ TRANSSTATUS=
- BOOTMENU_BEEP=n
- else
- USE_UDEBS_FROM=jessie
--USE_PROPOSED_UPDATES=1
-+USE_PROPOSED_UPDATES=0
- TRANSSTATUS=translation-status
- BOOTMENU_BEEP=y
- endif
+# diff --git a/isotools-jessie/d-i/debian/rules b/isotools-jessie/d-i/debian/rules
+# index 232e195..60e2f41 100755
+# --- a/isotools-jessie/d-i/debian/rules
+# +++ b/isotools-jessie/d-i/debian/rules
+# @@ -10,7 +10,7 @@ TRANSSTATUS=
+#  BOOTMENU_BEEP=n
+#  else
+#  USE_UDEBS_FROM=jessie
+# -USE_PROPOSED_UPDATES=1
+# +USE_PROPOSED_UPDATES=0
+#  TRANSSTATUS=translation-status
+#  BOOTMENU_BEEP=y
+#  endif
 diff --git a/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86 b/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86
 index 426c996..ecaead6 100644
 --- a/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86
