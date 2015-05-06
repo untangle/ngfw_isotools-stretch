@@ -7,23 +7,15 @@
 
 use strict;
 use List::Util qw{first};
-# Give prefernce to i386 and amd64, if specified, or if building a
-# source-only CD.
-my @ARCHES;
-if ( $ENV{ARCHES} ) {
-    push @ARCHES, 'i386' if $ENV{ARCHES} =~ /i386/;
-    push @ARCHES, 'amd64' if $ENV{ARCHES} =~ /amd64/;
-    push @ARCHES, grep { !/source|i386|amd64/ } split /\s+/, $ENV{ARCHES};
-}
-@ARCHES = qw{i386 amd64} unless @ARCHES;
 
-my ($mirror, $codename, $pkg, $pth, $output);
+my ($mirror, $codename, $pkg, $pth, $output, $text_out);
 
 $mirror = shift;
 $codename = shift;
 $pkg = shift;
 $output = shift;
 $pth = "$mirror/dists/$codename";
+$text_out = "";
 
 my @components = qw(main);
 push @components, 'contrib' if $ENV{CONTRIB};
@@ -32,6 +24,39 @@ push @components, 'local' if $ENV{LOCAL};
 
 if (!defined ($output)) {
     $output = "binary";
+}
+
+# Give preference to i386 and amd64, if specified
+my @ARCHES;
+if ( $ENV{ARCHES} ) {
+    push @ARCHES, 'i386' if $ENV{ARCHES} =~ /i386/;
+    push @ARCHES, 'amd64' if $ENV{ARCHES} =~ /amd64/;
+    push @ARCHES, grep { !/source|i386|amd64/ } split /\s+/, $ENV{ARCHES};
+}
+
+# We seem to be building a source-only CD. Check for whatever binary
+# arches exist in the archive; #695244
+if (!@ARCHES) {
+        my %found_arches;
+        my $dh;
+        for my $component(@components) {
+                opendir ($dh, "$pth/$component");
+                if ($dh) {
+                        while (my $entry = readdir $dh) {
+                                $entry =~ /^binary-(.*)/ and $1 !~ /all/ and $found_arches{$1} = 1;
+                        }
+                }
+                close $dh;
+        }
+        if ($found_arches{"i386"}) {
+                push @ARCHES, 'i386';
+        }
+        if ($found_arches{"amd64"}) {
+                push @ARCHES, 'amd64';
+        }
+        for my $arch (sort keys %found_arches) {                
+                push @ARCHES, $arch;
+        }
 }
 
 sub grab_bin_info {
@@ -111,6 +136,10 @@ if ($pkg eq "silo") {
     }
 } elsif ($pkg eq "yaboot") {
     $pkgdata = grab_bin_info($pth, "powerpc", $pkg);
+} elsif ($pkg eq "delo") {
+    $pkgdata = grab_bin_info($pth, "mipsel", $pkg);
+} elsif ($pkg eq "palo") {
+    $pkgdata = grab_bin_info($pth, "hppa", $pkg);
 } else { # Fallthrough for all other packages
     first { $pkgdata = grab_bin_info($pth, $_, $pkg) } @ARCHES;
 }
@@ -118,7 +147,7 @@ if ($pkg eq "silo") {
 if (length($pkgdata) > 2) {
     if ($output eq "binary") {
         $pkgdata =~ m/^Filename: (\S+)/m and $bin_deb = $1;
-        print "$bin_deb\n";
+	$text_out = "$bin_deb\n";
     }
     elsif ($output eq "source") {
         $srcname = $pkg;
@@ -128,7 +157,15 @@ if (length($pkgdata) > 2) {
             my $dir;
             $pkgdata =~ m/^Directory: (\S+)/m and $dir = $1;
             # Explicitly use the md5 lines in the Sources stanza, hence the xdigit(32) here
-            while ($pkgdata =~ m/^ ([[:xdigit:]]{32}) (\d+) (\S+)/msg) { print "$dir/$3\n"; }
+            while ($pkgdata =~ m/^ ([[:xdigit:]]{32}) (\d+) (\S+)/msg) {
+		$text_out = $text_out . "$dir/$3\n";
+	    }
         }
     }
 }
+
+if (length($text_out) < 2) {
+    die "which_deb: can't find $output file(s) for $pkg in $codename\n";
+}
+
+print $text_out;

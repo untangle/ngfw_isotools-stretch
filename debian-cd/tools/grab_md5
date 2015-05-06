@@ -8,6 +8,8 @@
 # Parse Packages and Sources files out of a mirror and pre-process
 # them into a single list ready for mkisofs to check later
 
+set -e
+
 MIRROR=$1
 ARCHES="$2"
 CODENAME=$3
@@ -18,6 +20,13 @@ for ARCH in $ARCHES
 do
     LOCATIONS="$MIRROR/dists/$CODENAME/ $MIRROR/dists/$DI_CODENAME/"
     echo "Looking in $LOCATIONS"
+
+    for LOCATION in $LOCATIONS; do
+        if [ ! -d $LOCATION ]; then
+            echo "Error: $LOCATION is not a directory"
+            exit 1
+        fi
+    done
 
     case $ARCH in
         source)

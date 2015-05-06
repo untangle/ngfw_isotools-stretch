@@ -32,7 +32,10 @@ options=" -q -o Dir::State::status=$APTTMP/$CODENAME-$ARCH/status \
 		  -o Dir::Cache=$APTTMP/$CODENAME-$ARCH/apt-cache/ \
 		  -o Dir::Etc=$APTTMP/$CODENAME-$ARCH/apt/ \
 		  -o APT::Cache::AllVersions=0 \
-		  -o APT::Architecture=$ARCH "
+		  -o APT::Cache::ShowVersion=1 \
+		  -o APT::Architecture=$ARCH \
+		  -o APT::Architectures::=$ARCH \
+		  -o Acquire::Languages=none"
 
 sections=main
 if [ "${NONFREE:-0}" != "0" ] || [ "${EXTRANONFREE:-0}" != "0" ] || [ "${FORCE_FIRMWARE:-0}" != "0" ]; then

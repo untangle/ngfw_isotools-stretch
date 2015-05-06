@@ -21,7 +21,12 @@ ifndef TASK
 TASK=Debian-generic
 endif
 ifndef MKISOFS
+ifneq (,$(filter i386 amd64 arm64,$(ARCHES)))
+export MKISOFS=xorriso
+export MKISOFS_OPTS=-as mkisofs -r -checksum_algorithm_iso md5,sha1
+else
 export MKISOFS=$(shell which genisoimage mkisofs | head -1)
+endif
 endif
 ifndef MKISOFS_OPTS
 #For normal users
@@ -31,6 +36,12 @@ MKISOFS_OPTS=-r
 endif
 ifndef HOOK
 HOOK=$(BASEDIR)/tools/$(CODENAME).hook
+endif
+ifndef ARCHIVE_KEYRING_PACKAGE
+ARCHIVE_KEYRING_PACKAGE=debian-archive-keyring
+endif
+ifndef ARCHIVE_KEYRING_FILE
+ARCHIVE_KEYRING_FILE=usr/share/keyrings/debian-archive-keyring.gpg
 endif
 
 export BUILD_DATE=$(shell date -u +%Y%m%d-%H:%M)
@@ -51,6 +62,9 @@ endif
 ifneq (${ARCH_MKISOFS_OPTS},)
     MKISOFS_OPTS = ${ARCH_MKISOFS_OPTS}
 endif
+ifndef DEBOOTSTRAP_OPTS
+DEBOOTSTRAP_OPTS=--no-check-gpg
+endif
 
 ## Internal variables  
 apt=$(BASEDIR)/tools/apt-selection
@@ -61,7 +75,6 @@ grab_md5=$(BASEDIR)/tools/grab_md5
 make_image=$(BASEDIR)/tools/make_image
 merge_package_lists=$(BASEDIR)/tools/merge_package_lists
 update_popcon=$(BASEDIR)/tools/update_popcon
-update_tasks=$(BASEDIR)/tools/update_tasks
 grab_source_list=$(BASEDIR)/tools/grab_source_list
 which_deb=$(BASEDIR)/tools/which_deb
 
@@ -70,7 +83,7 @@ TASKDIR=$(BDIR)/tasks
 ADIR=$(APTTMP)
 DB_DIR=$(BDIR)/debootstrap
 
-export DEBOOTSTRAP_DIR := $(DB_DIR)/usr/lib/debootstrap
+export DEBOOTSTRAP_DIR := $(DB_DIR)/usr/share/debootstrap
 export PATH := $(DB_DIR)/usr/sbin:$(PATH)
 export BDIR
 export TASKDIR
@@ -85,6 +98,9 @@ default:
 
 # Basic checks in order to avoid problems
 ok:
+ifdef FORCE_FAIL
+	@echo Debug variable FORCE_FAIL defined -- abort now; false
+endif
 ifndef TDIR
 	@echo TDIR undefined -- set up CONF.sh; false
 endif
@@ -99,6 +115,9 @@ ifndef ARCHES
 endif
 ifndef CODENAME
 	@echo CODENAME undefined -- set up CONF.sh; false
+endif
+ifndef DISKTYPE
+	@echo DISKTYPE undefined -- set up CONF.sh; false
 endif
 ifndef OUT
 	@echo OUT undefined -- set up CONF.sh; false
@@ -133,12 +152,9 @@ ifneq ($(ARCHES),source)
 	$(Q)mkdir -p $(TASKDIR)
 	$(Q)echo "- copying task files from 'tasks/$(DI_CODENAME)/'"
 	$(Q)cp -r $(BASEDIR)/tasks/$(CODENAME)/* $(TASKDIR)
-	$(Q)echo "- task.languages: using 'tasks/$(DI_CODENAME)/$(TASK_LANGLIST)'"
-	$(Q)cp -r $(BASEDIR)/tasks/$(DI_CODENAME)/$(TASK_LANGLIST) \
-		$(TASKDIR)/task.languages
 	$(Q)echo "- generating dynamic task files"
 	$(Q)set -e; cd $(TASKDIR); \
-#		sh -x $(BASEDIR)/tools/update_tasks;
+		$(BASEDIR)/tools/update_tasks; \
 		$(BASEDIR)/tools/generate_di_list; \
 		$(BASEDIR)/tools/generate_di+k_list
 ifeq ($(FORCE_FIRMWARE),1)
@@ -155,8 +171,8 @@ LATEST_DB := $(MIRROR)/$(shell $(which_deb) $(MIRROR) $(CODENAME) debootstrap)
 $(DB_DIR): $(LATEST_DB)
 	@rm -rf $(DB_DIR)
 	$(Q)dpkg -x $(LATEST_DB) $(DB_DIR)
-	$(Q)if [ ! -e $(DEBOOTSTRAP_DIR) ] ; then \
-		ln -sf share $(DB_DIR)/usr/lib ; \
+	$(Q)if [ ! -e $(DEBOOTSTRAP_DIR)/scripts/$(CODENAME) ] ; then \
+		ln -sf sid $(DEBOOTSTRAP_DIR)/scripts/$(CODENAME) ; \
 	fi
 endif
 
@@ -206,7 +222,7 @@ $(ADIR)/status:
 	@echo "Generating a fake status file for apt-get and apt-cache..."
 	$(Q)for ARCH in $(ARCHES); do \
 		mkdir -p $(ADIR)/$(CODENAME)-$$ARCH/apt/preferences.d; \
-		if [ $$ARCH = "source" -o "$(INSTALLER_CD)" = "1" -o "$(INSTALLER_CD)" = "2" -o "$(INSTALLER_CD)" = "C" ];then \
+		if [ $$ARCH = "source" -o "$(INSTALLER_CD)" = "1" -o "$(INSTALLER_CD)" = "2" -o "$(INSTALLER_CD)" = "C" -o "$(INSTALLER_CD)" = "F" ];then \
 			:> $(ADIR)/$(CODENAME)-$$ARCH/status ; \
 		else \
 			zcat $(MIRROR)/dists/$(CODENAME)/main/binary-$$ARCH/Packages.gz | \
@@ -215,11 +231,32 @@ $(ADIR)/status:
 		fi; \
 	done;
 	:> $(ADIR)/status
-    # Updating the apt database
+
+	# Set up keyring so apt doesn't complain
+	@echo "Setting up archive-keyring"
+	$(Q)mkdir -p $(TDIR)/archive-keyring
+	$(Q)dpkg -x $(MIRROR)/$(shell $(which_deb) $(MIRROR) $(CODENAME) $(ARCHIVE_KEYRING_PACKAGE)) $(TDIR)/archive-keyring
+	$(Q)for ARCH in $(ARCHES); do \
+		mkdir -p $(ADIR)/$(CODENAME)-$$ARCH/apt/trusted.gpg.d; \
+		ln -s $(TDIR)/archive-keyring/$(ARCHIVE_KEYRING_FILE) $(ADIR)/$(CODENAME)-$$ARCH/apt/trusted.gpg.d; \
+	done
+
+	# Updating the apt database
 	$(Q)for ARCH in $(ARCHES); do \
 		export ARCH=$$ARCH; \
 		$(apt) update; \
 	done
+
+	# If we're doing a build using d-i from sid, we'll need sid sources too
+	if [ "$(INC_SOURCE)"x = "yes"x ] && \
+		[ "$(DI_CODENAME)"x != ""x ] && \
+		[ "$(DI_CODENAME)"x != "$(CODENAME)"x ] ; then \
+		mkdir -p $(ADIR)/$(DI_CODENAME)-source/apt/preferences.d ; \
+		:> $(ADIR)/$(DI_CODENAME)-source/status ; \
+		export CODENAME=$(DI_CODENAME); \
+		export ARCH=source; \
+		$(apt) update; \
+	fi
     #
     # Checking the consistency of the standard system
     # If this does fail, then launch make correctstatus
@@ -255,9 +292,8 @@ correctstatus: status apt-update
 			export ARCH=$$ARCH; \
 			for i in `$(apt) selected -f install`; do \
 				echo $$ARCH:$$i; \
-				$(apt) cache dumpavail | perl -000 -ne \
-				"s/^(Package: .*)\$$/\$$1\nStatus: install ok installed/m; \
-				print if /^Package: \Q$$i\E\s*\$$/m;" \
+				$(apt) cache --no-all-versions show "$$i" | perl -000 -npe \
+				"s/^(Package: .*)\$$/\$$1\nStatus: install ok installed/m;" \
 				>> $(ADIR)/$(CODENAME)-$$ARCH/status; \
 			done; \
 		done; \
@@ -297,7 +333,8 @@ $(BDIR)/rawlist:
 		elif [ "$(INSTALLER_CD)"x = "2"x -o "$(INSTALLER_CD)"x = "C"x ] ; then \
 			echo "mawk" >>$(BDIR)/rawlist; \
 		else \
-			echo -e "mawk\nexim4-daemon-light" >>$(BDIR)/rawlist; \
+			echo "mawk" >>$(BDIR)/rawlist; \
+			echo "exim4-daemon-light" >>$(BDIR)/rawlist; \
 		fi; \
 	fi
 
@@ -308,7 +345,7 @@ $(BDIR)/rawlist:
 				[ -z "$$BINCLUDE" ] || BINCLUDE="--include=$$BINCLUDE"; \
 				BEXCLUDE=`[ -n "$(BASE_EXCLUDE)" ] && cat $(BASE_EXCLUDE) | tr "\n" "," | sed 's!,$$!!g'`; \
 				[ -z "$$BEXCLUDE" ] || BEXCLUDE="--exclude=$$BEXCLUDE"; \
-				debootstrap --arch $$ARCH \
+				debootstrap $(DEBOOTSTRAP_OPTS) --arch $$ARCH \
 				            --print-debs \
 				            $$BINCLUDE $$BEXCLUDE \
 				            $(CODENAME) \
@@ -335,9 +372,12 @@ $(BDIR)/rawlist:
 	if [ "$(EXCLUDE_486_KERNEL)"x = "1"x ] ; then \
 		ARCHDEFS="$$ARCHDEFS -DARCH_i386_EXCLUDE_486_KERNEL"; \
 	fi; \
+	if [ "$(EXCLUDE_586_KERNEL)"x = "1"x ] ; then \
+		ARCHDEFS="$$ARCHDEFS -DARCH_i386_EXCLUDE_586_KERNEL"; \
+	fi; \
 	if [ "$(SOURCEONLY)"x != "yes"x ] ; then \
 		cat $(TASKDIR)/$(TASK) | \
-		cpp -nostdinc -nostdinc++ -P -undef $$ARCHDEFS $$VARIANTDEFS\
+		cpp -nostdinc -P -undef $$ARCHDEFS $$VARIANTDEFS\
 	   		$$ARCHUNDEFS -U i386 -U linux -U unix \
 		    -DFORCENONUSONCD1=0 \
 		    -I $(TASKDIR) - - >> $(BDIR)/rawlist; \

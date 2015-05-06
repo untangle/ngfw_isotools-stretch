@@ -6,7 +6,7 @@ PUBDIRJIG=$1
 RSYNC_TARGET=$2
 ARCH=$3
 
-LOG=~/build/log/$ARCH.iso_run
+LOG=~/build.jessie/log/$ARCH.iso_run
 HOSTNAME=`hostname -f`
 LOCK=~/iso_run.lock
 START=`date -u +%H:%M:%S`
@@ -18,28 +18,26 @@ if lockfile -! -l 43200 -r-1 "$LOCK"; then
 fi
 trap "rm -f $LOCK > /dev/null 2>&1" exit  
 
+COPY_START=`date -u +%H:%M:%S`
+
 rm -f $LOG
 
 # Given an ISO image:
-# 1. create the torrent file
-# 2. create the list file
-# 3. copy all of them into place
+# 1. create the torrent file if desired (only for release builds)
+# 2. copy all of them into place
 process_iso() {
     FILE=$1
     OUTDIR=$2
 
-    BTFILE=`echo $FILE.torrent | sed 's/iso-/bt-/'`
-    ~/build/mktorrent $FILE >> $LOG
-
-    LISTFILE=`echo $FILE | sed 's/iso-/list-/g;s/\.iso$/.list.gz/g'`
-    ~/build/mklist $FILE >> $LOG
-
     echo $OUTDIR/$FILE >> $LOG
     cp -a $FILE $OUTDIR/$FILE
-    echo $OUTDIR/$BTFILE >> $LOG
-    cp -a $BTFILE $OUTDIR/$BTFILE
-    echo $OUTDIR/$LISTFILE >> $LOG
-    cp -a $LISTFILE $OUTDIR/$LISTFILE
+
+    if [ "$RELEASE_BUILD"x != ""x ] ; then
+	~/build.jessie/mktorrent $FILE >> $LOG
+	BTFILE=`echo $FILE.torrent | sed 's/iso-/bt-/'`
+	echo $OUTDIR/$BTFILE >> $LOG
+	cp -a $BTFILE $OUTDIR/$BTFILE
+    fi
 }
 
 # Poor man's rsync, but with some local optimisations
@@ -48,31 +46,68 @@ copy_files() {
     TARGET=$2
     ARCHES=$3
 
+    DISKTYPES="cd dvd bd dlbd"
+    DIRTYPES="iso jigdo list"
+
+    # Only make torrent files and dirs for release builds
+    if [ "$RELEASE_BUILD"x != ""x ] ; then
+	DIRTYPES="$DIRTYPES bt"
+    fi
+
     CURRENT=`pwd`
     cd $SRC
     for ARCH in $ARCHES
     do
-        for DISKTYPE in dvd cd bd; do
-            for DIRTYPE in bt iso jigdo list; do
+        for DISKTYPE in $DISKTYPES; do
+            for DIRTYPE in $DIRTYPES; do
                 mkdir -p -m775 $TARGET/$ARCH.tmp/$DIRTYPE-$DISKTYPE
             done
         done
 
         cd $ARCH
-	    find . -name '*.jigdo' -o -name '*.template' -o -name '*SUMS*' | \
-	        xargs tar cf - | (cd $TARGET/$ARCH.tmp/ && tar xvf -) >> $LOG
-
-        rm -rf bt-* list-*
-        mkdir bt-cd bt-dvd bt-bd list-cd list-dvd list-bd
-        for file in iso-*/*.iso; do
-	    if [ -e $file ] ; then
-		process_iso $file $TARGET/$ARCH.tmp
+        find . -name '*.jigdo' -o -name '*.template' \
+	    -o -name '*.list.gz' -o -name '*SUMS*' | \
+            xargs tar cf - | (cd $TARGET/$ARCH.tmp/ && tar xvf -) >> $LOG
+	
+        # Only make torrent files and dirs for release builds
+        rm -rf bt-*
+        for DISKTYPE in $DISKTYPES; do
+	    if [ "$RELEASE_BUILD"x != ""x ] ; then
+		mkdir bt-$DISKTYPE
 	    fi
-        done
-        DATE=`date -u`
-        sed "s/ARCH/$ARCH/g;s/DATE/$DATE/g" ~/build/weekly.html \
-            > $TARGET/$ARCH.tmp/HEADER.html
+	    for FILE in iso-$DISKTYPE/*.iso; do
+		if [ -e $FILE ] ; then
+		    process_iso $FILE $TARGET/$ARCH.tmp
+		fi
+	    done
+	    if [ "$RELEASE_BUILD"x != ""x ] ; then
+		for FILE in $TARGET/$ARCH.tmp/iso-$DISKTYPE/*SUMS*; do
+		    if [ -e $FILE ] ; then
+			cp -al $FILE $TARGET/$ARCH.tmp/bt-$DISKTYPE/
+		    fi
+		done
+	    fi
+	done
+
+	if [ "$RELEASE_BUILD"x = ""x ] ; then
+	    # Only populate the HEADER.html file for regular weekly
+	    # builds; we don't want it for releases
+            DATE=`date -u`
+            sed "s/ARCH/$ARCH/g;s/DATE/$DATE/g" ~/build.jessie/weekly.html \
+		> $TARGET/$ARCH.tmp/HEADER.html
+	fi
+
+	# Now clean up any directories without any real content
+	# (i.e. empty dir, or just containing checksum files)
+	for dir in $TARGET/$ARCH.tmp/*-* ; do
+	    num=`ls -l $dir | grep -v -e SUMS -e total | wc -l`
+	    if [ $num = 0 ] ; then 
+		rm -rf $dir
+	    fi
+	done	
+
         cd ..
+
     done
     cd $CURRENT
 }
@@ -91,5 +126,5 @@ mkdir -p $RSYNC_TARGET/trace
 date -u > $RSYNC_TARGET/trace/cdimage.debian.org
 
 END=`date -u +%H:%M:%S`
-echo "$ARCH synced across; started at $START, ended at $END"
+echo "$ARCH synced across to $RSYNC_TARGET; started at $START, copying started at $COPY_START, ended at $END"
 echo "$END: Finished" >> $LOG

@@ -17,7 +17,7 @@ fi
 export TDIR=/org/cdbuilder.debian.org/dst/deb-cd/tmp/firmware
 export BASEDIR=$TOPDIR/debian-cd
 mkdir -p $TDIR
-fakeroot $BASEDIR/tools/make-firmware-image $MIRROR $SUITE $TDIR $BASEDIR
+fakeroot $BASEDIR/tools/make-firmware-image $MIRROR $SUITE $TDIR
 
 DATE=`date +%Y%m%d`
 mkdir -p $OUT/$SUITE/$DATE

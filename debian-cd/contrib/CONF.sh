@@ -47,8 +47,8 @@ unset BASE_EXCLUDE      || true
 # Where I am (hoping I'm in the debian-cd dir)
 export BASEDIR=`pwd`
 
-# Building squeeze cd set ...
-export CODENAME=squeeze
+# Building jessie cd set ...
+export CODENAME=jessie
 
 if [ ! "$DI_CODENAME" ]
 then
@@ -145,23 +145,27 @@ export CONTRIB=1
 # Options
 #export MKISOFS="$BASEDIR/../mkisofs/usr/bin/mkisofs"
 #export MKISOFS="$BASEDIR/../genisoimage/usr/bin/genisoimage"
-export MKISOFS="$BASEDIR/../genisoimage"
+#export MKISOFS="$BASEDIR/../genisoimage"
 #export MKISOFS_OPTS="-jigdo-template-compress bzip2 -r -checksum_algorithm_iso md5,sha1,sha256,sha512"
-export MKISOFS_OPTS="-jigdo-template-compress bzip2 -r " #-checksum_algorithm_iso md5,sha1"
+#export MKISOFS_OPTS="-joliet-long -jigdo-template-compress bzip2 -r -checksum_algorithm_iso md5,sha1,sha256,sha512" #-checksum_algorithm_iso md5,sha1"
 # export MKISOFS_OPTS="-r"		#For normal users
 # export MKISOFS_OPTS="-r -F ."	#For symlink farmers
+export MKISOFS="/home/93sam/xorriso"
+export MKISOFS_OPTS="-as mkisofs -r -checksum_algorithm_iso md5,sha1,sha256,sha512"
 
 # Override for i386,amd64,multi to use xorriso.
 # BE AWARE: for multi-arch the order of the arches here will have to
 # match the order they're declared in the build
-export i386_MKISOFS="/home/93sam/xorriso"
-export i386_MKISOFS_OPTS="-as mkisofs -r -checksum_algorithm_iso md5,sha1"
-export amd64_MKISOFS="/home/93sam/xorriso"
-export amd64_MKISOFS_OPTS="-as mkisofs -r -checksum_algorithm_iso md5,sha1"
-export amd64_i386_MKISOFS="/home/93sam/xorriso"
-export amd64_i386_MKISOFS_OPTS="-as mkisofs -r -checksum_algorithm_iso md5,sha1"
-export i386_amd64_source_MKISOFS="/home/93sam/xorriso"
-export i386_amd64_source_MKISOFS_OPTS="-as mkisofs -r -checksum_algorithm_iso md5,sha1"
+#export i386_MKISOFS="/home/93sam/xorriso"
+#export i386_MKISOFS_OPTS="-as mkisofs -r -checksum_algorithm_iso md5,sha1,sha256,sha512"
+#export amd64_MKISOFS="/home/93sam/xorriso"
+#export amd64_MKISOFS_OPTS="-as mkisofs -r -checksum_algorithm_iso md5,sha1,sha256,sha512"
+#export amd64_i386_MKISOFS="/home/93sam/xorriso"
+#export amd64_i386_MKISOFS_OPTS="-as mkisofs -r -checksum_algorithm_iso md5,sha1,sha256,sha512"
+#export i386_amd64_source_MKISOFS="/home/93sam/xorriso"
+#export i386_amd64_source_MKISOFS_OPTS="-as mkisofs -joliet-long -r -checksum_algorithm_iso md5,sha1,sha256,sha512"
+export powerpc_MKISOFS="$BASEDIR/../genisoimage"
+export powerpc_MKISOFS_OPTS="-joliet-long -jigdo-template-compress bzip2 -r -checksum_algorithm_iso md5,sha1,sha256,sha512" #-checksum_algorithm_iso md5,sha1"
 
 # ISOLinux support for multiboot on CD1 for i386
 export ISOLINUX=1
@@ -199,7 +203,7 @@ export TASK_LANGLIST=tasksel_d-i.languages
 
 # Set this if the recommended packages should be skipped when adding 
 # package on the CD.  The default is 'false'.
-export NORECOMMENDS=1
+export NORECOMMENDS=0
 
 # Set this if the suggested packages should be skipped when adding 
 # package on the CD.  The default is 'true'.
@@ -261,7 +265,7 @@ do
     JIGDO_OPTS="$JIGDO_OPTS -jigdo-exclude $EXCL"
 done
 
-export IGNORE_MISSING_BOOT_SCRIPT=1
+export IGNORE_MISSING_BOOT_SCRIPT=0
 
 # Where to find the boot disks
 #export BOOTDISKS=$TOPDIR/ftp/skolelinux/boot-floppies
@@ -309,3 +313,8 @@ case "$OFFICIAL"x in
                export OFFICIAL_VAL=0
                ;;
 esac
+
+# Base link for snapshot.debian.org or similar
+# "SNAPDATETIME" will be replaced at runtime with the correct data
+# Leave this unset to not add this entry
+export SNAPURL=Debian=http://snapshot.debian.org/archive/debian/SNAPDATETIME/

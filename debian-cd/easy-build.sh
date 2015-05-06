@@ -150,7 +150,7 @@ esac
 
 # By default a GNOME CD/DVD is built, but other desktops are supported too
 if [ "$desktop" ]; then
-	if [ ! -e tasks/$CODENAME/task.list.$desktop ]; then
+	if [ ! -e tasks/$CODENAME/Debian-$desktop ]; then
 		echo "Error: desktop '$desktop' is not supported for $CODENAME"
 		exit 1
 	fi

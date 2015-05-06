@@ -12,13 +12,16 @@ exit 0 if $ENV{ARCHES} =~ /^\s*source\s*$/;
 
 my @ARCHES;
 if ( $ENV{ARCHES} ) {
-    push @ARCHES, 'i386' if $ENV{ARCHES} =~ /[^\s]i386[\s\$]/;
-    push @ARCHES, 'amd64' if $ENV{ARCHES} =~ /[^\s]amd64[\s\$]/;
+    push @ARCHES, 'i386' if $ENV{ARCHES} =~ /(^|\s)i386(\s|$)/;
+    push @ARCHES, 'amd64' if $ENV{ARCHES} =~ /(^|\s)amd64(\s|$)/;
     push @ARCHES, grep { !/^(source|i386|amd64)$/ } split /\s+/, $ENV{ARCHES};
 }
 @ARCHES = qw{i386 amd64} unless @ARCHES;
 
-@VARIANTS = split(" ", $ENV{VARIANTS});
+my @VARIANTS;
+if ( $ENV{VARIANTS} ) {
+    @VARIANTS = split(" ", $ENV{VARIANTS});
+}
 
 my $DATE=`date`;
 chomp $DATE;

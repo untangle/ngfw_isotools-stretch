@@ -1,81 +1,98 @@
 #!/bin/bash
 
 TOPDIR=$(dirname $0)
+if [ "$TOPDIR" = "." ] ; then
+    TOPDIR=`pwd`
+fi
+export TOPDIR
 
 . $TOPDIR/settings.sh
 
+BUILDLOCK=$HOME/.debian-cd.lock
 export PUBDIRJIG=$PUBDIR/daily-builds
 export DATE_BUILD="$DATE-$BUILDNUM"
-export TESTING_SUITE=squeeze
+export TESTING_SUITE=jessie
 BUILDS_RUNNING=""
 
-export SID_WANTED=1
+export NI_WANTED=1
+export TESTING_WANTED=0
+
+if [ "$RELEASE_BUILD"x = ""x ] ; then
+    export SID_WANTED=1
+    export OUT_FREE_TST=${PUBDIRJIG}/${TESTING_SUITE}_d-i/${DATE_BUILD}
+    export OUT_FW_TST=${PUBDIRJIG}-firmware/${TESTING_SUITE}_d-i/${DATE_BUILD}
+    export OUT_FREE_SID=${PUBDIRJIG}/sid_d-i/${DATE_BUILD}
+    export OUT_FW_SID=${PUBDIRJIG}-firmware/sid_d-i/${DATE_BUILD}
+    export RSYNC_TARGET_FREE=/mnt/nfs-cdimage/daily-builds
+    export RSYNC_TARGET_FIRMWARE=/mnt/nfs-cdimage/unofficial/non-free/cd-including-firmware/daily-builds
+else
+    export SID_WANTED=0
+    export TESTING_WANTED=1
+    export OUT_FREE_TST=${PUBDIRJIG}-$RELEASE_BUILD
+    export OUT_FW_TST=${PUBDIRJIG}-$RELEASE_BUILD-firmware
+    export OUT_FREE_SID=""
+    export OUT_FW_SID=""
+    export RSYNC_TARGET_FREE=/mnt/nfs-cdimage/.${RELEASE_BUILD}
+    export RSYNC_TARGET_FIRMWARE=/mnt/nfs-cdimage/unofficial/non-free/cd-including-firmware/.${RELEASE_BUILD}
+    export CONF=~/build.jessie/CONF.sh.${RELEASE_BUILD}
+    export RELEASE_BUILD=$RELEASE_BUILD
+    export EXTENSION=".small"
+fi
 
 . $TOPDIR/common.sh
 
-# If we're doing a normal set of daily/weekly builds, leave the
-# checksum filenames alone. Otherwise, make life easier for people
-# combining things later and append a suitable name as we build.
-if [ "$DEBVERSION"x != "testing"x ] ; then
-    export SUMS_EXTENSION=".small"
-fi
+# Make sure the machine isn't rebooted while we're busy
+reboot_lock
 
 finalise_arch_dir () {
     ARCH=$1
-    INST_VER=$2
-    TYPE=$3
 
-    if [ "$TYPE" = "free" ] ; then
-	ARCH_DIR=$PUBDIRJIG/${INST_VER}_d-i/$DATE_BUILD/$ARCH/
-    elif [ "$TYPE" = "firmware" ] ; then
-	ARCH_DIR=$PUBDIRJIG-firmware/${INST_VER}_d-i/$DATE_BUILD/$ARCH
-    else
-	echo "Uncaught finalise_arch_dir TYPE \"$TYPE\""
-	exit 1
-    fi
-
-    # Only keep things / do any work here if there are any files in the ARCH_DIR
-    NUM_FILES=`find $ARCH_DIR -type f | wc -l`
-    if [ $NUM_FILES = 0 ] ; then
-	rm -rf $ARCH_DIR
-    else
-	ARCH_ISO_DIR=${ARCH_DIR}/iso-cd
-	ARCH_JIGDO_DIR=${ARCH_DIR}/jigdo-cd
-
-	cd $ARCH_ISO_DIR
-	DATESTRING=`date -u`
-	if [ "$TYPE" = "free" ] ; then
-	    sed "s/ARCH/$ARCH/g;s/DATE/$DATESTRING/g;s/BUILDNUM/$BUILDNUM/g;s/INST_VER/$INST_VER/g" $TOPDIR/daily.html > HEADER.html
+    for OUT_DIR in $OUT_FREE_TST $OUT_FW_TST $OUT_FREE_SID $OUT_FW_SID; do
+	ARCH_DIR=$OUT_DIR/$ARCH
+        # Only keep things / do any work here if there are any files in the ARCH_DIR
+	NUM_FILES=`find $ARCH_DIR -type f | wc -l`
+	if [ $NUM_FILES = 0 ] ; then
+	    rm -rf $ARCH_DIR
 	else
-	    sed "s/ARCH/$ARCH/g;s/DATE/$DATESTRING/g;s/BUILDNUM/$BUILDNUM/g;s/INST_VER/$INST_VER/g" $TOPDIR/daily-firmware.html > HEADER.html
+	    ARCH_ISO_DIR=${ARCH_DIR}/iso-cd
+	    ARCH_JIGDO_DIR=${ARCH_DIR}/jigdo-cd
+
+	    if [ "$RELEASE_BUILD"x = ""x ] ; then
+		DATESTRING=`date -u`
+		case $ARCH_ISO_DIR in
+		    *firmware*)
+			INFILE=$TOPDIR/daily-firmware.html;;
+		    *)
+			INFILE=$TOPDIR/daily.html;;
+		esac
+		sed "s/ARCH/$ARCH/g;s/DATE/$DATESTRING/g;s/BUILDNUM/$BUILDNUM/g;s/INST_VER/$INST_VER/g" \
+		    $INFILE > $ARCH_DIR/HEADER.html
+	    fi
+
+	    generate_checksums_for_arch $ARCH $ARCH_JIGDO_DIR
+
+	    cd $ARCH_DIR
+	    # Only make torrent files for release builds
+	    if [ "$RELEASE_BUILD"x != ""x ] ; then
+		~/build.jessie/mktorrent iso-cd/*iso
+		cp iso-cd/*SUMS* bt-cd
+	    fi
+	    if [ "$RELEASE_BUILD"x = ""x ] ; then
+		echo "Signing checksums files using the automatic key"
+		~/build.jessie/sign-images $OUT_DIR $ARCH
+	    fi
+	    ~/build.jessie/mklist iso-cd/*iso
+	    cd $TOPDIR
 	fi
-	$TOPDIR/debian-cd/tools/imagesums $ARCH_JIGDO_DIR $SUMS_EXTENSION
-	cp $ARCH_JIGDO_DIR/*SUMS* $ARCH_ISO_DIR
-	cd ..
-	~/build/mktorrent iso-cd/*iso
-	~/build/mklist iso-cd/*iso
-	cd $TOPDIR
-    fi
+    done
 }
 
-export RSYNC_TARGET_FREE=/mnt/nfs-cdimage/daily-builds
-export RSYNC_TARGET_FIRMWARE=/mnt/nfs-cdimage/unofficial/non-free/cd-including-firmware
-
-if [ "$ARCHES"x = ""x ] ; then
-    ARCHES="amd64 armel hppa i386 ia64 mips mipsel powerpc sparc multi-arch kfreebsd-amd64 kfreebsd-i386"
-#    ARCHES="amd64"
-fi
-
-if [ "$ARCHES_FIRMWARE"x = ""x ] ; then
-    ARCHES_FIRMWARE="amd64 i386 powerpc multi-arch"
-#    ARCHES_FIRMWARE="amd64"
-fi
-
 cd $TOPDIR &&
-if lockfile -r0 .debian-cd.lock ; then
+if lockfile -r0 $BUILDLOCK ; then
 
-    echo "svn update debian-cd:"
-    cd debian-cd && svn cleanup ; svn up ; cd ..
+#    echo "NOT checking for git updates"
+    echo "git update debian-cd"
+    cd debian-cd && git pull ; cd ..
 
     cd $TOPDIR
 
@@ -87,31 +104,23 @@ if lockfile -r0 .debian-cd.lock ; then
     export KERNEL_PARAMS="desktop=all"
 
     for arch in $ARCHES; do
+        # We don't do source daily builds
+        if [ "$arch" = "source" ] ; then
+            continue
+        fi
+
 	rm -rf $PUBDIRJIG/$arch
 	arch_error=""
 	arch_start=`now`
-	
-        echo "Building $arch:"
-	for ARCHDIR in \
-	    ${PUBDIRJIG}/${TESTING_SUITE}_d-i/${DATE_BUILD}/${arch} \
-	    ${PUBDIRJIG}-firmware/${TESTING_SUITE}_d-i/${DATE_BUILD}/${arch} \
-	    ; do
-	    mkdir -p ${ARCHDIR}/iso-cd ${ARCHDIR}/jigdo-cd
+
+	for OUT_DIR in $OUT_FREE_TST $OUT_FW_TST $OUT_FREE_SID $OUT_FW_SID; do
+	    mkdir -p ${OUT_DIR}/${arch}/iso-cd ${OUT_DIR}/${arch}/jigdo-cd
 	done
 
-	if [ "$SID_WANTED" = "1" ] ; then
-	    for ARCHDIR in \
-		${PUBDIRJIG}/sid_d-i/${DATE_BUILD}/${arch} \
-		${PUBDIRJIG}-firmware/sid_d-i/${DATE_BUILD}/${arch} \
-		; do
-		mkdir -p ${ARCHDIR}/iso-cd ${ARCHDIR}/jigdo-cd
-	    done
-	fi
-
         if [ "$arch" = "multi-arch" ] ; then
-	    for arch1 in $ARCHES_FIRMWARE; do
-		if [ "$arch" = "$arch1" ] ; then
-		    if [ "$SID_WANTED" = "1" ] ; then
+	    if $(arch_has_firmware $arch) ; then
+		if [ "$SID_WANTED" = "1" ] ; then
+		    if [ "$NI_WANTED" = "1" ] ; then
 			build_started SIDNIFIRMWARE
 			OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
 			    NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=C \
@@ -121,52 +130,57 @@ if lockfile -r0 .debian-cd.lock ; then
 			    DI=sid DI_DIST="$DI_DIST" VARIANTS=xen \
 			    DI_WWW_HOME=default ./testingcds "amd64 i386" &
 		    fi
+		fi
 
-		    build_started TESTINGNIFIRMWARE
+		if [ "$TESTING_WANTED" = "1" ] ; then
+		    if [ "$NI_WANTED" = "1" ] ; then
+			build_started TESTINGNIFIRMWARE
+			OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
+			    NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=C \
+			    FORCE_FIRMWARE=1 CDNAME=firmware \
+			    TASK=debian-installer+kernel LOGAPPEND="-1" \
+			    MAXISOS=ALL MAXJIGDOS=ALL \
+			    DI=${TESTING_SUITE} DI_DIST="$DI_DIST" VARIANTS=xen \
+			    ./testingcds "amd64 i386" &
+		    fi
+		fi
+	    fi
+
+	    if [ "$SID_WANTED" = "1" ] ; then
+		if [ "$NI_WANTED" = "1" ] ; then
+		    build_started SIDNI
 		    OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
-			NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=C \
-			FORCE_FIRMWARE=1 CDNAME=firmware \
+			NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=2 \
+			TASK=debian-installer+kernel LOGAPPEND="-1" \
+			MAXISOS=ALL MAXJIGDOS=ALL \
+			DI=sid DI_DIST="$DI_DIST" VARIANTS=xen \
+			DI_WWW_HOME=default ./testingcds "amd64 i386" &
+		fi
+	    fi
+
+	    if [ "$TESTING_WANTED" = "1" ] ; then
+		if [ "$NI_WANTED" = "1" ] ; then
+		    build_started TESTINGNI
+		    OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
+			NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=2 \
 			TASK=debian-installer+kernel LOGAPPEND="-1" \
 			MAXISOS=ALL MAXJIGDOS=ALL \
 			DI=${TESTING_SUITE} DI_DIST="$DI_DIST" VARIANTS=xen \
 			./testingcds "amd64 i386" &
 		fi
-	    done
-
-	    if [ "$SID_WANTED" = "1" ] ; then
-		build_started SIDNI
-		OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
-                    NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=2 \
-                    TASK=debian-installer+kernel LOGAPPEND="-1" \
-                    MAXISOS=ALL MAXJIGDOS=ALL \
-                    DI=sid DI_DIST="$DI_DIST" VARIANTS=xen \
-                    DI_WWW_HOME=default ./testingcds "amd64 i386" &
 	    fi
-
-	    build_started TESTINGNI
-            OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
-                NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=2 \
-                TASK=debian-installer+kernel LOGAPPEND="-1" \
-                MAXISOS=ALL MAXJIGDOS=ALL \
-                DI=${TESTING_SUITE} DI_DIST="$DI_DIST" VARIANTS=xen \
-                ./testingcds "amd64 i386" &
 
 	    catch_parallel_builds
 	    rm -rf $PUBDIRJIG/$arch
 	    if [ "$arch_error"x = "none"x ] ; then
-		finalise_arch_dir $arch ${TESTING_SUITE} free
-		finalise_arch_dir $arch ${TESTING_SUITE} firmware
-		if [ "$SID_WANTED" = "1" ] ; then
-		    finalise_arch_dir $arch sid free
-		    finalise_arch_dir $arch sid firmware
-		fi
+		finalise_arch_dir $arch
 	    fi
 
         else # end of m-a
 
-	    for arch1 in $ARCHES_FIRMWARE; do
-		if [ "$arch" = "$arch1" ] ; then
-		    if [ "$SID_WANTED" = "1" ] ; then
+	    if $(arch_has_firmware $arch) ; then
+		if [ "$SID_WANTED" = "1" ] ; then
+		    if [ "$NI_WANTED" = "1" ] ; then
 			build_started SIDNIFIRMWARE
 			OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
 			    FORCE_FIRMWARE=1 CDNAME=firmware \
@@ -175,56 +189,74 @@ if lockfile -r0 .debian-cd.lock ; then
 			    DI=sid DI_WWW_HOME=default DI_DIR="$ARCH_DI_DIR" \
 			    ./testingcds "$arch" &
 		    fi
+		fi
 
-		    build_started TESTINGNIFIRMWARE
+		if [ "$TESTING_WANTED" = "1" ] ; then
+		    if [ "$NI_WANTED" = "1" ] ; then
+			build_started TESTINGNIFIRMWARE
+			OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
+			    FORCE_FIRMWARE=1 CDNAME=firmware \
+			    NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=C \
+			    TASK=debian-installer+kernel MAXISOS=ALL MAXJIGDOS=ALL \
+			    DI=${TESTING_SUITE} DI_DIST="$DI_DIST" \
+			    ./testingcds "$arch" &
+		    fi
+		fi
+	    fi
+
+	    if [ "$SID_WANTED" = "1" ] ; then
+		if [ "$NI_WANTED" = "1" ] ; then
+		    build_started SIDNI
 		    OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
-			FORCE_FIRMWARE=1 CDNAME=firmware \
-			NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=C \
+			NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=2 \
+			TASK=debian-installer+kernel MAXISOS=ALL MAXJIGDOS=ALL \
+			DI=sid DI_WWW_HOME=default DI_DIR="$ARCH_DI_DIR" \
+			./testingcds "$arch" &
+		fi
+	    fi
+
+	    if [ "$TESTING_WANTED" = "1" ] ; then
+		if [ "$NI_WANTED" = "1" ] ; then
+		    build_started TESTINGNI
+		    OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
+			NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=2 \
 			TASK=debian-installer+kernel MAXISOS=ALL MAXJIGDOS=ALL \
 			DI=${TESTING_SUITE} DI_DIST="$DI_DIST" \
 			./testingcds "$arch" &
 		fi
-	    done
-
-	    if [ "$SID_WANTED" = "1" ] ; then
-		build_started SIDBC
-		OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
-		    NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=1 \
-		    TASK=debian-installer MAXISOS=ALL MAXJIGDOS=ALL \
-		    DI=sid DI_WWW_HOME=default DI_DIR="$ARCH_DI_DIR" \
-		    ./testingcds "$arch" &
-
-		build_started SIDNI
-		OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
-		    NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=2 \
-		    TASK=debian-installer+kernel MAXISOS=ALL MAXJIGDOS=ALL \
-		    DI=sid DI_WWW_HOME=default DI_DIR="$ARCH_DI_DIR" \
-		    ./testingcds "$arch" &
 	    fi
 
-	    build_started TESTINGBC
-	    OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
-		NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=1 \
-		TASK=debian-installer MAXISOS=ALL MAXJIGDOS=ALL \
-		DI=${TESTING_SUITE} DI_DIST="$DI_DIST" \
-		./testingcds "$arch" &
+	    # Special Mac-only builds
+            if [ "$arch" = "i386" ] ; then
+		if [ "$SID_WANTED" = "1" ] ; then
+		    if [ "$NI_WANTED" = "1" ] ; then
+			build_started SIDMACNI
+			OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
+			    NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=F \
+			    TASK=debian-installer+kernel MAXISOS=ALL MAXJIGDOS=ALL \
+			    BOOT_METHODS=BIOS CDNAME="debian-mac" \
+			    DI=sid DI_WWW_HOME=default DI_DIR="$ARCH_DI_DIR" \
+			    ./testingcds "$arch" &
+		    fi
+		fi
 
-	    build_started TESTINGNI
-	    OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
-		NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=2 \
-		TASK=debian-installer+kernel MAXISOS=ALL MAXJIGDOS=ALL \
-		DI=${TESTING_SUITE} DI_DIST="$DI_DIST" \
-		./testingcds "$arch" &
+		if [ "$TESTING_WANTED" = "1" ] ; then
+		    if [ "$NI_WANTED" = "1" ] ; then
+			build_started TESTINGMACNI
+			OMIT_RELEASE_NOTES=1 OMIT_MANUAL=1 NORECOMMENDS=1 \
+			    NOSUGGESTS=1 COMPLETE=0 INSTALLER_CD=F \
+			    TASK=debian-installer+kernel MAXISOS=ALL MAXJIGDOS=ALL \
+			    BOOT_METHODS=BIOS CDNAME="debian-mac" \
+			    DI=${TESTING_SUITE} DI_DIST="$DI_DIST" \
+			    ./testingcds "$arch" &
+		    fi
+		fi
+	    fi
 
 	    catch_parallel_builds
 	    rm -rf $PUBDIRJIG/$arch
 	    if [ "$arch_error"x = "none"x ] ; then
-		finalise_arch_dir $arch ${TESTING_SUITE} free
-		finalise_arch_dir $arch ${TESTING_SUITE} firmware
-		if [ "$SID_WANTED" = "1" ] ; then
-		    finalise_arch_dir $arch sid free
-		    finalise_arch_dir $arch sid firmware
-		fi
+		finalise_arch_dir $arch
 	    fi
 
         fi # end of normal arch build
@@ -232,30 +264,37 @@ if lockfile -r0 .debian-cd.lock ; then
 
     if [ "$NOSYNC"x = ""x ] ; then
 
-        echo "Clean up old builds on build machine:"
-        for DIR in $PUBDIRJIG/* $PUBDIRJIG-firmware/* ; do
-            cd $DIR
-            for THIS in 20* ; do
-                if [ $THIS != $DATE-$BUILDNUM ] ; then
-                    echo "  Deleting $DIR/$THIS"
-                    rm -rf $DIR/$THIS
-                fi
+	if [ "$RELEASE_BUILD"x = ""x ] ; then
+            echo "Clean up old builds on build machine:"
+            for DIR in $PUBDIRJIG/* $PUBDIRJIG-firmware/* ; do
+		cd $DIR
+		for THIS in 20* ; do
+                    if [ $THIS != $DATE-$BUILDNUM ] ; then
+			echo "  Deleting $DIR/$THIS"
+			rm -rf $DIR/$THIS
+                    fi
+		done
             done
-        done
 
-	echo "Sync normal builds across to output dir: $RSYNC_TARGET_FREE"
-        rsync -rHltv $PUBDIRJIG/ $RSYNC_TARGET_FREE/
-        echo "Remove extra builds for normal dailies:"
-        ~/bin/remove_extra_dailies $RSYNC_TARGET_FREE "$ARCHES"
-
-	echo "Sync firmware builds across to output dir: $RSYNC_TARGET_FIRMWARE"
-        rsync -rHltv $PUBDIRJIG-firmware/ $RSYNC_TARGET_FIRMWARE/
-        echo "Remove extra builds for firmware dailies:"
-        ~/bin/remove_extra_dailies $RSYNC_TARGET_FIRMWARE "$ARCHES_FIRMWARE"
-
-        echo "$DATE-$BUILDNUM" > $RSYNC_TARGET_FREE/daily-trace
+	    echo "Sync normal builds across to output dir: $RSYNC_TARGET_FREE"
+            rsync -rHltv $PUBDIRJIG/ $RSYNC_TARGET_FREE/
+            echo "Remove extra builds for normal dailies:"
+            ~/bin/remove_extra_dailies $RSYNC_TARGET_FREE "$ARCHES"
+	    
+	    echo "Sync firmware builds across to output dir: $RSYNC_TARGET_FIRMWARE"
+            rsync -rHltv $PUBDIRJIG-firmware/ $RSYNC_TARGET_FIRMWARE/
+            echo "Remove extra builds for firmware dailies:"
+            ~/bin/remove_extra_dailies $RSYNC_TARGET_FIRMWARE "$ARCHES_FIRMWARE"
+	    
+            echo "$DATE-$BUILDNUM" > $RSYNC_TARGET_FREE/daily-trace
+	else # Release build
+	    echo "Sync normal builds for $RELEASE_BUILD across to output dir: $RSYNC_TARGET_FREE"
+            rsync -rHltv $OUT_FREE_TST/ $RSYNC_TARGET_FREE/	    
+	    echo "Sync firmware builds for $RELEASE_BUILD across to output dir: $RSYNC_TARGET_FIRMWARE"
+            rsync -rHltv $OUT_FW_TST/ $RSYNC_TARGET_FIRMWARE/
+	fi
     fi
 
     cd $TOPDIR
-    rm -f .debian-cd.lock
+    rm -f $BUILDLOCK
 fi

@@ -47,8 +47,10 @@ fi
 (dpkg --fsys-tarfile $MIRROR/$silo_deb | \
 	tar xf - -C $inst/ ./boot/{isofs,second}.b)
 
-echo $silo_deb >> $CDDIR/../$N.pkgs_extracted
-find_pkg_file silo source >> $CDDIR/../$N.pkgs_extracted
+if [ -n "$ARCHIVE_EXTRACTED_SOURCES" ]; then
+    echo $silo_deb >> $CDDIR/../$N.pkgs_extracted
+    find_pkg_file silo source >> $CDDIR/../$N.pkgs_extracted
+fi
 
 # Some custom etc files
 cp -f -p $BASEDIR/data/wheezy/sparc/silo.conf $inst/boot/

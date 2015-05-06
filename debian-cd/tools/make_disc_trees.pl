@@ -14,7 +14,7 @@ use Compress::Zlib;
 
 my %pkginfo;
 my ($basedir, $mirror, $tdir, $codename, $archlist, $mkisofs, $maxcds,
-    $maxisos, $maxjigdos, $extranonfree);
+    $maxisos, $maxjigdos, $extranonfree, $nonfree, $contrib, $use_local);
 my $mkisofs_base_opts = "";
 my $mkisofs_opts = "";
 my $mkisofs_dirs = "";
@@ -22,6 +22,7 @@ my (@arches, @arches_nosrc, @overflowlist, @pkgs_added);
 my (@exclude_packages, @unexclude_packages, @excluded_package_list);
 my %firmware_package;
 my $current_checksum_type = "";
+my %descriptions;
 
 undef @pkgs_added;
 undef @exclude_packages;
@@ -36,46 +37,31 @@ $archlist = shift;
 $mkisofs = shift;
 $mkisofs_base_opts = shift;
 
-my $security = $ENV{'SECURITY'} || $mirror;
-my $localdebs = $ENV{'LOCALDEBS'} || $mirror;
+require "$basedir/tools/link.pl";
+
 my $iso_blksize = 2048;
 my $log_opened = 0;
 my $old_split = $/;
-my $symlink_farm = $ENV{'SYMLINK'} || 0;
-my $link_verbose = $ENV{'VERBOSE'} || 0;
-my $link_copy = $ENV{'COPYLINK'} || 0;
-
-require "$basedir/tools/link.pl";
-
-$maxcds = 9999;
+my $security = read_env('SECURITY', $mirror);
+my $localdebs = read_env('LOCALDEBS', $mirror);
+my $symlink_farm = read_env('SYMLINK', 0);
+my $link_verbose = read_env('VERBOSE', 0);
+my $link_copy = read_env('COPYLINK', 0);
 
 # MAXCDS is the hard limit on the MAXIMUM number of images to
 # make. MAXJIGDOS and MAXISOS can only make this number smaller; we
 # will use the higher of those 2 numbers as the last image to go to,
 # if they're set
+$maxcds = read_env('MAXCDS', 9999);
 
-if (defined($ENV{'MAXCDS'})) {
-	$maxcds = $ENV{'MAXCDS'};
-} else {
-	$maxcds = 9999;
+$maxisos = read_env('MAXISOS', 9999);
+if ($maxisos =~ 'ALL' || $maxisos =~ 'all') {
+    $maxisos = 9999;
 }
 
-if (defined($ENV{'MAXISOS'})) {
-	$maxisos = $ENV{'MAXISOS'};
-    if ($maxisos =~ 'ALL' || $maxisos =~ 'all') {
-        $maxisos = 9999;
-    }
-} else {
-	$maxisos = 9999;
-}
-
-if (defined($ENV{'MAXJIGDOS'})) {
-	$maxjigdos = $ENV{'MAXJIGDOS'};
-    if ($maxjigdos =~ 'ALL' || $maxjigdos =~ 'all') {
-        $maxjigdos = 9999;
-    }
-} else {
-	$maxjigdos = 9999;
+$maxjigdos = read_env('MAXJIGDOS', 9999);
+if ($maxjigdos =~ 'ALL' || $maxjigdos =~ 'all') {
+    $maxjigdos = 9999;
 }
 
 if ($maxisos > $maxjigdos) {
@@ -90,11 +76,10 @@ if ($maxisos < $maxcds) {
     $maxcds = $maxisos;
 }
 
-if (defined($ENV{'EXTRANONFREE'})) {
-	$extranonfree = $ENV{'EXTRANONFREE'};
-} else {
-	$extranonfree = 0;
-}
+$extranonfree = read_env('EXTRANONFREE', 0);
+$nonfree = read_env('NONFREE', 0);
+$contrib = read_env('CONTRIB', 0);
+$use_local = read_env('LOCAL', 0);
 	
 my $list = "$tdir/list";
 my $bdir = "$tdir/$codename";
@@ -113,6 +98,19 @@ foreach my $arch (split(' ', $archlist)) {
 	}
     # Pre-cache all the package information that we need
     load_packages_cache($arch);
+}
+
+if (! ($archlist eq "source")) {
+    load_descriptions("main");
+    if ($contrib) {
+        load_descriptions("contrib");
+    }
+    if ($nonfree || $extranonfree) {
+        load_descriptions("non-free");
+    }
+    if ($use_local) {
+        load_descriptions("local");
+    }
 }
 
 my $disknum = 1;
@@ -144,10 +142,7 @@ my $size = 0;
 my $guess_size = 0;
 my @overflowpkg;
 my $mkisofs_check = "$mkisofs $mkisofs_base_opts -r -print-size -quiet";
-my $debootstrap_script = "";
-if (defined ($ENV{'DEBOOTSTRAP_SCRIPT'})) {
-	$debootstrap_script = $ENV{'DEBOOTSTRAP_SCRIPT'};
-}
+my $debootstrap_script = read_env('DEBOOTSTRAP_SCRIPT', "");
 
 chdir $bdir;
 
@@ -285,6 +280,8 @@ while (defined (my $pkg = <INLIST>)) {
             (($size > $size_swap_check) &&
              ($count_since_last_check > $size_check_period))) {
             $count_since_last_check = 0;
+            # Recompress files as needed before the size check
+            find (\&recompress, "$cddir/dists");
             print LOG "Running $size_check $cddir\n";
             $size = `$size_check $cddir`;
             chomp $size;
@@ -295,6 +292,8 @@ while (defined (my $pkg = <INLIST>)) {
                 $pkg = pop(@pkgs_added);
                 print LOG "CD $disknum over-full ($size > $maxdiskblocks). Rollback!\n";
                 $guess_size = int($hfs_mult * add_packages("--rollback", $cddir, $pkg));
+                # Recompress files as needed before the size check
+                find (\&recompress, "$cddir/dists");
                 $size=`$size_check $cddir`;
                 chomp $size;
                 print LOG "CD $disknum: Real current size is $size blocks after rolling back $pkg\n";
@@ -339,6 +338,7 @@ close(LOG);
 #  Local helper functions
 #
 #############################################
+# Load up information about all the packages
 sub load_packages_cache {
     my $arch = shift;
     my @pkglist;
@@ -359,6 +359,7 @@ sub load_packages_cache {
     close INLIST;
 
     print "Reading in package information for $arch:\n";
+    print LOG "Reading in package information for $arch:\n";
 
     $/ = ''; # Browse by paragraph
     while (@pkglist) {
@@ -372,7 +373,7 @@ sub load_packages_cache {
         }
         while (defined($_ = <LIST>)) {
             m/^Package: (\S+)/m and $p = $1;
-            $pkginfo{$arch}{$p} = $_;
+            push @{$pkginfo{$arch}{$p}}, $_;
             $num_pkgs++;
         }
         close LIST;
@@ -380,6 +381,53 @@ sub load_packages_cache {
     }
     $/ = $old_split; # Browse by line again
     print "  Done: Read details of $num_pkgs packages for $arch\n";
+}
+
+# Load all the translated descriptions we can find
+sub load_descriptions {
+    my $suite = shift;
+    my $lang;
+	my $dh;
+    my ($p);
+    my $num_total = 0;
+    my $num_files = 0;
+    my $dir = "$mirror/dists/$codename/$suite/i18n";
+    if ($suite =~ /local/) {
+        $dir = "$localdebs/dists/$codename/$suite/i18n";
+    }
+    my @files;
+
+    if (-d $dir) {
+        print "Reading in translated package descriptions for $suite:\n";
+        print LOG "Reading in translated package descriptions for $suite:\n";
+        opendir($dh, $dir) || die "can't opendir $dir: $!\n";
+        @files = readdir($dh);
+        $/ = ''; # Browse by paragraph
+        foreach my $file (@files) {
+            if ($file =~ /Translation-(.*).bz2/) {
+                my $num_descs = 0;
+                $lang = $1;
+                open(BZ, "bzip2 -cd $dir/$file |") ||
+                    die "can't open description file $dir/$file for reading: $!\n";
+                $num_files++;
+                print LOG "  Parsing $file\n";
+                while (defined($_ = <BZ>)) {
+                    m/^Package: (\S+)/m and $p = $1;
+                    $descriptions{"$lang"}{$p}{"data"} = $_;
+                    $descriptions{"$lang"}{$p}{"used"} = 0;
+                    $num_descs++;
+                    $num_total++;
+                }
+                close(BZ);
+                print LOG "    $num_descs descriptions\n";
+            }
+        }
+        $/ = $old_split; # Browse by line again
+        print "  Done: read $num_total entries for $num_files languages\n";
+        print LOG "  Done: read $num_total entries for $num_files languages\n";
+    } else {
+        print "WARNING: no translated descriptions found for $codename/$suite\n";
+    }
 }
 
 sub should_start_extra_nonfree {
@@ -527,14 +575,31 @@ sub checksum_file {
 	return ($checksum, $st->size);
 }
 
-sub recompress {
-	# Recompress the Packages and Sources files; workaround for bug
-	# #402482
+sub remove_uncompressed {
 	my ($filename);
 
 	$filename = $File::Find::name;
 
+	if ($filename =~ m/\/.*\/(Packages|Sources)$/o ||
+		$filename =~ m/\/.*\/i18n\/(Translation-[_a-zA-Z]+)$/o)
+	{
+		unlink($_) or die "Failed to remove $_: $!\n";
+	}
+}
+
+sub recompress {
+	# Recompress various files
+	my ($filename);
+
+	$filename = $File::Find::name;
+
+	# Packages and Sources files; workaround for bug #402482
 	if ($filename =~ m/\/.*\/(Packages|Sources)$/o) {
+		system("gzip -9c < $_ >$_.gz");
+	}
+	# Translation files need to be compressed in .gz format on CD?
+	if ($filename =~ m/\/.*\/i18n\/(Translation.*)$/o &&
+		! ($filename =~ m/\/.*\/i18n\/(Translation.*gz)$/o)) {
 		system("gzip -9c < $_ >$_.gz");
 	}
 }	
@@ -544,7 +609,7 @@ sub find_and_checksum_files_for_release {
 
 	$filename = $File::Find::name;
 
-	if ($filename =~ m/\/.*\/(Packages|Sources|Release)/o) {
+	if ($filename =~ m/\/.*\/(Packages|Sources|Release|Translation)/o) {
 		$filename =~ s/^\.\///g;
 		($checksum, $size) = checksum_file($_, $current_checksum_type);
 		printf RELEASE " %s %8d %s\n", $checksum, $size, $filename;
@@ -598,7 +663,7 @@ sub get_disc_size {
     }
 
     # See if we've been asked to switch sizes for the whole set
-    $disk_size_hack = $ENV{'FORCE_CD_SIZE'} || "";
+    $disk_size_hack = read_env('FORCE_CD_SIZE', "");
     if ($disk_size_hack) {
        print LOG "HACK HACK HACK: FORCE_CD_SIZE found:\n";
        print LOG "  forcing use of a $disk_size_hack disk instead of $chosen_disk\n";
@@ -606,7 +671,7 @@ sub get_disc_size {
     }
 
     # If we're asked to do a specific size for *this* disknum, over-ride again
-    $disk_size_hack = $ENV{"FORCE_CD_SIZE$disknum"} || "";
+    $disk_size_hack = read_env("FORCE_CD_SIZE$disknum", "");
     if ($disk_size_hack) {
        print LOG "HACK HACK HACK: FORCE_CD_SIZE$disknum found:\n";
        print LOG "  forcing use of a $disk_size_hack disk instead of $chosen_disk\n";
@@ -653,7 +718,7 @@ sub get_disc_size {
         $maxdiskblocks = int(8 * $GB / $blocksize) - $reserved;
         $diskdesc = "8GB STICK";
     } elsif ($chosen_disk eq "CUSTOM") {
-        $maxdiskblocks = $ENV{'CUSTOMSIZE'}  - $reserved || 
+        $maxdiskblocks = $ENV{'CUSTOMSIZE'} - $reserved || 
             die "Need to specify a custom size for the CUSTOM disktype\n";
         $diskdesc = "User-supplied size";
     }
@@ -776,6 +841,7 @@ sub finish_disc {
 	find (\&recompress, ".");
 	checksum_files_for_release();
 	close(RELEASE);
+	find (\&remove_uncompressed, ".");
 	chdir("../..");
 
 	print "  Finishing off md5sum.txt\n";
@@ -850,10 +916,10 @@ sub Packages_dir {
 # Dump the apt-cached data into a Packages file; make the parent dir
 # for the Packages file if necesssary
 sub add_Packages_entry {
-    my ($p, $file, $section, $pdir, $pkgfile, $gz);
     my $dir = shift;
     my $arch = shift;
-    my ($st1, $st2, $size1, $size2);
+    my $_ = shift;
+    my ($p, $file, $section, $pdir, $pkgfile, $gz, $st1, $st2, $size1, $size2);
     my $blocks_added = 0;
     my $old_blocks = 0;
     my $new_blocks = 0;
@@ -863,10 +929,16 @@ sub add_Packages_entry {
 
     if ($arch eq "source") {
         m/^Directory: (\S+)/mi and $file = $1;
+        if (!defined($file)) {
+            die "Can't parse source file information out of $_\n";
+        }
         $pdir = Packages_dir($dir, $file, $section) . "/source";
         $pkgfile = "$pdir/Sources";
     } else {
         m/^Filename: (\S+)/mi and $file = $1;
+        if (!defined($file)) {
+            die "Can't parse binary file information out of $_\n";
+        }
         $pdir = Packages_dir($dir, $file, $section) . "/binary-$arch";
         $pkgfile = "$pdir/Packages";
     }
@@ -907,13 +979,79 @@ sub add_Packages_entry {
     return $blocks_added;
 }
 
+# Write out translated description(s) for a package
+sub add_trans_desc_entry {
+    my $dir = shift;
+    my $arch = shift;
+    my $_ = shift;
+    my ($p, $file, $section, $idir, $pkgfile, $gz, $st);
+    my $size = 0;
+    my $blocks_added = 0;
+    my $old_blocks = 0;
+    my $new_blocks = 0;
+
+    m/^Package: (\S+)/m and $p = $1;
+    m/^Section: (\S+)/m and $section = $1;
+
+    m/^Filename: (\S+)/mi and $file = $1;
+    $idir = Packages_dir($dir, $file, $section) . "/i18n";
+
+    if (! -d $idir) {
+        system("mkdir -p $idir");
+        $blocks_added++;
+    }	
+
+    foreach my $lang (keys %descriptions) {
+        # Do we have a translation for this language?
+        if (defined $descriptions{$lang}{$p}{"data"}) {
+            my $trans_file = "$idir/Translation-$lang";
+
+            msg_ap(0, "  Adding $p to $trans_file(.gz)\n");
+
+            if ($descriptions{$lang}{$p}{"used"}) {
+                msg_ap(0, "    - not, already included\n");
+            } else {
+                # Keeping files in .gz format is far too expensive in
+                # terms of de-compressing and re-compressing all the
+                # time. Store uncompressed and only compress when we're
+                # finished. Analysis of typical text suggests that gzip
+                # will give roughly a factor of 2 compresssion here, so
+                # use that estimate. For accuracy, we may end up
+                # compressing *anyway* just before doing a size check; if
+                # so, we'll need to uncompress again on entry here.
+
+                if (-f "$trans_file.gz") {
+                    system("gunzip $trans_file.gz");
+                }
+
+                if (-f $trans_file) {
+                    $st = stat("$trans_file") || die "unable to stat $trans_file\n";
+                    $old_blocks += size_in_blocks($st->size / 2);
+                }
+
+                # Add the new description
+                open(IFILE, ">> $trans_file");
+                print IFILE $descriptions{$lang}{$p}{"data"};
+                $descriptions{$lang}{$p}{"used"} = 1;
+                close(IFILE);
+
+                $st = stat("$trans_file") || die "unable to stat $trans_file\n";
+                $size += int($st->size / 2);
+                $new_blocks += size_in_blocks($st->size / 2);
+            }
+        }
+    }
+    $blocks_added += ($new_blocks - $old_blocks);
+    msg_ap(0, "    now $size bytes, $blocks_added blocks added\n");
+    return $blocks_added;
+}
+
 sub add_md5_entry {
     my $dir = shift;
     my $arch = shift;
-    my ($pdir, $file, $md5);
+    my $_ = shift;
+    my ($pdir, $file, $md5, $st, $size, $p);
     my $md5file = "$dir/md5sum.txt";
-    my ($st, $size);
-    my $p;
     my $blocks_added = 0;
     my $old_blocks = 0;
     my $new_blocks = 0;
@@ -949,10 +1087,11 @@ sub add_md5_entry {
 
 # Roll back the results of add_Packages_entry()
 sub remove_Packages_entry {
-    my ($p, $file, $section, $pdir, $pkgfile, $tmp_pkgfile, $match, $gz);
     my $dir = shift;
     my $arch = shift;
-    my ($st1, $st2, $size1, $size2);
+    my $_ = shift;
+    my ($p, $file, $section, $pdir, $pkgfile, $tmp_pkgfile, $match, $gz,
+        $st1, $st2, $size1, $size2);
     my $blocks_removed = 0;
     my $old_blocks = 0;
     my $new_blocks = 0;
@@ -996,6 +1135,7 @@ sub remove_Packages_entry {
             $gz->gzwrite($match) or die "Failed to write $pkgfile.gz: $gzerrno\n";
         }
     }
+    $/ = $old_split; # Browse by line again
 
     $gz->gzclose();
     close(IFILE);
@@ -1013,14 +1153,84 @@ sub remove_Packages_entry {
     return $blocks_removed;
 }
 
+# Roll back the result of add_trans_desc_entry()
+sub remove_trans_desc_entry {
+    my $dir = shift;
+    my $arch = shift;
+    my $_ = shift;
+    my ($p, $file, $section, $idir, $gz, $match, $st);
+    my $size = 0;
+    my $blocks_added = 0;
+    my $old_blocks = 0;
+    my $new_blocks = 0;
+
+    m/^Package: (\S+)/m and $p = $1;
+    m/^Section: (\S+)/m and $section = $1;
+
+    m/^Filename: (\S+)/mi and $file = $1;
+    $idir = Packages_dir($dir, $file, $section) . "/i18n";
+
+    $/ = ''; # Browse by paragraph
+    foreach my $lang (keys %descriptions) {
+        # Do we have a translation for this language?
+        if (defined $descriptions{$lang}{$p}{"data"}) {
+            my $trans_file = "$idir/Translation-$lang";
+            my $tmp_tfile = "$trans_file" . ".rollback";
+            my $entries_remaining = 0;
+
+            msg_ap(0, "  Removing $p from $trans_file(.gz)\n");
+
+            # Keeping files in .gz format is expensive - see comment
+            # in add_trans_desc_entry() above.
+            if (-f "$trans_file.gz") {
+                system("gunzip $trans_file.gz");
+            }
+            $st = stat("$trans_file") || die "unable to stat $trans_file\n";
+            $old_blocks += size_in_blocks($st->size / 2);
+
+            # Remove the description
+            open(IFILE, "< $trans_file") || die "unable to open $trans_file\n";
+            open(OFILE, ">> $tmp_tfile");
+
+            while (defined($match = <IFILE>)) {
+                if (! ($match =~ /^Package: \Q$p\E$/m)) {
+                    print OFILE $match;
+                    $entries_remaining++;
+                }
+            }
+
+            close(IFILE);
+            close(OFILE);
+            
+            $descriptions{$lang}{$p}{"used"} = 0;
+
+            # If we still have any entries in the new file,
+            # keep it. Otherwise, just delete it
+            if ($entries_remaining) {
+                rename $tmp_tfile, $trans_file;
+                $st = stat("$trans_file") || die "unable to stat $trans_file\n";
+                $size += int($st->size / 3);
+                $new_blocks += size_in_blocks($st->size / 3);
+            } else {
+                unlink($tmp_tfile);
+                unlink($trans_file);
+            }
+        }
+    }
+    $/ = $old_split; # Browse by line again
+    $blocks_added += ($new_blocks - $old_blocks);
+    msg_ap(0, "    now $size bytes, $blocks_added blocks added\n");
+    return $blocks_added;
+}
+
 sub remove_md5_entry {
     my $dir = shift;
     my $arch = shift;
-    my ($pdir, $file, $md5, $match, $present);
+    my $_ = shift;
     my $md5file = "$dir/md5sum.txt";
     my $tmp_md5file = "$dir/md5sum.txt.tmp";
     my @fileslist;
-    my ($st, $size, $p);
+    my ($pdir, $file, $md5, $match, $present, $st, $size, $p);
     my $blocks_removed = 0;
     my $old_blocks = 0;
     my $new_blocks = 0;
@@ -1066,6 +1276,7 @@ sub remove_md5_entry {
     $new_blocks = size_in_blocks($st->size);
     $blocks_removed = $old_blocks - $new_blocks;
     msg_ap(0, "    now $size bytes, $blocks_removed blocks removed\n");
+    $/ = $old_split; # Browse by line again
     return $blocks_removed;
 }
 
@@ -1103,78 +1314,94 @@ sub add_packages {
 
     msg_ap(0, "Looking at $pkg: arch $arch, package $pkgname, rollback $rollback\n");
 
-    $_ = $pkginfo{$arch}{$pkgname};
-    undef @files;
-
-    $source = $mirror;
-    if ($arch eq "source") {
-        m/^Directory: (\S+)/m and $pdir = $1;
-        $source=$security if $pdir=~m:updates/:;
-	# Explicitly use the md5 lines in the Sources stanza, hence the xdigit(32) here
-	while (/^ ([[:xdigit:]]{32}) (\d+) (\S+)/msg) { push(@files, "$pdir/$3"); }
-    } else {
-        m/^Filename: (\S+)/mi and push(@files, $1);
-        $source=$security if $1=~m:updates/:;
-    }
-    
-    if ($rollback) {
-        # Remove the Packages entry/entries for the specified package
-        $total_blocks -= remove_Packages_entry($dir, $arch, $_);
-        $total_blocks -= remove_md5_entry($dir, $arch, $_);
-        
-        foreach my $file (@files) {
-            my $missing = 0;
-            # Count how big the file is we're removing, for checking if the disc is full
-            if (! -e "$source/$file") {
-                msg_ap(0, "Can't find $file in the main archive, trying local\n");
-                if (-e "$localdebs/$file") {
-                    $source = $localdebs;
-                } else {
-                    die "$file not found under either $source or $localdebs\n";
-                }                        
+    foreach my $package_info (@{$pkginfo{$arch}{$pkgname}}) {
+        undef @files;
+        $source = $mirror;
+        if ($arch eq "source") {
+            if ($package_info =~ m/^Directory: (\S+)/m) {
+                $pdir = $1;
             }
-            $realfile = real_file ("$source/$file");
-            $total_blocks -= get_file_blocks($realfile);
-
-            # Remove the link
-            unlink ("$dir/$file") || msg_ap(0, "Couldn't delete file $dir/$file\n");
-            msg_ap(0, "  Rollback: removed $dir/$file\n");
+            if ($pdir =~ m:updates/:) {
+                $source = $security;
+            }
+            # Explicitly use the md5 lines in the Sources stanza, hence the xdigit(32) here
+            while ($package_info =~ /^ ([[:xdigit:]]{32}) (\d+) (\S+)/msg) {
+                push(@files, "$pdir/$3");
+            }
+        } else {
+            if ($package_info =~ m/^Filename: (\S+)/mi) {
+                push(@files, $1);
+            }
+            if ($1 =~ m:updates/:) {
+                $source = $security;
+            }
         }
-    } else {
-        $total_blocks += add_Packages_entry($dir, $arch, $_);
-        $total_blocks += add_md5_entry($dir, $arch, $_);
 
-        foreach my $file (@files) {
-
-            # And put the file in the CD tree (with a (hard) link)
-            if (! -e "$source/$file") {
-                msg_ap(0, "Can't find $file in the main archive, trying local\n");
-                if (-e "$localdebs/$file") {
-                    $source = $localdebs;
-                } else {
-                    die "$file not found under either $source or $localdebs\n";
-                }                        
+        if ($rollback) {
+            # Remove the Packages entry/entries for the specified package
+            $total_blocks -= remove_Packages_entry($dir, $arch, $package_info);
+            $total_blocks -= remove_md5_entry($dir, $arch, $package_info);
+            if (!($arch eq "source")) {
+                $total_blocks -= remove_trans_desc_entry($dir, $arch, $package_info);
             }
-            $realfile = real_file ("$source/$file");
-
-            if (! -e "$dir/$file") {
-                # Count how big the file is, for checking if the disc
-                # is full. ONLY do this if the file is not already
-                # linked in - consider binary-all packages on a
-                # multi-arch disc
-                $total_blocks += get_file_blocks($realfile);
-                $total_blocks += good_link ($realfile, "$dir/$file");
-                msg_ap(0, "  Linked $dir/$file\n");
-                if ($firmware_package{$pkgname}) {
-                    msg_ap(0, "Symlink fw package $pkgname into /firmware\n");
-                    if (! -d "$dir/firmware") {
-                        mkdir "$dir/firmware" or die "symlink failed $!\n";
-                    }
-                    symlink("../$file", "$dir/firmware/" . basename($file));
-                    msg_ap(0, "Symlink ../$file $dir/firmware/.\n");
+        
+            foreach my $file (@files) {
+                my $missing = 0;
+                # Count how big the file is we're removing, for checking if the disc is full
+                if (! -e "$source/$file") {
+                    msg_ap(0, "Can't find $file in the main archive, trying local\n");
+                    if (-e "$localdebs/$file") {
+                        $source = $localdebs;
+                    } else {
+                        die "$file not found under either $source or $localdebs\n";
+                    }                        
                 }
-            } else {
-                msg_ap(0, "  $dir/$file already linked in\n");
+                $realfile = real_file ("$source/$file");
+                $total_blocks -= get_file_blocks($realfile);
+
+                # Remove the link
+                unlink ("$dir/$file") || msg_ap(0, "Couldn't delete file $dir/$file\n");
+                msg_ap(0, "  Rollback: removed $dir/$file\n");
+            }
+        } else {
+            $total_blocks += add_Packages_entry($dir, $arch, $package_info);
+            $total_blocks += add_md5_entry($dir, $arch, $package_info);
+            if (!($arch eq "source")) {
+                $total_blocks += add_trans_desc_entry($dir, $arch, $package_info);
+            }
+
+            foreach my $file (@files) {
+
+                # And put the file in the CD tree (with a (hard) link)
+                if (! -e "$source/$file") {
+                    msg_ap(0, "Can't find $file in the main archive, trying local\n");
+                    if (-e "$localdebs/$file") {
+                        $source = $localdebs;
+                    } else {
+                        die "$file not found under either $source or $localdebs\n";
+                    }                        
+                }
+                $realfile = real_file ("$source/$file");
+
+                if (! -e "$dir/$file") {
+                    # Count how big the file is, for checking if the
+                    # disc is full. ONLY do this if the file is not
+                    # already linked in - consider binary-all packages
+                    # on a multi-arch disc
+                    $total_blocks += get_file_blocks($realfile);
+                    $total_blocks += good_link ($realfile, "$dir/$file");
+                    msg_ap(0, "  Linked $dir/$file\n");
+                    if ($firmware_package{$pkgname}) {
+                        msg_ap(0, "Symlink fw package $pkgname into /firmware\n");
+                        if (! -d "$dir/firmware") {
+                            mkdir "$dir/firmware" or die "symlink failed $!\n";
+                        }
+                        symlink("../$file", "$dir/firmware/" . basename($file));
+                        msg_ap(0, "Symlink ../$file $dir/firmware/.\n");
+                    }
+                } else {
+                    msg_ap(0, "  $dir/$file already linked in\n");
+                }
             }
         }
     }

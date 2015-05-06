@@ -1,10 +1,26 @@
 # This file provides some common code that is intented to be called
 # by the various boot-<arch> scripts.
 
+# Make sure that sbin directories are on the PATH too - filesystem
+# creation tools are often hidden there
+PATH=/sbin:/usr/sbin:$PATH
+export PATH
 
 # Expand %ARCH% variable in envvars for location of D-I images
 DI_WWW_HOME="$(echo "$DI_WWW_HOME" | sed -e "s|%ARCH%|$ARCH|g")"
 DI_DIR="$(echo "$DI_DIR" | sed -e "s|%ARCH%|$ARCH|g")"
+
+# Find out what the default desktop is in tasksel if we've not set it
+# (i.e. using "all" for netinst, DVD etc.) - print the name of the
+# first desktop task recommended by task-desktop
+UNSPEC_DESKTOP_DEFAULT="$($BASEDIR/tools/apt-selection cache depends task-desktop | \
+    awk '
+    /Recommends:.*desktop/ {
+        gsub("task-","")
+        gsub("-desktop","")
+        print $2
+        exit
+    }')"
 
 # Only i386 and amd64 support desktop selection with the 'light' and 'all'
 # desktops; make sure other arches get a working config
@@ -67,5 +83,22 @@ find_pkg_file() {
         echo "WARNING: unable to find the $@ package in $DI_CODENAME or $CODENAME distribution of the mirror" >&2
     fi
     echo $pkgfile
+}
+
+# Work out the right boot load size for a specified file
+calc_boot_size() {
+    FILE=$1
+
+    size=$[($(stat -c%s "$FILE")+2047)/2048]
+    echo $size
+}
+
+# Grab the xorriso version and turn it into a number we can use
+xorriso_version() {
+    $MKISOFS --version 2>&1 | awk '
+	/^xorriso version/ {
+	    split($4, ver, ".")
+	    print ver[1]*10000+ver[2]*100+ver[3]
+	}'
 }
 

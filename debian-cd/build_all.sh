@@ -40,7 +40,7 @@ if [ -z "$IMAGETARGET" ] ; then
 	IMAGETARGET="official_images"
 fi
 
-for ARCHES in i386 amd64 alpha arm hppa ia64 m68k mips mipsel powerpc s390 sparc kfreebsd-amd64 kfreebsd-i386 source
+for ARCHES in i386 amd64 armel armhf arm64 mips mipsel powerpc ppc64el s390x kfreebsd-amd64 kfreebsd-i386 source
 do
 	export ARCHES
 	echo "Now we're going to build CD for $ARCHES !"

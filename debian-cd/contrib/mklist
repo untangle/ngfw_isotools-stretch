@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export LC_ALL=C
+
 for FILE in $@; do
     if [ -e "$FILE" ] ; then
 	ISODIR=`dirname $FILE`
@@ -9,9 +11,10 @@ for FILE in $@; do
 	fi
 	LISTFILE=`echo $FILE | sed 's/\.iso$/.list.gz/g'`
 	
-	isoinfo -fR -i $FILE | grep /pool/ | \
-            awk '/\.deb$|\.udeb$|\.tar\.gz$|\.dsc$|\.diff\.gz$/  {gsub(".*/","");print $1}' | \
-            LANG=C sort | gzip -9 > $LISTFILE
+	isoinfo -fR -i $FILE | perl -e '
+        while (<>) {
+            chomp;m,^/pool/[^/]+/[^/]+/[^/]+/(.*), and print "$1\n";
+        }' | sort | gzip -9 > $LISTFILE
 	mv $LISTFILE $LISTDIR
     fi
 done

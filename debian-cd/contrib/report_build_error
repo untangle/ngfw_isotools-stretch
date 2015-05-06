@@ -1,10 +1,17 @@
 #!/bin/sh
 
+export TOPDIR=$(dirname $0)
+
+. $TOPDIR/settings.sh
+. $TOPDIR/common.sh
+
 OUTDIR=$1
 ARCH=$2
 RESULTS=$3
 
 OUTFILE=$OUTDIR/$ARCH/HEADER.html
+INLOGS="/org/cdbuilder.debian.org/dst/deb-cd/log"
+OUTLOGS="build-logs/$DATE"
 
 grep -q WARNING $OUTFILE
 if [ $? -ne 0 ] ; then
@@ -17,22 +24,17 @@ fi
 
 echo "<hr>" >> $OUTFILE
 echo "<ul>" >> $OUTFILE
+mkdir -p ${OUTDIR}/${ARCH}/${OUTLOGS}
 for RESULT in $RESULTS; do
     TYPE=`echo $RESULT | awk -F / '{print $1}'`
     ERROR=`echo $RESULT | awk -F / '{print $2}'`
     DATE=`echo $RESULT | awk -F / '{print $3}'`
-    case $TYPE in
-        CDFAIL)
-            echo "<li>Full CD build failed with error $ERROR at $DATE" >> $OUTFILE ;;
-        DVDFAIL)
-            echo "<li>DVD build failed with error $ERROR at $DATE" >> $OUTFILE ;;
-        BDFAIL)
-            echo "<li>Blu-ray build failed with error $ERROR at $DATE" >> $OUTFILE ;;
-        KDECDFAIL)
-            echo "<li>KDE CD build failed with error $ERROR at $DATE" >> $OUTFILE ;;
-        LIGHTCDFAIL)
-            echo "<li>XFCE/lxde CD build failed with error $ERROR at $DATE" >> $OUTFILE ;;
-    esac
+    LOGFILE=`echo $RESULT | awk -F / '{print $4}'`
+    BUILDTYPE=`echo $TYPE | sed 's/FAIL//g'`
+    cp ${INLOGS}/${LOGFILE} ${OUTDIR}/${ARCH}/${OUTLOGS}/${BUILDTYPE}.log
+    DESC=`build_description ${BUILDTYPE}`
+    echo "<li>$DESC build failed with error $ERROR at $DATE; <a href=\"$OUTLOGS/${BUILDTYPE}.log\">logfile</a>" >> $OUTFILE
+
 done
 echo "</ul>" >> $OUTFILE
 

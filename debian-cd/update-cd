@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: update-cd 2257 2011-07-05 10:46:43Z 93sam $
+# $Id$
 # 
 # (c) Steve McIntyre <stevem@chiark.greenend.org.uk> Released under
 # GNU GPL v2 1st January 2001
@@ -32,6 +32,9 @@ MKISOFS="$PWD/../genisoimage -jigdo-template-compress bzip2 -r -checksum_algorit
 
 # Use JTE extensions to mkisofs to make jigdo files?
 JTE=1
+
+# Set up torrents too?
+BT=1
 
 # The working directory to use. MUST be on the same partition as the mirror.
 TDIR=/org/cdbuilder.debian.org/src/deb-cd/tmp/squeeze-update/cd-work
@@ -90,7 +93,7 @@ CAPCODE=`perl -e "print ucfirst("$CODENAME")"`
 export FIRSTVER CAPCODE
 
 if [ "$ARCHLIST"x = ""x ] ; then
-    ARCHLIST="armel amd64 i386 ia64 mips mipsel powerpc s390 sparc source kfreebsd-amd64 kfreebsd-i386" # amd64 # all dealt with specially
+    ARCHLIST="arm64 armel armhf amd64 i386 mips mipsel powerpc s390x source kfreebsd-amd64 kfreebsd-i386" # amd64 # all dealt with specially
 fi
 
 export TDIR NONFREE VER MIRROR CODENAME OUT BASEDIR
@@ -141,6 +144,7 @@ make_cd () {
     ISODIR=$OUT/$THISARCH/iso-$TYPE
     JIGDODIR=$OUT/$THISARCH/jigdo-$TYPE
     LISTDIR=$OUT/$THISARCH/list-$TYPE
+    BTDIR=$OUT/$THISARCH/bt-$TYPE
 
     if [ ! -d ${ISODIR} ] ; then
         mkdir -p ${ISODIR}
@@ -150,6 +154,9 @@ make_cd () {
     fi
     if [ ! -d ${LISTDIR} ] ; then
         mkdir -p ${LISTDIR}
+    fi
+    if [ $BT = 1 ] && [ ! -d ${BTDIR} ] ; then
+        mkdir -p ${BTDIR}
     fi
 
     if [ $JTE = 1 ] ; then
@@ -171,7 +178,7 @@ make_cd () {
             ${JIGDODIR}/${BASENAME}.jigdo \
             ${BASENAME}.iso \
             $OUT ${BASENAME}.template \
-            "Debian GNU/Linux $VER - $OFFICIAL $THISARCH $FIRSTVER->$VER update $TYPEUP #$THISNUM"
+            "Debian ${DEBIAN_KERNEL} $VER - $OFFICIAL $THISARCH $FIRSTVER->$VER update $TYPEUP #$THISNUM"
         echo $SNAPSHOT >> ${JIGDODIR}/${BASENAME}.jigdo
         # Make sure that the ISO is as new/newer than the jigdo file; #587774
         touch ${ISODIR}/${BASENAME}.iso
@@ -180,6 +187,7 @@ make_cd () {
             awk '/Image Hex MD5Sum/ {print $5}'`
         echo "$MD5  ${BASENAME}.iso" >> ${JIGDODIR}/MD5SUMS.update
         echo "$MD5  ${BASENAME}.iso" >> ${ISODIR}/MD5SUMS.update
+        [ $BT = 1 ] && echo "$MD5  ${BASENAME}.iso" >> ${BTDIR}/MD5SUMS.update
         for SHA_SIZE in 1 256 512; do
             SHA=`cat ${JIGDODIR}/${BASENAME}.jigdo | \
                 awk "/Image Hex SHA${SHA_SIZE}Sum/ {print \\$5}"`
@@ -189,6 +197,7 @@ make_cd () {
             fi
             echo "$SHA  ${BASENAME}.iso" >> ${JIGDODIR}/SHA${SHA_SIZE}SUMS.update
             echo "$SHA  ${BASENAME}.iso" >> ${ISODIR}/SHA${SHA_SIZE}SUMS.update
+            [ $BT = 1 ] && echo "$SHA  ${BASENAME}.iso" >> ${BTDIR}/SHA${SHA_SIZE}SUMS.update
         done
         gzip -9 ${JIGDODIR}/${BASENAME}.jigdo
         mv ${JIGDODIR}/${BASENAME}.jigdo.gz ${JIGDODIR}/${BASENAME}.jigdo
@@ -244,7 +253,7 @@ start_new_disc () {
         echo "Creating $TYPEUP$CDNUM for binary-$THISARCH (part $THISNUM)"
     fi
     mkdir $UPD/CD$CDNUM $UPD/CD$CDNUM/.disk
-    INFO="Debian GNU/Linux $VER Update $TYPEUP $DATE: $THISARCH $TYPEUP $THISNUM"
+    INFO="Debian ${DEBIAN_KERNEL} $VER Update $TYPEUP $DATE: $THISARCH $TYPEUP $THISNUM"
     echo $INFO > $UPD/CD$CDNUM/.disk/info
     SIZE_USED=0
     SRCFILES=0
@@ -278,6 +287,14 @@ do
     THISNUM=0
 
     MIRROR=$MIRROR_NORM
+
+    case "$THISARCH" in
+        kfreebsd) DEBIAN_KERNEL="GNU/kFreeBSD";;
+        hurd)     DEBIAN_KERNEL="GNU/Hurd";;
+        source)   DEBIAN_KERNEL="";;
+        *)        DEBIAN_KERNEL="GNU/Linux";;
+    esac
+    export DEBIAN_KERNEL
 
     rm -rf $OUT/$THISARCH/*-$TYPE
 

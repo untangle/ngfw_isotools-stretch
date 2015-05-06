@@ -65,8 +65,10 @@ if [ -z "$YABOOT_DEBUG" ]; then
     mv usr/lib/yaboot/yaboot .
     rm -rf usr
 
-    echo $YADEB >> $CDDIR/../$N.pkgs_extracted
-    find_pkg_file yaboot source >> $CDDIR/../$N.pkgs_extracted
+    if [ -n "$ARCHIVE_EXTRACTED_SOURCES" ]; then
+        echo $YADEB >> $CDDIR/../$N.pkgs_extracted
+        find_pkg_file yaboot source >> $CDDIR/../$N.pkgs_extracted
+    fi
 
 else
  cp -f $YABOOT_DEBUG yaboot
@@ -75,28 +77,45 @@ fi
 #
 # generate/download images for "powerpc"
 # (missing: bootvars1.3b.sit.hqx, BootX_1.2.2.sit, boot-floppy-hfs.img)
-cat $BASEDIR/data/$DI_CODENAME/yaboot/boot.msg \
- | sed "s/\${MEDIA_TYPE}/CDROM/" \
- | sed "s/\${DEBIAN_VERSION}/${CODENAME}/g" \
- | sed "s/\${BUILD_DATE}/${BUILD_DATE}/g" \
- > boot.msg
-cat $BASEDIR/data/$DI_CODENAME/yaboot/yaboot.conf \
- | sed "s/CODENAME/${CODENAME}/g" > yaboot.conf
-if [ -n "$KERNEL_PARAMS" ]; then
-    sed -i "/^[[:space:]]\+append=\"/ s|append=\"|append=\"$KERNEL_PARAMS |" yaboot.conf
-fi
+
 cp $BASEDIR/data/$DI_CODENAME/yaboot/ofboot.b ofboot.b
+
+if [ "$DESKTOP"x = ""x ] || [ "$DESKTOP"x = "all"x ] ; then
+    DEFAULT_DESKTOP="$UNSPEC_DESKTOP_DEFAULT"
+else
+    DEFAULT_DESKTOP="$DESKTOP"
+fi
 
 for subarch in powerpc powerpc64 #prep
 do
   case $subarch in
     powerpc|prep)
       bitness=
+      yabootconf=mac32.conf
+      yabootmsg=boot32.msg
       ;;
     powerpc64)
       bitness=64
+      yabootconf=yaboot.conf
+      yabootmsg=boot.msg
       ;;
   esac
+
+  cat $BASEDIR/data/$DI_CODENAME/yaboot/$yabootconf \
+   | sed "s/CODENAME/${CODENAME}/g" \
+   > $yabootconf
+
+  cat $BASEDIR/data/$DI_CODENAME/yaboot/$yabootmsg \
+   | sed "s/\${MEDIA_TYPE}/CDROM/" \
+   | sed "s/\${DEBIAN_VERSION}/${CODENAME}/g" \
+   | sed "s/\${BUILD_DATE}/${BUILD_DATE}/g" \
+   | sed "s/\${DEFAULT_DESKTOP}/${DEFAULT_DESKTOP}/g" \
+   > $yabootmsg
+
+  if [ -n "$KERNEL_PARAMS" ]; then
+      sed -i "/^[[:space:]]\+append=\"/ s|append=\"|append=\"$KERNEL_PARAMS |" $yabootconf
+  fi
+
   if [ ! "$DI_WWW_HOME" ];then
         if [ ! "$DI_DIR" ];then 
            DI_DIR="$MIRROR/dists/$DI_DIST/main/installer-$ARCH/current/images"

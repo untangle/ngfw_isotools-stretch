@@ -40,7 +40,11 @@ if [ $N != 1 ]; then
 fi
 
 # Download boot images.
-BOOT_IMAGES="cdrom/debian-cd_info.tar.gz cdrom/kfreebsd.gz cdrom/initrd.gz"
+BOOT_IMAGES="cdrom/debian-cd_info.tar.gz cdrom/kfreebsd.gz cdrom/kfreebsd-9.gz cdrom/initrd.gz"
+
+if [ "$ARCH" = kfreebsd-amd64 ]; then
+	BOOT_IMAGES="$BOOT_IMAGES cdrom/gtk/initrd.gz"
+fi
 
 for image in $BOOT_IMAGES; do
        if [ ! -e "$image" ]; then
@@ -50,7 +54,7 @@ for image in $BOOT_IMAGES; do
                        if [ ! "$DI_DIR" ];then
                                DI_DIR="$MIRROR/dists/$DI_DIST/main/installer-$ARCH/current/images"
                        fi
-                       cp "$DI_DIR/$image" $image
+                       cp "$DI_DIR/$image" $image || true
                else
                        wget "$DI_WWW_HOME/$image" -O $image
                fi
@@ -60,7 +64,15 @@ done
 # Install kernel and initrd
 mkdir -p $CDDIR/boot/kernel/
 cp "cdrom/kfreebsd.gz" "$CDDIR/boot/kernel/kfreebsd.gz"
+if [ -f cdrom/kfreebsd-9.gz ] ; then
+   cp "cdrom/kfreebsd-9.gz" "$CDDIR/boot/kernel/kfreebsd-9.gz"
+fi
 cp "cdrom/initrd.gz" "$CDDIR/boot/mfsroot.gz"
+
+if [ "$ARCH" = kfreebsd-amd64 ] && [ -f cdrom/gtk/initrd.gz ] ; then
+	mkdir -p $CDDIR/boot/gtk/
+	cp "cdrom/gtk/initrd.gz" "$CDDIR/boot/gtk/mfsroot.gz"
+fi
 
 # Install bootloader
 mkdir -p boot$N
@@ -69,7 +81,9 @@ add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-J -joliet-long"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-b boot/grub/grub_eltorito"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-c boot/boot.cat"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-no-emul-boot"
-add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-boot-load-size 4"
+
+bls=4 # Specify 4 for BIOS boot, don't calculate it
+add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-boot-load-size $bls"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-boot-info-table"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-cache-inodes"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_dirs "boot$N"
@@ -79,6 +93,7 @@ if [ -f $CDDIR/README.html ]; then
        todos > $CDDIR/autorun.inf <<EOF
 [autorun]
 open=autorun.bat
+label=Install Debian GNU/kFreeBSD
 EOF
        todos > $CDDIR/autorun.bat <<EOF
 @echo Starting "README.html"...

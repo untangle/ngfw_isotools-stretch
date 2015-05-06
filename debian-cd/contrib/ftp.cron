@@ -7,7 +7,7 @@ TOPDIR=`pwd`
 . $TOPDIR/.ftp.buildnum
 
 MYCOPY=$TOPDIR/.ftp.cron
-BUILDLOCK=$TOPDIR/.debian-cd.lock
+BUILDLOCK=$HOME/.debian-cd.lock
 MAILLIST=$TOPDIR/.debian-cd.mail
 
 # Change these to abort daily/weekly builds as appropriate
@@ -101,6 +101,7 @@ if [ -f "$TRACE" ] ; then
                     $TOPDIR/cronjob.weekly
                 fi
             fi
+	    cd $HOME && ./bin/cdbuilder_log_analyser > build/log/analysis.html
             exit 0
         fi
     fi

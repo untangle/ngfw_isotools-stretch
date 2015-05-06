@@ -35,40 +35,62 @@ cat > debian-installer+kernel << EOF
  */
 
 #include <debian-installer>
+
+/* Hardware config */
 eject
-locales
-libdevmapper1.02
-lvm-common
-lvm2
-mdadm
-aptitude
-hotplug
 pciutils
 usbutils
-/* Used for Squeeze and onwards */
-kbd
+keyboard-configuration
 console-setup
 pcmciautils
-wireless-tools
-xfsprogs
-jfsutils
-dosfsutils
-reiserfsprogs
-btrfs-tools
-libfribidi0
-localization-config
 acpi
 acpid
 acpi-support-base
-ppp
-pppoeconf
-pptp-linux
+pbbuttonsd
+mouseemu
 udev
-installation-report
-openssh-server
+discover
+
+/* Storage and filesystem tools */
+e2fsprogs
+dmsetup
+lvm2
+mdadm
+xfsprogs
+jfsutils
+dosfstools
+reiserfsprogs
+btrfs-tools
+ufsutils
+zfsutils
 cryptsetup
 loop-aes-utils
 dmraid
+open-iscsi
+/* multipath-tools-boot is used for multipath support and installed
+ * during installation process if multipath is used
+ */
+multipath-tools-boot
+
+/* Networking */
+wireless-tools
+ppp
+pppoeconf
+pptp-linux
+/* #593914: netinsts are being used on wireless too these days. */
+wpasupplicant
+/* #782299: netcfg will install rdnssd, make sure it's on our media */
+rdnssd
+
+/* Misc d-i */
+installation-report
+openssh-server
+popularity-contest
+os-prober
+locales
+
+/* Needed for some languages with bi-directional support */
+libfribidi0
 
 /* Needed for rootless installs. */
 sudo
@@ -77,19 +99,6 @@ sudo
  * laptop so we have to make sure to get it included on first CD for
  * arches that are know to have laptops
  */
-
-/* On x86 users have a choice between grub-legacy and grub-pc */
-
-/* #231583: Make life easier for Australian ISP users */
-bpalogin
-
-/* multipath-tools-boot is used for multipath support and installed
- * during installation process if multipath is used
- */
-multipath-tools-boot
-
-/* #593914: netinsts are being used on wireless too these days. */
-wpasupplicant
 
 /* add the list of firmware packages here too if required */
 #ifdef FORCE_FIRMWARE
@@ -101,6 +110,9 @@ initramfs-tools
 busybox
 grub-legacy
 grub-pc
+grub-efi
+grub-efi-ia32
+grub-efi-ia32-bin
 laptop-detect
 lilo
 elilo
@@ -110,24 +122,15 @@ libc6-i686
  * Kernel headers are included as third party modules are commonly
  * used on this architecture.
  */
-linux-image-2.6-686
-linux-headers-2.6-686
-loop-aes-modules-2.6-686
-atl2-modules-2.6-686
-speakup-modules-2.6-686
+linux-image-686-pae
+linux-headers-686-pae
 #ifndef ARCH_i386_EXCLUDE_486_KERNEL
-linux-image-2.6-486
-linux-headers-2.6-486
-loop-aes-modules-2.6-486
-atl2-modules-2.6-486
-speakup-modules-2.6-486
+linux-image-486
+linux-headers-486
 #endif
-#ifdef VARIANT_xen
-linux-image-2.6-686-bigmem
-linux-headers-2.6-686-bigmem
-loop-aes-modules-2.6-686-bigmem
-atl2-modules-2.6-686-bigmem
-speakup-modules-2.6-686-bigmem
+#ifndef ARCH_i386_EXCLUDE_586_KERNEL
+linux-image-586
+linux-headers-586
 #endif
 
 #endif
@@ -137,106 +140,49 @@ initramfs-tools
 busybox
 grub-legacy
 grub-pc
+grub-efi
+grub-efi-amd64
+grub-efi-amd64-bin
 laptop-detect
 lilo
-linux-image-2.6-amd64
-linux-headers-2.6-amd64
-loop-aes-modules-2.6-amd64
-atl2-modules-2.6-amd64
-speakup-modules-2.6-amd64
-#endif
-
-#ifdef ARCH_alpha
-initramfs-tools
-busybox
-aboot
-aboot-base
-linux-image-2.6-alpha-generic
-linux-image-2.6-alpha-smp
-loop-aes-modules-2.6-alpha-generic
-loop-aes-modules-2.6-alpha-smp
-#endif
-
-#ifdef ARCH_hppa
-initramfs-tools
-busybox
-linux-image-2.6-parisc
-linux-image-2.6-parisc-smp
-linux-image-2.6-parisc64
-linux-image-2.6-parisc64-smp
-loop-aes-modules-2.6-parisc
-loop-aes-modules-2.6-parisc-smp
-loop-aes-modules-2.6-parisc64
-loop-aes-modules-2.6-parisc64-smp
-palo
+linux-image-amd64
+linux-headers-amd64
 #endif
 
 #ifdef ARCH_ia64
 initramfs-tools
 busybox
-linux-image-2.6-itanium
-linux-image-2.6-itanium-smp
-linux-image-2.6-mckinley
-linux-image-2.6-mckinley-smp
-loop-aes-modules-2.6-itanium
-loop-aes-modules-2.6-itanium-smp
-loop-aes-modules-2.6-mckinley
-loop-aes-modules-2.6-mckinley-smp
+linux-image-itanium
+linux-image-itanium-smp
+linux-image-mckinley
+linux-image-mckinley-smp
 elilo
 #endif
 
 #ifdef ARCH_mips
-/* doesn't use a initrd to boot */
+initramfs-tools
 arcboot
 sibyl
-linux-image-2.6-r4k-ip22
-linux-image-2.6-r5k-ip32
-linux-image-2.6-sb1-bcm91250a
-linux-image-2.6-sb1a-bcm91480b
-loop-aes-modules-2.6-r4k-ip22
-loop-aes-modules-2.6-r5k-ip32
-loop-aes-modules-2.6-sb1-bcm91250a
-loop-aes-modules-2.6-sb1a-bcm91480b
+linux-image-octeon
+linux-image-r4k-ip22
+linux-image-r5k-ip32
+linux-image-sb1-bcm91250a
+linux-image-sb1a-bcm91480b
 #endif
 
 #ifdef ARCH_mipsel
-/* doesn't use a initrd to boot */
+initramfs-tools
 sibyl
 colo
 delo
-linux-image-2.6-r3k-kn02
-linux-image-2.6-r4k-kn04
-linux-image-2.6-r5k-cobalt
-linux-image-2.6-sb1-bcm91250a
-linux-image-2.6-sb1a-bcm91480b
-loop-aes-modules-2.6-r3k-kn02
-loop-aes-modules-2.6-r4k-kn04
-loop-aes-modules-2.6-r5k-cobalt
-loop-aes-modules-2.6-sb1-bcm91250a
-loop-aes-modules-2.6-sb1a-bcm91480b
-#endif
-
-#ifdef ARCH_arm
-initramfs-tools
-busybox
-nwutil
-slugimage
-glantank
-flash-kernel
-nslu2-utils
-apex-nslu2
-linux-image-2.6-footbridge
-linux-image-2.6-iop32x
-linux-image-2.6-ixp4xx
-linux-image-2.6-nslu2
-linux-image-2.6-rpc
-linux-image-2.6-s3c2410
-loop-aes-modules-2.6-footbridge
-loop-aes-modules-2.6-iop32x
-loop-aes-modules-2.6-ixp4xx
-loop-aes-modules-2.6-nslu2
-loop-aes-modules-2.6-rpc
-loop-aes-modules-2.6-s3c2410
+linux-image-loongson-2e
+linux-image-loongson-2f
+linux-image-loongson-3
+linux-image-r3k-kn02
+linux-image-r4k-kn04
+linux-image-r5k-cobalt
+linux-image-sb1-bcm91250a
+linux-image-sb1a-bcm91480b
 #endif
 
 #ifdef ARCH_armel
@@ -246,12 +192,27 @@ slugimage
 flash-kernel
 nslu2-utils
 apex-nslu2
-linux-image-2.6-iop32x
-linux-image-2.6-ixp4xx
-linux-image-2.6-versatile
-loop-aes-modules-2.6-iop32x
-loop-aes-modules-2.6-ixp4xx
-loop-aes-modules-2.6-versatile
+linux-image-iop32x
+linux-image-ixp4xx
+linux-image-kirkwood
+linux-image-mv78xx0
+linux-image-orion5x
+linux-image-versatile
+#endif
+
+#ifdef ARCH_armhf
+initramfs-tools
+busybox
+flash-kernel
+linux-image-armmp
+linux-image-armmp-lpae
+#endif
+
+#ifdef ARCH_arm64
+initramfs-tools
+busybox
+flash-kernel
+linux-image-arm64
 #endif
 
 #ifdef ARCH_sparc
@@ -260,14 +221,10 @@ busybox
 silo
 libc6-sparcv9b
 libc6-sparcv9
-linux-image-2.6-sparc32
-linux-image-2.6-sparc32-smp
-linux-image-2.6-sparc64
-linux-image-2.6-sparc64-smp
-loop-aes-modules-2.6-sparc32
-loop-aes-modules-2.6-sparc32-smp
-loop-aes-modules-2.6-sparc64
-loop-aes-modules-2.6-sparc64-smp
+linux-image-sparc32
+linux-image-sparc32-smp
+linux-image-sparc64
+linux-image-sparc64-smp
 #endif
 
 #ifdef ARCH_powerpc
@@ -279,25 +236,33 @@ yaboot
 powerpc-utils
 hfsutils
 mkvmlinuz
-linux-image-2.6-powerpc
-linux-image-2.6-powerpc-smp
-linux-image-2.6-powerpc64
-linux-image-2.6-prep
-loop-aes-modules-2.6-powerpc
-loop-aes-modules-2.6-powerpc-smp
-loop-aes-modules-2.6-powerpc64
-loop-aes-modules-2.6-prep
+linux-image-powerpc
+linux-image-powerpc-smp
+linux-image-powerpc64
+linux-image-prep
+#endif
+
+#ifdef ARCH_ppc64el
+initramfs-tools
+grub-ieee1275
+busybox
+powerpc-utils
+powerpc-ibm-utils
+linux-image-powerpc64le
+#endif
+
+#ifdef ARCH_alpha
+aboot
 #endif
 
 #ifdef ARCH_kfreebsd_amd64
-kfreebsd-image-8-amd64
+kfreebsd-image-10-amd64
 grub-pc
 #endif
 
 #ifdef ARCH_kfreebsd_i386
-kfreebsd-image-8-486
-kfreebsd-image-8-686
-kfreebsd-image-8-686-smp
+kfreebsd-image-10-486
+kfreebsd-image-10-686
 grub-pc
 libc0.1-i686
 #endif
@@ -312,4 +277,8 @@ libc0.3-xen
 #endif
 #endif
 
+#if defined(ARCH_s390) || defined(ARCH_s390x)
+s390-tools
+sysconfig-hardware
+#endif
 EOF

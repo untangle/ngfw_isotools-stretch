@@ -25,22 +25,33 @@ DI_DATA_DIR=$BASEDIR/data/$DI_CODENAME
 CAPCODENAME=`perl -e "print ucfirst("$CODENAME")"`
 
 NUM_ARCHES=`echo $ARCHES | wc -w`
+case "$ARCHES" in
+    *kfreebsd*) DEBIAN_KERNEL="GNU/kFreeBSD";;
+    *hurd*)     DEBIAN_KERNEL="GNU/Hurd";;
+    *)          DEBIAN_KERNEL="GNU/Linux";;
+esac
+export DEBIAN_KERNEL
 
 if [ "$VOLID_BASE"x = ""x ] ; then
     VOLID_BASE="Debian $DEBVERSION"
 fi
 
+if [ "$DISKINFO_DISTRO"x = ""x ] ; then
+    DISKINFO_DISTRO="Debian"
+fi
+export DISKINFO_DISTRO
+
 if [ $NUM_ARCHES = 1 ] ; then
     case $ARCHES in
         source)
             SOURCEDISK=1
-            export DISKINFO="Debian GNU/Linux $DEBVERSION \"$CAPCODENAME\" - $OFFICIAL $DISKTYPE Source-$DISKNUM $BUILD_DATE"
+            export DISKINFO="$DISKINFO_DISTRO $DEBVERSION \"$CAPCODENAME\" - $OFFICIAL $DISKTYPE Source-$DISKNUM $BUILD_DATE"
             export VOLID="$VOLID_BASE Source $DISKNUM"
             export SOURCEONLY=yes
             ;;
         *)
             BINARYDISK=1
-            export DISKINFO="Debian GNU/Linux $DEBVERSION \"$CAPCODENAME\" - $OFFICIAL $ARCHES $DISKTYPE Binary-$DISKNUM $BUILD_DATE"
+            export DISKINFO="$DISKINFO_DISTRO ${DEBIAN_KERNEL} $DEBVERSION \"$CAPCODENAME\" - $OFFICIAL $ARCHES $DISKTYPE Binary-$DISKNUM $BUILD_DATE"
             case "$ARCHES" in
                 powerpc)
                     export VOLID="$VOLID_BASE ppc $DISKNUM" ;;
@@ -62,9 +73,30 @@ else
         *source*) SOURCEDISK=1;;
     esac
     export ARCHDEF=`echo $ARCHES | sed 's? ?/?g'`
-    export DISKINFO="Debian GNU/Linux $DEBVERSION \"$CAPCODENAME\" - $OFFICIAL Multi-architecture $ARCHDEF $DISKTYPE #$DISKNUM $BUILD_DATE"
+    export DISKINFO="$DISKINFO_DISTRO ${DEBIAN_KERNEL} $DEBVERSION \"$CAPCODENAME\" - $OFFICIAL Multi-architecture $ARCHDEF $DISKTYPE #$DISKNUM $BUILD_DATE"
     export VOLID="$VOLID_BASE M-A $DISKNUM"
 fi
+
+merge_include_exclude () {
+    OUT="$1"
+    TYPE="$2"
+    LIST="$3"
+    WRITE=0 # Don't create empty files
+
+    # Check to see if any file specified actually exist
+    for FILE in $LIST ; do
+        if [ -r "$FILE" ] ; then
+            WRITE=1
+        else
+            echo "WARNING: Unable to read $TYPE file $FILE"
+        fi
+    done
+
+    # If we have any files, merge and write them out
+    if [ "$WRITE" = 1 ] ; then
+        sort -u $LIST > "$OUT"
+    fi
+}
 
 mkdir -p $CDDIR
 echo "  Adding the required directories"
@@ -187,39 +219,18 @@ if [ $DISKNUM = 1 ] ; then
                 esac
             fi
 
-            # Sort out the udeb include and exclude files
-            if [ -n "$UDEB_INCLUDE" ] ; then
-                if [ -r "$UDEB_INCLUDE" ] ; then
-                    cat "$UDEB_INCLUDE" >> "$CDDIR/.disk/udeb_include"
-                else
-                    echo "WARNING: Unable to read UDEB_INCLUDE file $UDEB_INCLUDE"
-                fi
-            fi
-            if [ -n "$UDEB_EXCLUDE" ] ; then
-                if [ -r "$UDEB_EXCLUDE" ] ; then
-                    cat "$UDEB_EXCLUDE" >> "$CDDIR/.disk/udeb_exclude"
-                else
-                    echo "WARNING: Unable to read UDEB_EXCLUDE file $UDEB_EXCLUDE"
-                fi
-            fi
-
-            # Ditto the base include and exclude
-            if [ -n "$BASE_INCLUDE" ] ; then
-                if [ -r "$BASE_INCLUDE" ] ; then
-                    cat "$BASE_INCLUDE" >> "$CDDIR/.disk/base_include"
-                else
-                    echo "WARNING: Unable to read BASE_INCLUDE file $BASE_INCLUDE"
-                fi
-            fi
-            if [ -n "$BASE_EXCLUDE" ] ; then
-                if [ -r "$BASE_EXCLUDE" ] ; then
-                    cat "$BASE_EXCLUDE" >> "$CDDIR/.disk/base_exclude"
-                else
-                    echo "WARNING: Unable to read BASE_EXCLUDE file $BASE_EXCLUDE"
-                fi
-            fi
+            UDEB_INCLUDES="$UDEB_INCLUDES $UDEB_INCLUDE"
+            UDEB_EXCLUDES="$UDEB_EXCLUDES $UDEB_EXCLUDE"
+            BASE_INCLUDES="$BASE_INCLUDES $BASE_INCLUDE"
+            BASE_EXCLUDES="$BASE_EXCLUDES $BASE_EXCLUDE"
         fi
     done
+
+    # Sort and merge the the include and exclude files as necessary
+    merge_include_exclude "$CDDIR/.disk/udeb_include" UDEB_INCLUDE "$UDEB_INCLUDES"
+    merge_include_exclude "$CDDIR/.disk/udeb_exclude" UDEB_EXCLUDE "$UDEB_EXCLUDES"
+    merge_include_exclude "$CDDIR/.disk/base_include" BASE_INCLUDE "$BASE_INCLUDES"
+    merge_include_exclude "$CDDIR/.disk/base_exclude" BASE_EXCLUDE "$BASE_EXCLUDES"
 
     if [ "$OMIT_DOC_TOOLS" != "1" ]; then
         echo "  Adding docs to CD1"
@@ -283,6 +294,9 @@ if [ $DISKNUM = 1 ] ; then
         echo >> $CDDIR/README.excluded
     fi
 
+    # Stop the greps below from complaining
+    touch $BDIR/sort_deps_dummy.log
+
     grep "refused because of toobig" $BDIR/sort_deps*.log | sort -u | awk '{print $1}' > $BDIR/toobig
     if [ -s $BDIR/toobig ] ; then
         echo "  Adding README.excluded (some package files were too big)"
@@ -308,7 +322,7 @@ $BASEDIR/tools/add-bin-doc $DISKNUM "$ARCHES"
 
 # Common stuff for all disks in the set
 if [ "$SOURCEONLY"x = "yes"x ] ; then
-    echo -n "-J " >> $BDIR/$DISKNUM.mkisofs_opts
+    echo -n "-J -joliet-long" >> $BDIR/$DISKNUM.mkisofs_opts
 fi
 
 echo "  Adding Release files"

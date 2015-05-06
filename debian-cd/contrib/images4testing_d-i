@@ -1,0 +1,2 @@
+DI_DIST=jessie
+DI_CODENAME=$DI_DIST

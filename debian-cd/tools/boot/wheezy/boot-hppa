@@ -29,10 +29,19 @@ if [ $N != 1 -a $N != 1_NONUS ]; then
 	exit 0
 fi
 
-PALODEB="$($BASEDIR/tools/apt-selection cache show palo | \
-	sed -n 's/^Filename: \(.*_hppa.deb\)$/\1/p')"
-ar p "${MIRROR}/${PALODEB}" data.tar.gz | tar xz ./usr/share/palo/iplboot
+PALODEB=$(find_pkg_file palo)
+if [ -z "$PALODEB" ] ; then 
+    echo "ERROR:  the palo package is required." >&2
+    exit 1
+fi
+(dpkg --fsys-tarfile "$MIRROR/$PALODEB" | \
+    tar xf - -C . ./usr/share/palo/iplboot)
 mv usr/share/palo/iplboot $CDROOT/install/iplboot
+
+if [ -n "$ARCHIVE_EXTRACTED_SOURCES" ]; then
+    echo $PALODEB >> $CDDIR/../$N.pkgs_extracted
+    find_pkg_file palo source >> $CDDIR/../$N.pkgs_extracted
+fi
 
 if [ ! "$DI_WWW_HOME" ];then
         if [ ! "$DI_DIR" ];then

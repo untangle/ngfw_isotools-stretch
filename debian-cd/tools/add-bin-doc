@@ -56,7 +56,7 @@ cpp -traditional -undef -P -C -Wall -nostdinc -I$dir \
     -D OFFICIAL_VAL=$OFFICIAL_VAL \
     -D OMIT_RELEASE_NOTES="$OMIT_RELEASE_NOTES" \
     -D OUTPUTtext $BASEDIR/data/$CODENAME/README.html.in \
-	| sed -e 's/%%.//g' > $dir/README.html
+	| sed -e "s/%%.//g;s,DEBIAN_KERNEL,$DEBIAN_KERNEL,g" > $dir/README.html
 
 rm -f $dir/README.txt
 lynx -dump -force_html $dir/README.html | todos \
@@ -69,7 +69,7 @@ cpp -traditional -undef -P -C -Wall -nostdinc -I $dir/ \
     -D OFFICIAL_VAL=$OFFICIAL_VAL \
     -D OMIT_RELEASE_NOTES="$OMIT_RELEASE_NOTES" \
     -D OUTPUThtml $BASEDIR/data/$CODENAME/README.html.in \
-	| sed -e 's/%%.//g' > $dir/README.html
+	| sed -e "s/%%.//g;s,DEBIAN_KERNEL,$DEBIAN_KERNEL,g" > $dir/README.html
 
 rm -f $dir/README.diskdefines
 mkdir -p $dir/pics 

@@ -44,11 +44,20 @@ if [ $NN != 1 ]; then
 	exit 0
 fi
 
-DELODEB="$($BASEDIR/tools/apt-selection cache show delo | \
-	sed -n 's/^Filename: \(.*_mipsel.deb\)$/\1/p')"
-ar p "${MIRROR}/${DELODEB}" data.tar.gz | tar xz ./boot/delo.2nd
+DELODEB=$(find_pkg_file delo)
+if [ -z "$DELODEB" ] ; then 
+    echo "ERROR:  the delo package is required." >&2
+    exit 1
+fi
+(dpkg --fsys-tarfile "$MIRROR/$DELODEB" | \
+    tar xf - -C . ./boot/delo.2nd)
 mkdir -p $CDROOT/boot
 mv boot/delo.2nd $CDROOT/boot/delo.2nd
+
+if [ -n "$ARCHIVE_EXTRACTED_SOURCES" ]; then
+    echo $DELODEB >> $CDDIR/../$N.pkgs_extracted
+    find_pkg_file delo source >> $CDDIR/../$N.pkgs_extracted
+fi
 
 install -m 644 -D $BASEDIR/data/wheezy/delo.conf "$CDROOT"/etc/delo.conf
 

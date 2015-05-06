@@ -22,8 +22,10 @@ multiarch_workaround() {
 		boot$N/isolinux/amdtxt.cfg || true
 	sed -i "/^include menu.cfg/ a\include instsel.cfg" \
 		boot$N/isolinux/prompt.cfg
-	sed -i "/^default install/ a\include instsel.cfg" \
-		boot$N/isolinux/desktop/prompt.cfg
+	if [ -e boot$N/isolinux/desktop/prompt.cfg ]; then
+		sed -i "/^default install/ a\include instsel.cfg" \
+			boot$N/isolinux/desktop/prompt.cfg
+	fi
 	cat >boot$N/isolinux/instsel.cfg <<EOF
 default install-select
 label install-select
@@ -48,8 +50,8 @@ create_desktop_dir() {
 
 modify_for_single_desktop() {
 	# Cleanup
-	rm boot$N/isolinux/dtmenu.cfg
-	rm -r boot$N/isolinux/desktop
+	rm -f boot$N/isolinux/dtmenu.cfg
+	rm -fr boot$N/isolinux/desktop
 
 	# Set default desktop, or remove if not applicable
 	if [ "$DESKTOP" ]; then

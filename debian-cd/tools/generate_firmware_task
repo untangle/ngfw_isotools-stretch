@@ -16,14 +16,15 @@
 
 use strict;
 
-my ($mirror, $codename, $archlist, $outfile);
+my ($mirror, $codename, $archlist, $outfile, $localdebs);
 my $date;
 my $pkgfiles = "";
-my ($pkg, $filename);
+my ($pkg, $filename, $arch);
 my %seen;
 
 $codename = $ENV{'CODENAME'};
 $mirror = $ENV{'MIRROR'};
+$localdebs = $ENV{'LOCALDEBS'};
 $archlist = shift;
 $outfile = shift;
 
@@ -32,8 +33,14 @@ if (!defined($codename) || !defined($mirror) ||
     die "Error in arguments\n";
 }
 
-foreach my $arch (split(' ', $archlist)) {
+foreach $arch (split(' ', $archlist)) {
     $pkgfiles = "$pkgfiles $mirror/dists/$codename/*/binary-$arch/Packages.gz";
+}
+
+if (defined($localdebs)) {
+    foreach $arch (split(' ', $archlist)) {
+        $pkgfiles = "$pkgfiles $localdebs/dists/$codename/*/binary-$arch/Packages.gz";
+    }
 }
 
 open (OUT, "> $outfile") or die "Can't open outfile for writing: $!\n";

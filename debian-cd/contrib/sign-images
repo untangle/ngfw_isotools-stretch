@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Helper for signing images
+#
+DIR=$1
+ARCH=$2
+
+KEYID=42468F4009EA8AC3
+
+cd $DIR/$ARCH
+
+for file in $(find . -name '*SUMS' \
+    -o -name *SUMS.small \
+    -o -name *SUMS.large); do
+    gpg -q -a --detach-sign \
+	--batch --no-tty \
+        --passphrase-file ~/.testing-pass \
+        -u $KEYID \
+        $file 2>&1 > gpg.log
+    error=$?
+    if [ $error -ne 0 ] ; then  
+        echo "  FAIL:"
+        cat gpg.log
+        exit 1
+    fi
+    mv $file.asc $file.sign > gpg.log 2>&1
+    if [ $error -ne 0 ] ; then  
+        echo "  FAIL:"
+        cat gpg.log
+        exit 1
+    fi
+done
+
+rm -f gpg.log

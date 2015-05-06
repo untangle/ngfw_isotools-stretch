@@ -1,46 +1,27 @@
+/* Packages that belong on the first CD (but not the netinst or
+ * businesscard), despite not being directly installed by debootstrap,
+ * or d-i, or tasksel.
+ */
+
+/* hysterical raisins, but too small to remove */
 openssh-client
-openssh-server
-gnupg
-build-essential
-kernel-package
-module-assistant
-deborphan
-debfoster
-debsums
-localepurge
-chdrvfont
-fbset
-fdutils
-ftp
-g++
-libnet-telnet-perl
-libtimedate-perl
-libmailtools-perl
-pump
-twm
-menu
-wmaker
-wmakerconf
+/* could be used by debconf in certain configurations */
 libterm-readline-gnu-perl
-whiptail
-dialog
-doc-base
-grub
-util-linux-locales
-discover
-read-edid
-mdetect
-aptitude
+/* Accessibility stuff that is installed by base-installer
+ * in certain situations, but too large for the netinst. */
 brltty
-popularity-contest
-ntpdate
-hdparm
-jfbterm
-unifont
-console-cyrillic
-console-terminus
-iso-codes
-alsa-base
-alsa-utils
-wpasupplicant
+speakup
+/* See rationale in #630805 */
 apt-offline
+
+/* #231583: Make life easier for Australian ISP users */
+bpalogin
+
+/* Enough toolchain to build kernel modules. This plus the kernel
+ * headers (which are also included on CDs) is enough to be able to build
+ * out of kernel tree wifi drivers, for example. The user may need to
+ * sneakernet over the source tree; should not need to sneakernet the
+ * toolchain.
+ * (Could be omitted from smaller images if necessary. */
+make
+gcc

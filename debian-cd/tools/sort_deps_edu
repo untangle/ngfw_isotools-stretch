@@ -20,20 +20,20 @@ use strict;
 
 my $list = shift;
 
-my $nonfree = $ENV{'NONFREE'} || 0;
-my $extranonfree = $ENV{'EXTRANONFREE'} || 0;
-my $force_firmware = $ENV{'FORCE_FIRMWARE'} || 0;
-my $local = $ENV{'LOCAL'} || 0;
-my $complete = $ENV{'COMPLETE'} || 0;
-my $norecommends = (defined $ENV{'NORECOMMENDS'} ? $ENV{'NORECOMMENDS'} : 1);
-my $nosuggests = $ENV{'NOSUGGESTS'} || 1;
+my $nonfree = read_env('NONFREE', 0);
+my $extranonfree = read_env('EXTRANONFREE', 0);
+my $force_firmware = read_env('FORCE_FIRMWARE', 0);
+my $local = read_env('LOCAL', 0);
+my $complete = read_env('COMPLETE', 0);
+my $norecommends = read_env('NORECOMMENDS', 1);
+my $nosuggests = read_env('NOSUGGESTS', 1);
+my $verbose = read_env('VERBOSE', 0);
+my $max_pkg_size = read_env('MAX_PKG_SIZE', 9999999999999);
 
 my $apt = "$ENV{'BASEDIR'}/tools/apt-selection";
 my $adir = "$ENV{'APTTMP'}/$ENV{'CODENAME'}-$ENV{'ARCH'}";
 my $arch = "$ENV{'ARCH'}";
 my $dir = "$ENV{'TDIR'}/$ENV{'CODENAME'}";
-my $verbose = $ENV{'VERBOSE'} || 0;
-my $max_pkg_size = $ENV{'MAX_PKG_SIZE'} || 9999999999999;
 
 my @output;
 
@@ -41,6 +41,17 @@ $| = 1; # Autoflush for debugging
 
 open(LOG, ">$dir/sort_deps.$arch.log")
        || die "Can't write in $dir/sort_deps.$arch.log !\n";
+
+sub read_env {
+    my $env_var = shift;
+    my $default = shift;
+
+    if (exists($ENV{$env_var})) {
+        return $ENV{$env_var};
+    }
+    # else
+    return $default;
+}
 
 sub msg {
 	my $level = shift;

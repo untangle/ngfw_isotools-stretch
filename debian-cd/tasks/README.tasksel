@@ -58,9 +58,6 @@ Static task files (can be found in tasks/codename):
   top level task file; defines order of other task files to be used,
   including task-essential-[generic|<desktop>] and
   task-full-[generic|<desktop>]
-- tasksel_d-i.languages:
-  list of languages used to add language tasks at build time (see detailed
-  explanation below)
 - task.list.generic or task.list.<desktop>:
   tasksel tasks to be included
 
@@ -85,58 +82,3 @@ the subdirectory tasks under the working directory for the build):
 
 The generation of these files is done early in a build by the script
 tools/update_tasks.
-
-The file <codename>/tasksel_d-i.languages
-=========================================
-This file contains the superset of all languages that have language tasks
-in the <codename> version of tasksel. The list should contain the language
-names as used in tasksel.
-Any languages that are not supported in the <codename> version of Debian
-Installer should be commented out. Reason is that it makes no sense to
-include them on early CDs as they will never be used during installations
-and thus the space can be better used for other packages.
-
-The following procedure can be used to update the language list:
-- delete the current list of languages (leaving leading comments) from
-  <codename>/tasksel_d-i.languages
-- get the current source for tasksel and do:
-  $ cd tasks
-  $ grep -l "Test-lang" * | sed "s/-desktop//" | sort -u
-- add the resulting list to <codename>/tasksel_d-i.languages
-- check what languages are supported in the version of localechooser for
-  <codename> by checking the file 'languagelist' in its source
-- comment out any languages not supported by localechooser (either not
-  present or commented out in 'languagelist')
-- check the diff between the old and new version and double check any
-  changes
-
-Language list used at build time
-================================
-The language list that is used to add languages tasks is a copy of
-tasks/$DI_CODENAME/$TASKSEL_LANGLIST. By default TASKSEL_LANGLIST is set
-to 'tasksel_d-i.languages' (see CONF.sh).
-
-Note that the file is taken based on DI_CODENAME and not CODENAME! Reason
-is that if those differ DI_CODENAME will almost always be the "newer"
-release and it is better to have a list that reflects the languages
-supported by the version of Debian Installer that is used, especially
-since any languages not supported by the CODENAME version of tasksel will
-be filtered out automatically by the tools/update_tasks script.
-
-Using a custom language list
-----------------------------
-In some cases it may be desirable to only include a subset of the language
-tasks available in tasksel. For example if you're building images for a
-derived distribution targeted at a specific language or set of languages
-and would prefer to not waste space on language-specific packages that
-would never be used but instead include as many "regular" package as
-possible.
-
-In that case you should create a custom language list file. We'd suggest
-to create it in one tasks/<codename> directory and add symlinks in other
-tasks/<codename> directories.
-Then change TASKSEL_LANGLIST in CONF.sh to use your custom list.
-
-Another option is to set 'TASKSEL_LANGLIST=empty' and add the desired
-language tasks (note: the full task names, not just the language names!)
-to all relevant task.list* files.

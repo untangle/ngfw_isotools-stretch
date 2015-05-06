@@ -1,6 +1,17 @@
-my $symlink_farm = $ENV{'SYMLINK'} || 0;
-my $link_verbose = $ENV{'VERBOSE'} || 0;
-my $link_copy = $ENV{'COPYLINK'} || 0;
+my $symlink_farm = read_env('SYMLINK', 0);
+my $link_verbose = read_env('VERBOSE', 0);
+my $link_copy = read_env('COPYLINK', 0);
+
+sub read_env {
+    my $env_var = shift;
+    my $default = shift;
+
+    if (exists($ENV{$env_var})) {
+        return $ENV{$env_var};
+    }
+    # else
+    return $default;
+}
 
 sub good_link ($$) {
 	my ($src, $dest) = @_;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright 1999 Raphaël Hertzog <hertzog@debian.org>
+# Copyright 1999 RaphaÃ«l Hertzog <hertzog@debian.org>
 # See the README file for the license
 #
 # This script takes 1 argument on input :
@@ -13,30 +13,46 @@
 # per-disc basis now.
 
 use strict;
+use Data::Dumper;
+use Dpkg::Version;
 
-my $list = shift;
+my $listfile = shift;
 
-my $nonfree = $ENV{'NONFREE'} || 0;
-my $extranonfree = $ENV{'EXTRANONFREE'} || 0;
-my $force_firmware = $ENV{'FORCE_FIRMWARE'} || 0;
-my $local = $ENV{'LOCAL'} || 0;
-my $complete = $ENV{'COMPLETE'} || 0;
-my $norecommends = $ENV{'NORECOMMENDS'} || 1;
-my $nosuggests = $ENV{'NOSUGGESTS'} || 1;
+my $nonfree = read_env('NONFREE', 0);
+my $extranonfree = read_env('EXTRANONFREE', 0);
+my $force_firmware = read_env('FORCE_FIRMWARE', 0);
+my $local = read_env('LOCAL', 0);
+my $complete = read_env('COMPLETE', 0);
+my $norecommends = read_env('NORECOMMENDS', 1);
+my $nosuggests = read_env('NOSUGGESTS', 1);
+my $verbose = read_env('VERBOSE', 0);
+my $max_pkg_size = read_env('MAX_PKG_SIZE', 9999999999999);
 
 my $apt = "$ENV{'BASEDIR'}/tools/apt-selection";
 my $adir = "$ENV{'APTTMP'}/$ENV{'CODENAME'}-$ENV{'ARCH'}";
 my $arch = "$ENV{'ARCH'}";
 my $dir = "$ENV{'TDIR'}/$ENV{'CODENAME'}";
-my $verbose = $ENV{'VERBOSE'} || 0;
-my $max_pkg_size = $ENV{'MAX_PKG_SIZE'} || 9999999999999;
 
-my @output;
+my $force_unstable_tasks = read_env('FORCE_SID_TASKSEL', 0);
+my $tasks_packages = read_env('TASKS_PACKAGES',
+                              "$ENV{'MIRROR'}/dists/sid/main/binary-$ENV{'ARCH'}/Packages.gz");
+my @output = ();
 
 $| = 1; # Autoflush for debugging
 
 open(LOG, ">$dir/sort_deps.$arch.log")
        || die "Can't write in $dir/sort_deps.$arch.log !\n";
+
+sub read_env {
+    my $env_var = shift;
+    my $default = shift;
+
+    if (exists($ENV{$env_var})) {
+        return $ENV{$env_var};
+    }
+    # else
+    return $default;
+}
 
 sub msg {
 	my $level = shift;
@@ -54,7 +70,7 @@ msg(0, "Running sort_deps to sort packages for $arch:\n");
 msg(1, "======================================================================
 Here are the settings you've chosen for making the list:
 Architecture: $arch
-List of prefered packages: $list
+List of prefered packages: $listfile
 Output file: $dir/packages.$arch
 ");
 msg(1, "Complete selected packages with all the rest: ");
@@ -63,6 +79,10 @@ msg(1, "Include non-free packages: ");
 msg(1, yesno($nonfree)."\n");
 msg(1, "Force inclusion of firmware packages: ");
 msg(1, yesno($force_firmware)."\n");
+msg(1, "Ignore Recommends: ");
+msg(1, yesno($norecommends)."\n");
+msg(1, "Ignore Suggests: ");
+msg(1, yesno($nosuggests)."\n");
 msg(1, "======================================================================
 ");
 
@@ -73,30 +93,31 @@ open(AVAIL, "$apt cache dumpavail |") || die "Can't fork : $!\n";
 my ($p, $re);
 while (defined($_=<AVAIL>)) {
 	next if not m/^Package: (\S+)\s*$/m;
-	$p = $1;
-	$included{$p} = 0;
-	$packages{$p}{"Package"} = $p;
-	foreach $re (qw(Version Priority Section Filename Size MD5sum)) {
-		(m/^$re: (\S+)\s*$/m and $packages{$p}{$re} = $1)
-		|| msg(1, "Header field '$re' missing for package '$p'.\n");
-	}
-	$packages{$p}{"Depends"} = [];
-	$packages{$p}{"Suggests"} = [];
-	$packages{$p}{"Recommends"} = [];
-	$packages{$p}{"IsUdeb"} = ($packages{$p}{"Filename"} =~ /.udeb$/) ? 1 : 0;
-	$packages{$p}{"IsFirmware"} = ($packages{$p}{"Filename"} =~ /(firmware|microcode)/) ? 1 : 0;
-	if ($packages{$p}{"Section"} =~ /contrib\//) {
-		$packages{$p}{"Component"} = "contrib";
-	} elsif ($packages{$p}{"Section"} =~ /non-free\//) {
-		$packages{$p}{"Component"} = "non-free";
-	} elsif ($packages{$p}{"IsUdeb"}) {
-		$packages{$p}{"Component"} = "main-installer";
-	} else {
-		$packages{$p}{"Component"} = "main";
-	}
-
+    if (!$force_unstable_tasks || $1 !~ /^task-/) {
+        parse_package($_);
+    }
 }
 close AVAIL or die "apt-cache failed : $@ ($!)\n";
+
+# Read in the extra (new/unstable) tasks packages
+if ($force_unstable_tasks) {
+    my $num = 0;
+    if ($tasks_packages =~ /\.gz$/) {
+        open(AVAIL, "zcat $tasks_packages |") || die "Can't zcat $tasks_packages : $!\n";
+    } else {
+        open(AVAIL, "< $tasks_packages") || die "Can't open $tasks_packages for reading: $!\n";
+    }
+    while (defined($_=<AVAIL>)) {
+        next if not m/^Package: (\S+)\s*$/m;
+        if ($1 =~ /^task-/) {
+            parse_package($_);
+            $num++;
+        }
+    }
+    close AVAIL or die "reading unstable tasks failed : $@ ($!)\n";
+    msg(0, "  Read $num tasks packages from $tasks_packages\n");
+}
+    
 $/ = $oldrs;
 
 # Get the list of excluded packages
@@ -131,7 +152,7 @@ foreach (keys %excluded) {
 close (STATS);
 
 # Browse the list of packages to include
-my ($output_size, $size) = (0, 0, 0);
+my ($output_size, $size) = (0, 0);
 my %cds;
 
 # Generate a dependency tree for each package
@@ -142,7 +163,7 @@ while (@list) {
 	$ENV{'LC_ALL'} = 'C'; # Required since apt is now translated
 	open (APT, "$apt cache depends @pkg |") || die "Can't fork : $!\n";
 	my (@res) = (<APT>);
-	close APT or die "« apt-cache depends » failed ... \n" . 
+	close APT or die "'apt-cache depends failed ... \n" . 
 	                 "you must have apt >= 0.3.11.1 !\n";
 	# Getting rid of conflicts/replaces/provides
 	my $i = 0;
@@ -152,9 +173,11 @@ while (@list) {
 		if ($res[$i] !~ m/^(\S+)\s*$/) {
 			msg(0, "UNEXPECTED: Line `$res[$i]' while parsing " .
 			       "end of deptree from '$p'\n");
+			die "sort_deps failed! :-(\n";
 		}
-		$p = lc $1; $i++;
-		msg(2, "   Dependency tree of `$p' ...\n");
+		$p = lc $1;
+		$i++;
+		msg(2, "  Dependency tree of `$p' ...\n");
 		read_depends (\$i, \@res, $p);
 	}
 	
@@ -181,7 +204,7 @@ msg(0, "  S/R/I/B packages take $output_size bytes\n");
 
 # Now start to look for packages wanted by the user ...
 msg(0, "  Adding the rest of the requested packages\n");
-open (LIST, "< $list") || die "Can't open $list : $!\n";
+open (LIST, "< $listfile") || die "Can't open $listfile : $!\n";
 while (defined($_=<LIST>)) {
 	chomp;
 	next if m/^\s*$/;
@@ -199,9 +222,9 @@ while (defined($_=<LIST>)) {
 	# nevertheless ... this may be removed once the udebs have a
 	# better depencency system
 	if ($packages{$_}{"IsUdeb"}) {
-	    add_to_output($packages{$_}{"Size"}, [$_]);
+		add_to_output($_);
 	} else {
-	    add_package ($_, ! $norecommends, ! $nosuggests);
+		add_package ($_, ! $norecommends, ! $nosuggests);
 	}
 }
 close LIST;
@@ -251,7 +274,7 @@ if ($extranonfree and (! $nonfree))
 	# include and if COMPLETE=0 there's a chance that the package
 	# will not get included in any CD ... so I'm checking the complete
 	# list again
-	open (LIST, "< $list") || die "Can't open $list : $!\n";
+	open (LIST, "< $listfile") || die "Can't open $listfile : $!\n";
 	while (defined($_=<LIST>)) {
 		chomp;
 		next if m/^\s*$/;
@@ -305,7 +328,8 @@ open(FWLIST, ">> $dir/firmware-packages")
 foreach (@output) {
     my $component = $packages{$_}{"Component"};
     my $size = $packages{$_}{"Size"};
-    print CDLIST "$arch:$component:$_:$size\n";
+    my $bu = $packages{$_}{"Built-Using"};
+    print CDLIST "$arch:$component:$_:$size:$bu\n";
     if ($packages{$_}{"IsFirmware"}) {
         print FWLIST "$_\n";
     }
@@ -320,17 +344,95 @@ close LOG;
 ## END OF MAIN
 ## BEGINNING OF SUBS
 
+sub parse_package {
+	my $p;
+	m/^Package: (\S+)\s*$/m and $p = $1;
+	$included{$p} = 0;
+	$packages{$p}{"Package"} = $p;
+	foreach $re (qw(Version Priority Section Filename Size MD5sum)) {
+		(m/^$re: (\S+)\s*$/m and $packages{$p}{$re} = $1)
+		|| msg(1, "Header field '$re' missing for package '$p'.\n");
+	}
+	$packages{$p}{"Depends"} = [];
+	$packages{$p}{"Suggests"} = [];
+	$packages{$p}{"Recommends"} = [];
+	$packages{$p}{"Built-Using"} = "";	
+	if (m/^Built-Using: (.*)$/m) {
+	    my $built = $1;
+	    $built =~ s/ \(= \S*\)//g;
+	    $built =~ s/,//g;
+	    $built =~ s/ /,/g;
+	    $packages{$p}{"Built-Using"} = $built;
+	}
+	$packages{$p}{"IsUdeb"} = ($packages{$p}{"Filename"} =~ /.udeb$/) ? 1 : 0;
+	$packages{$p}{"IsFirmware"} = ($packages{$p}{"Filename"} =~ /(firmware|microcode)/) ? 1 : 0;
+	if ($packages{$p}{"Section"} =~ /contrib\//) {
+		$packages{$p}{"Component"} = "contrib";
+	} elsif ($packages{$p}{"Section"} =~ /non-free\//) {
+		$packages{$p}{"Component"} = "non-free";
+	} elsif ($packages{$p}{"IsUdeb"}) {
+		$packages{$p}{"Component"} = "main-installer";
+	} else {
+		$packages{$p}{"Component"} = "main";
+	}
+}
+
+sub dump_depend {
+    my $tmpin = shift;
+    my %d;
+    my $ret = "";
+
+    if ("ARRAY" eq ref($tmpin)) {
+        my @array = @{$tmpin};
+        foreach (@array) {
+            %d = %$_;
+            $ret .= $d{"Package"};
+            if ($d{"CmpOp"} ne "") {
+                $ret .= " (" . $d{"CmpOp"} . " " . $d{"Version"} . ")";
+            }
+            $ret .= " ";
+        }
+    } elsif ("HASH" eq ref($tmpin)) {
+        %d = %$tmpin;
+        $ret .= $d{"Package"};
+        if ($d{"CmpOp"} ne "") {
+            $ret .= " (" . $d{"CmpOp"} . " " . $d{"Version"} . ")";
+        }
+    } else {
+        die "dump_depend: $tmpin is neither an array nor a hash!\n";
+    }
+
+    return $ret;
+}
+
+sub dump_or_list {
+	my $out_type = shift;
+	my $elt = shift;
+	my @or = @$elt;
+
+	if (scalar @or == 1) {
+		msg(1, "    $out_type: " . dump_depend($or[0]) . "\n");
+	} else {
+		msg(1, "    $out_type: OR (");
+		foreach my $t (@or) {
+			msg(1, dump_depend($t) . " ");
+		}
+		msg(1, ")\n");
+	}
+}
+
 sub read_depends {
 	my $i = shift;     # Ref
 	my $lines = shift; # Ref
 	my $pkg = shift;   # string
 	my $types = "(?:Pre)?Depends|Suggests|Recommends|Replaces|Conflicts|Breaks|Enhances";
 	my (@dep, @rec, @sug);
-	my ($type, $or, $elt);
+	my ($type, $or);
 
 	while ($lines->[$$i] =~ m/^\s([\s\|])($types):/) {
 		$type = $2; $or = $1;
-		# Get rid of replaces and conflicts ...
+		# Get rid of replaces, conflicts and any other fields we don't
+		# care about...
 		if (($type eq "Replaces") or
 			($type eq "Conflicts") or
 			($type eq "Breaks") or
@@ -341,42 +443,144 @@ sub read_depends {
 			}
 			next;
 		}
+
+		my $out_type = $type;
+		$out_type =~ s/^Pre//; # PreDepends are like Depends for me 
+
 		# Check the kind of depends : or, virtual, normal
 		if ($or eq '|') {
-			$elt = read_ordepends ($i, $lines);
+			my $elt = read_ordepends ($i, $lines);
+			dump_or_list($out_type, \@$elt);
+			push @{$packages{$pkg}{$out_type}}, $elt;
 		} elsif ($lines->[$$i] =~ m/^\s\s$type: <([^>]+)>/) {
-			$elt = read_virtualdepends ($i, $lines);
-		} elsif ($lines->[$$i] =~ m/^\s\s$type: (\S+)/) {
-			$elt = $1; $$i++;
+			my $elt = read_virtualdepends ($i, $lines);
+			foreach my $t (@$elt) {
+				msg(1, "    $out_type: " . dump_depend($t) . " <virt>\n");
+			}
+			push @{$packages{$pkg}{$out_type}}, $elt;
+		} elsif ($lines->[$$i] =~ m/^\s\s$type: (\S+)( \((\S+) (\S+)\))*/) {
+			my @or;
+			my %elt;
+			$elt{"Package"} = $1;
+			if (defined $2) {
+				$elt{"CmpOp"} = $3;
+				$elt{"Version"} = $4;
+			} else {
+				$elt{"CmpOp"} = "";
+				$elt{"Version"} = "";
+			}
+			push @or, \%elt;
+			$$i++;
+
 			# Special case for packages providing not
-			# truely virtual packages
+			# truly virtual packages
 			if ($lines->[$$i] =~ m/^\s{4}/) {
-				$elt = [ $elt ];
-				while ($lines->[$$i] =~ m/\s{4}(\S+)/) {
-					push @{$elt}, $1;
+				while ($lines->[$$i] =~ m/\s{4}(\S+)( \((\S+) (\S+)\))*/) {
+					my %elt1;
+					$elt1{"Package"} = $1;
+					if (defined $2) {
+						$elt1{"CmpOp"} = $3;
+						$elt1{"Version"} = $4;
+					} else {
+						$elt1{"CmpOp"} = "";
+						$elt1{"Version"} = "";
+					}
+					push @or, \%elt1;
 					$$i++;
 				}
 			}
+			dump_or_list($out_type, \@or);
+			push @{$packages{$pkg}{$out_type}}, \@or;
 		} else {
 			msg(0, "ERROR: Unknown depends line : $lines->[$$i]\n");
 			foreach ($$i - 3 .. $$i + 3) {
 				msg(0, "      ", $lines->[$_]);
 			}
 		}
-		$type =~ s/^Pre//; # PreDepends are like Depends for me 
-		next if dep_satisfied($elt);
-		push @{$packages{$pkg}{$type}}, $elt;
 	}
 }
 
+# Big matrix of tests. Check to see if the available version of a
+# package matches what we're requesting in a dependency relationship
+sub check_versions {
+	my $wanted = shift;
+	my $op = shift;
+	my $available = shift;
+
+	# Trivial check - if we don't care about versioning, anything will
+	# do!
+	if ($op eq "") {
+		return 1;
+	}
+
+	# Ask the dpkg perl code to compare the version strings
+	my $comp = version_compare($available, $wanted);
+
+	if ($op eq "<=") {
+		if ($comp == -1 || $comp == 0) {
+			return 1;
+		}
+	} elsif ($op eq ">=") {
+		if ($comp == 0 || $comp == 1) {
+			return 1;
+		}
+	} elsif ($op eq "<<") {
+		if ($comp == -1) {
+			return 1;
+		}
+	} elsif ($op eq ">>") {
+		if ($comp == 1) {
+			return 1;
+		}
+	} elsif ($op eq "=") {
+		if ($comp == 0) {
+			return 1;
+		}
+	# Not sure this ("!") actually exists!
+	# Mentioned in apt sources, but not in debian policy
+	# No harm done by checking for it, though...
+	} elsif ($op eq "!") {
+		if ($comp == -1 || $comp == 1) {
+			return 1;
+		}
+	}
+	# else
+	return 0;
+}
+
+# Check if a specific dependency package is installed already
+sub dep_pkg_included {
+	my $p = shift;
+	my %d = %$p;
+	my $pn = $d{"Package"};
+
+	if ($included{$pn}) {
+		if (check_versions($d{"Version"}, $d{"CmpOp"}, $packages{$pn}{"Version"})) {
+			msg(1, "      $pn is included already, acceptable version " . $packages{$pn}{"Version"} . "\n");
+			return 1;
+		} else {
+			msg(1, "      $pn is included already, but invalid version " . $packages{$pn}{"Version"} . "\n");
+		}
+	}
+	# else
+	return 0;
+}
+
+# Check to see if a dependency is satisfied, either a direct
+# dependency or any one of an OR array
 sub dep_satisfied {
 	my $p = shift;
-	if (ref $p) {
+
+	if ("ARRAY" eq ref $p) {
 		foreach (@{$p}) {
-			return 1 if $included{$_};
+			if (dep_pkg_included($_)) {
+				return 1;
+			}
 		}
+	} elsif ("HASH" eq ref $p) {
+		return dep_pkg_included($p);
 	} else {
-		return $included{$p};
+		die "dep_satisfied: $p is neither a hash nor an array!\n";
 	}
 	return 0;
 }
@@ -385,11 +589,21 @@ sub read_ordepends {
 	my $i = shift;
 	my $lines = shift;
 	my @or = ();
-	my ($val,$dep, $last) = ('','',0);
+	my ($val, $dep, $last) = ('','',0);
+	my ($op, $version);
+
+	chomp $lines->[$$i];
 	
 	while ($lines->[$$i] 
-	            =~ m/^\s([\s\|])((?:Pre)?Depends|Suggests|Recommends): (\S+)/) {
+	            =~ m/^\s([\s\|])((?:Pre)?Depends|Suggests|Recommends): (\S+)( \((\S+) (\S+)\))*/) {
 		$val = $3;
+		if (defined $4) {
+			$op = $5;
+			$version = $6;
+		} else {
+			$op = "";
+			$version = "";
+		}
 		$last = 1 if $1 ne '|'; #Stop when no more '|'
 		if ($val =~ m/^<.*>$/) {
 			$dep = read_virtualdepends ($i, $lines);
@@ -399,11 +613,26 @@ sub read_ordepends {
 				push @or, $dep;
 			}
 		} else {
-			push @or, $val; $$i++;
-			# Hack for packages providing not a truely
+			my %elt;
+			$elt{"Package"} = $val;
+			$elt{"CmpOp"} = $op;
+			$elt{"Version"} = $version;
+			push @or, \%elt;
+			$$i++;
+			# Hack for packages providing not a truly
 			# virtual package
-			while ($lines->[$$i] =~ m/^\s{4}(\S+)/) {
-				push @or, $1;
+			while ($lines->[$$i] =~ m/^\s{4}(\S+)( \((\S+) (\S+)\))*/) {
+				my %elt1;
+				$elt1{"Package"} = $1;
+				if (defined $2) {
+					$elt1{"CmpOp"} = $3;
+					$elt1{"Version"} = $4;
+				} else {
+					$elt1{"CmpOp"} = "";
+					$elt1{"Version"} = "";
+				}
+				msg(1, "    " . dump_depend(\%elt1) . "\n");
+				push @or, \%elt1;
 				$$i++;
 			}
 		}
@@ -425,14 +654,28 @@ sub read_virtualdepends {
 	    $$i++
 	}
 	# Now look at the alternatives on the following lines
-	while ($lines->[$$i] =~ m/^\s{4}(\S+)/) {
-		push @or, $1;
+	while ($lines->[$$i] =~ m/^\s{4}(\S+)( \((\S+) (\S+)\))*/) {
+		my %elt;
+		$elt{"Package"} = $1;
+		if (defined $2) {
+			$elt{"CmpOp"} = $3;
+			$elt{"Version"} = $4;
+		} else {
+			$elt{"CmpOp"} = "";
+			$elt{"Version"} = "";
+		}
+		push @or, \%elt;
 		$$i++;
 	}
 	if (@or) {
 		return \@or;
 	} else {
-		return $virtual;
+		my %elt;
+		$elt{"Package"} = $virtual;
+		$elt{"CmpOp"} = "";
+		$elt{"Version"} = "";
+		push @or, \%elt;
+		return \@or;
 	}
 }
 
@@ -463,7 +706,7 @@ sub add_package {
 		return;
 	}
 	
-	msg(3, "  \@dep before checklist = @dep\n");
+	msg(3, "  \@dep before checklist = " . dump_depend(\@dep) . "\n");
 	
 	# Check if all packages are allowed (fail if one cannot)
 	($ok, $reasons) = check_list (\@dep, 1);
@@ -473,24 +716,26 @@ sub add_package {
 		return;
 	}
 	
-	msg(3, "  \@dep after checklist = @dep\n");
+	msg(3, "  \@dep after checklist = " . dump_depend(\@dep) . "\n");
 	
 	if ($add_rec) {
-	    #TODO: Look for recommends (not yet included !!)
-	    add_recommends (\@dep);
-	    # Check again but doesn't fail if one of the package cannot be
-	    # installed, just ignore it (it will be removed from @dep)
+		#TODO: Look for recommends (not yet included !!)
+		add_recommends (\@dep, $p);
+		msg(3, "  \@dep after add_recommends = " . dump_depend(\@dep) . "\n");
+		# Check again but doesn't fail if one of the package cannot be
+		# installed, just ignore it (it will be removed from @dep)
 		($ok, $reasons) = check_list (\@dep, 0);
 		if (not $ok) {
 			msg(0, "UNEXPECTED: It shouldn't fail here !\n");
 			return;
 		}
-		msg(3, "  \@dep after checklist2 = @dep\n");
+		msg(3, "  \@dep after checklist2 = " . dump_depend(\@dep) . "\n");
 	}
 
 	if ($add_sug) {
 	    #TODO: Look for suggests (not yet included !!)
-		add_suggests (\@dep);
+		add_suggests (\@dep, $p);
+		msg(3, "  \@dep after add_suggests = " . dump_depend(\@dep) . "\n");
         # Check again but doesn't fail if one of the package cannot be
         # installed, just ignore it (it will be removed from @dep)
         ($ok, $reasons) = check_list (\@dep, 0);
@@ -498,147 +743,253 @@ sub add_package {
             msg(0, "UNEXPECTED: It shouldn't fail here !\n");
             return;
         }
-		msg(3, "  \@dep after checklist3 = @dep\n");
+		msg(3, "  \@dep after checklist3 = " . dump_depend(\@dep) . "\n");
 	}
 	
-	# All packages are ok, now check for the size issue
-	$size = get_size (\@dep);
-	add_to_output ($size, \@dep);
+	# All packages are ok, now list them out and add sizes
+	foreach my $t (@dep) {
+		my %t = %$t;
+		my $pkgname = $t{"Package"};
+		add_to_output($pkgname);
+    }
 }
 
 sub accepted {
 	my $p = shift;
 	return not $excluded{$p} if (exists $excluded{$p});
-	# Return false for a non-existant package ...
+	# Return false for a non-existent package ...
 	msg(1, "WARNING: $p cannot be accepted, it doesn't exist ...\n");
 	return 0;
 }
 
 sub add_suggests {
-	my $list = shift;
+	my $deps_list = shift;
+	my $pkg = shift;
+	my @parents = ($pkg);
 	my $p; # = shift;
-	my @copy = @{$list}; # A copy is needed since I'll modify the array
+	my @copy = @{$deps_list}; # A copy is needed since I'll modify the array
 	
 	foreach $p (@copy) {
-		add_missing($list, $packages{$p}{"Suggests"}, $p);
+		my %t = %$p;
+		my $pkgname = $t{"Package"};
+		add_missing($deps_list, $packages{$pkgname}{"Suggests"}, \%t, 1, \@parents);
 	}
-		
 }
 
 sub add_recommends {
-	my $list = shift;
+	my $deps_list = shift;
+	my $pkg = shift;
+	my @parents = ($pkg);
 	my $p; # = shift;
-	my @copy = @{$list}; # A copy is needed since I'll modify the array
+	my @copy = @{$deps_list}; # A copy is needed since I'll modify the array
 	
 	foreach $p (@copy) {
-		add_missing($list, $packages{$p}{"Recommends"}, $p);
+		my %t = %$p;
+		my $pkgname = $t{"Package"};
+		add_missing($deps_list, $packages{$pkgname}{"Recommends"}, \%t, 1, \@parents);
 	}
-		
 }
 
 sub get_missing {
 	my $p = shift;
-	my @list = ();
+	my @deps_list = ();
+	my @parents = ();
+	my %t;
+	my $dep_text;
 	
-	if (not add_missing (\@list, $packages{$p}{"Depends"}, $p)) {
+	$t{"Package"} = $p;
+	$t{"CmpOp"} = "";
+	$t{"Version"} = "";
+
+	if (not add_missing (\@deps_list, $packages{$p}{"Depends"}, \%t, 0, \@parents)) {
 		return ();
 	}
 
-	remove_entry($p, \@list);
-	push @list, $p;
-	return (@list);
+	# Explicitly move the package itself to the end of the list,
+	# i.e. *after* all its dependencies
+	remove_entry(\%t, \@deps_list);
+	push @deps_list, \%t;
+
+	return (@deps_list);
 }
 
-# Recursive function adding to the 
+# Recursive function adding packages to our list
 sub add_missing {
 	my $list = shift;
 	my $new = shift;
 	my $pkgin = shift;
 	my @backup = @{$list};
 	my $ok = 1;
-	
+	my $soft_depend = shift;
+	my $parents = shift;
+	my $pkgname;
+	my (%pkgin);
+
+	if (ref $pkgin eq "HASH") {
+		%pkgin = %$pkgin;
+	} else {
+		die "add_missing passed a non-hash";
+	}
+
+	push(@{$parents}, $pkgin{"Package"});
+	#msg(3, "   add_missing: parents atm @{$parents}\n");
 	# Check all dependencies 
-	foreach (@{$new}) {
-		if (ref) {
-			my $textout = "";
-			foreach my $orpkg (@{$_}) {
-				$textout .= "$orpkg ";
+	foreach my $thisdep (@{$new}) {
+		my $textout = "";
+		$pkgname = $pkgin{"Package"};
+
+		# Print out status
+		if ("ARRAY" eq ref($thisdep)) {
+			if (scalar(@{$thisdep} > 1)) {
+				$textout = "(OR ";
 			}
-			msg(3, "    $pkgin Dep: ( OR $textout)\n");
+			foreach my $orpkg (@{$thisdep}) {
+				$textout .= dump_depend($orpkg) . " ";
+			}
+			if (scalar(@{$thisdep} > 1)) {
+				$textout .= ")";
+			}
+		} elsif ("HASH" eq ref($thisdep)) {
+			$textout = dump_depend($thisdep);
 		} else {
-			msg(3, "    $pkgin Dep: $_\n");
+			die "add_missing: $thisdep should be an array or hash!\n";
 		}
-		next if dep_satisfied ($_);
+		msg(3, "    $pkgname Dep: $textout soft_depend $soft_depend\n");
+
+		# Bail out early if we can!
+		if (dep_satisfied ($thisdep)) {
+			next;
+		}
+
+		# Still work to do...
 		# If it's an OR
-		if (ref) {
+		if ("ARRAY" eq ref($thisdep)) {
 			my $or_ok = 0;
-			# Loop over each package in the OR
-			# We always add the first package in the OR to allow
-			# APT to figure out which is the better one to install
-			# for any combination of packages that have similar
-			# alternative dependencies, but in different order.
-			# Having the first alternative available should be good
-			# enough for all cases we care about.
-			foreach my $pkg (@{$_}) {
-				next if not accepted ($pkg);
-				# If the package is already included
-				# then don't worry
-				if ($included{$pkg}) {
+
+			# First check all the OR packages up-front with no
+			# recursion. If *any* one of them is already installed, it
+			# will do.
+			foreach my $pkg (@{$thisdep}) {
+				my %t = %$pkg;
+				my $pkgname = $t{"Package"};
+
+				# Already installed?
+				if (dep_satisfied($pkg)) {
+					msg(3, "    OR relationship already installed: " . dump_depend($pkg) . "\n");
 					$or_ok = 1;
 					last;
 				}
-				# Check we don't already have the package
-				if (is_in ($pkg, $list)) {
+
+				# Pulled in already somewhere above us in the
+				# depth-first search? (yes, we have to cope with
+				# circular dependencies here...)
+				if (is_in ($t{"Package"}, $parents) &&
+					check_versions($t{"Version"}, $t{"CmpOp"}, $packages{$pkgname}{"Version"})) {
+					msg(3, "    OR relationship already satisfied by parent " . dump_depend($pkg) . "\n");
 					$or_ok = 1;
 					last;
-				# Otherwise try to add it
-				} else {
-					# Stop after the first package that is
-					# added successfully
-					push (@{$list}, $pkg);
-					if (add_missing ($list, $packages{$pkg}{"Depends"}, $pkg)) {
+				}
+				# else
+				msg(3, "      " . dump_depend($pkg) . " not already installed\n");
+			}
+
+			# If we don't have any of the OR packages, then start
+			# again and try them in order. We always add the first
+			# package in the OR to allow APT to figure out which is
+			# the better one to install for any combination of
+			# packages that have similar alternative dependencies, but
+			# in different order. Having the first alternative
+			# available should be good enough for all cases we care
+			# about.
+			if (not $or_ok) {
+				msg(3, "    OR relationship not already satisfied, looking at alternatives in order\n");
+				
+				foreach my $pkg (@{$thisdep}) {
+					my %t = %$pkg;
+					my $pkgname = $t{"Package"};
+					if (not accepted($pkgname)) {
+						next;
+					}
+					# Check we don't already have the package
+					if (is_in_dep_list($pkg, $list)) {
 						$or_ok = 1;
-						remove_entry($pkg, $list);
-						push @{$list}, $pkg;
 						last;
+						# Otherwise try to add it
 					} else {
-						pop @{$list};
+						# Stop after the first
+						# package that is
+						# added successfully
+						push (@{$list}, $pkg);
+						if (add_missing ($list, $packages{$pkgname}{"Depends"}, $pkg, $soft_depend, $parents)) {
+							$or_ok = 1;
+							remove_entry($pkg, $list);
+							push @{$list}, $pkg;
+							last;
+						} else {
+							pop @{$list};
+						}
 					}
 				}
 			}
 			$ok &&= $or_ok;
 			if (not $ok) {
-				msg(1, "  $pkgin failed, couldn's satisfy OR dep\n");
+				$pkgname = $pkgin{"Package"};
+				if ($soft_depend) {
+					msg(1, "  $pkgname failed, couldn't satisfy OR dep (but it's a soft dep, so ignoring...)\n");
+					$ok = 1;
+				} else {
+					msg(1, "  $pkgname failed, couldn't satisfy OR dep\n");
+				}
 			}				
 		# Else it's a simple dependency
 		} else {
-            msg(1, "  Looking at adding $_ to satisfy dep\n");
-			if (not exists $packages{lc $_}) {
-				msg(1, "  $_ doesn't exist...\n");
-				msg(1, "  $pkgin failed, couldn't satisfy dep on $_\n");
-				$ok = 0;
-				last;
+			my %t = %{$thisdep};
+			my $pt = dump_depend(\%t);
+			msg(1, "  Looking at adding $pt to satisfy dep\n");
+
+			if (not exists $packages{lc $t{"Package"}}) {
+				msg(1, "  $pt doesn't exist...\n");
+				if ($soft_depend) {
+					msg(1, "  soft dep: $pkgname ok, despite missing dep on $pt\n");
+					$ok = 1;
+				} else {
+					msg(1, "  $pkgname failed, couldn't satisfy dep on $pt\n");
+					$ok = 0;
+					last;
+				}
 			}
-			next if $included{lc $_}; # Already included, don't worry
-			next if is_in (lc $_, $list);
-			push @{$list}, lc $_;
-			if (not add_missing ($list, $packages{lc $_}{"Depends"}, lc $_)) {
-				msg(1, "couldn't add $_ ...\n");
-				msg(1, "$pkgin failed, couldn't satisfy dep on $_\n");
-				pop @{$list};
-				$ok = 0;
+			if (dep_satisfied(\%t)) {
+				msg(1, "    $pt already included\n");
+				next; # Already included, don't worry
 			}
-			remove_entry(lc $_, $list);
-			push @{$list}, lc $_;
+			if (is_in_dep_list(\%t, $list)) {
+				msg(1, "    $pt already in dep list\n");
+				next;
+			}
+			push @{$list}, \%t;
+			if (not add_missing ($list, $packages{$t{"Package"}}{"Depends"}, \%t, $soft_depend, $parents)) {
+				my $pkgname = $pkgin{"Package"};
+				msg(1, "couldn't add $pt ...\n");
+				if ($soft_depend) {
+					msg(1, "soft dep: $pkgname ok, despite missing dep on $pt\n");
+					$ok = 1;
+				} else {
+					msg(1, "$pkgname failed, couldn't satisfy dep on $pt\n");
+					pop @{$list};
+					$ok = 0;
+				}
+			}
+			remove_entry(\%t, $list);
+			push @{$list}, \%t;
 		}
 	}
 	# If a problem has come up, then restore the original list
 	if (not $ok) {
 		@{$list} = @backup;
 	}
-    if (not is_in(lc $pkgin, $list)) {
-        push @{$list}, lc $pkgin;
-    }
+	if (not is_in_dep_list(\%pkgin, $list)) {
+		push @{$list}, \%pkgin;
+	}
 	return $ok;
 }
 
@@ -652,30 +1003,41 @@ sub is_in {
 	return 0;		
 }
 
-# Remove an antry from @{$array}
-sub remove_entry {
-    my $value = shift;
-    my $array = shift;
-    my $entries = scalar(@{$array});
-    my $i;
+# Check if a package dependency is already in a dependency list
+sub is_in_dep_list {
+	my $hash = shift;
+	my $array = shift;
+	my %t = %$hash;
 
-    for ($i=0; $i < $entries; $i++) {
-        if (@{$array}[$i] eq $value) {
-            splice(@{$array}, $i, 1);
-            $i--;
-            $entries--;
-        }
-    }
+	foreach my $key (@{$array}) {
+		my %a = %$key;
+		if ($a{"Package"} eq $t{"Package"}) {
+			my $pn = $a{"Package"};
+			if (check_versions($t{"Version"}, $t{"CmpOp"}, $packages{$pn}{"Version"})) {
+				return 1;
+			}
+		}
+	}
+	return 0;		
 }
 
-# The size of a group of packages
-sub get_size {
-	my $arrayref = shift;
-	my $size = 0;
-	foreach (@{$arrayref}) {
-		$size += $packages{$_}{"Size"};
+# Remove an antry from @{$array}
+sub remove_entry {
+	my $tmp1 = shift;
+	my $array = shift;
+	my $entries = scalar(@{$array});
+	my $i;
+	my %t1 = %$tmp1;
+
+	for ($i=0; $i < $entries; $i++) {
+		my $tmp2 = @{$array}[$i];
+		my %t2 = %$tmp2;
+		if ($t1{"Package"} eq $t2{"Package"}) {
+            splice(@{$array}, $i, 1);
+			$i--;
+			$entries--;
+		}
 	}
-	return $size;
 }
 
 # Check a list of packages
@@ -685,31 +1047,34 @@ sub check_list {
 	my $ok = 1;
 	my @to_remove = ();
 	my $reasons = "";
-	foreach (@{$ref}) {
-		if (not exists $excluded{$_}) {
-		  msg(1,"  $_ has been refused because it doesn't exist ...\n");
-		  $ok = 0;
-		  push @to_remove, $_;
-		  $reasons = $reasons . " noexist";
-		  next;
+	foreach my $thispkg (@{$ref}) {
+		my %t = %$thispkg;
+		my $pkgname = $t{"Package"};
+		if (not exists $excluded{$pkgname}) {
+			msg(1,"  $pkgname has been refused because it doesn't exist ...\n");
+			$ok = 0;
+			push @to_remove, $thispkg;
+			$reasons = $reasons . " noexist";
+			next;
 		}
-		if (not accepted($_)) {
-		  msg(1,"  $_ has been refused because of $excluded{$_} ...\n");
-		  $ok = 0;
-		  push @to_remove, $_;
-		  $reasons = $reasons . " " . $excluded{$_};
-		  next;
+		if (not accepted($pkgname)) {
+			msg(1,"  $pkgname has been refused because of $excluded{$pkgname} ...\n");
+			$ok = 0;
+			push @to_remove, $thispkg;
+			$reasons = $reasons . " " . $excluded{$pkgname};
+			next;
 		}
-		if ($included{$_}) {
-		  msg(1, 
-		      "  $_ has already been included in CD $included{$_}.\n");
-		  push @to_remove, $_;
-		  $reasons = $reasons . " alreadyinc";
-		  next;
+		if ($included{$pkgname}) {
+			msg(1, "  $pkgname has already been included.\n");
+			push @to_remove, $thispkg;
+			$reasons = $reasons . " alreadyinc";
+			next;
 		}
 	}
 	foreach my $removed (@to_remove) {
-		msg(2, "  Removing $removed ... ($reasons )\n");
+		my %t = %$removed;
+		my $pkgname = $t{"Package"};
+		msg(2, "  Removing $pkgname ... ($reasons )\n");
 		@{$ref} = grep { $_ ne $removed } @{$ref};
 	}
 	return ($fail ? $ok : 1, $reasons);
@@ -717,20 +1082,15 @@ sub check_list {
 
 # Add packages to the output list
 sub add_to_output {
-	my $size = shift;
-	my $ref = shift;
-
-	msg(2, "  \$output_size = $output_size, \$size = $size\n");
+	my $pkgname = shift;
+	my $size = $packages{$pkgname}{"Size"};
 
 	$output_size += $size;
-
-	foreach my $pkg (@{$ref}) {
-	    $included{$pkg} = 1;
-	}
-	push(@output, @{$ref});
+	$included{$pkgname} = 1;
+	push(@output, $pkgname);
 }
 
 sub yesno {
-  my $in = shift;
-  return $in ? "yes" : "no";
+	my $in = shift;
+	return $in ? "yes" : "no";
 }

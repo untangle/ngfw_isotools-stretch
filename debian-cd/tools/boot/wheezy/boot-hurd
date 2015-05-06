@@ -36,7 +36,7 @@ if [ $N != 1 ]; then
 fi
 
 # Download boot images.
-BOOT_IMAGES="cdrom/debian-cd_info.tar.gz cdrom/gnumach.gz cdrom/initrd.gz cdrom/ext2fs.static cdrom/ld.so.1"
+BOOT_IMAGES="cdrom/debian-cd_info.tar.gz cdrom/gnumach.gz cdrom/initrd.gz cdrom/gtk/initrd.gz cdrom/ext2fs.static cdrom/ld.so.1"
 
 for image in $BOOT_IMAGES; do
        if [ ! -e "$image" ]; then
@@ -55,8 +55,10 @@ done
 
 # Install kernel and initrd
 mkdir -p $CDDIR/boot/kernel/
+mkdir -p $CDDIR/boot/gtk/
 cp "cdrom/gnumach.gz" "$CDDIR/boot/kernel/gnumach.gz"
 cp "cdrom/initrd.gz" "$CDDIR/boot/initrd.gz"
+cp "cdrom/gtk/initrd.gz" "$CDDIR/boot/gtk/initrd.gz"
 cp "cdrom/ext2fs.static" "$CDDIR/boot/kernel/ext2fs.static"
 cp "cdrom/ld.so.1" "$CDDIR/boot/kernel/ld.so.1"
 
@@ -67,7 +69,9 @@ add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-J -joliet-long"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-b boot/grub/grub_eltorito"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-c boot/boot.cat"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-no-emul-boot"
-add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-boot-load-size 4"
+
+bls=4 # Specify 4 for BIOS boot, don't calculate it
+add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-boot-load-size $bls"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-boot-info-table"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-cache-inodes"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_dirs "boot$N"
@@ -77,6 +81,7 @@ if [ -f $CDDIR/README.html ]; then
        todos > $CDDIR/autorun.inf <<EOF
 [autorun]
 open=autorun.bat
+label=Install Debian GNU/Hurd
 EOF
        todos > $CDDIR/autorun.bat <<EOF
 @echo Starting "README.html"...

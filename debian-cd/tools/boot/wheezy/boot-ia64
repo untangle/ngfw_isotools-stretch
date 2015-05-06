@@ -51,12 +51,13 @@ install_languages $CDDIR
 
 mkdir -p boot$N/boot
 cp -f boot.img boot$N/boot/
-
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-J -joliet-long"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-no-emul-boot"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-b boot/boot.img"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-c boot/boot.catalog"
 
+bls=$(calc_boot_size "boot$N/boot/boot.img")
+add_mkisofs_opt $CDDIR/../$N.mkisofs_opts "-boot-load-size $bls"
 add_mkisofs_opt $CDDIR/../$N.mkisofs_dirs "boot$N"
 
 # done

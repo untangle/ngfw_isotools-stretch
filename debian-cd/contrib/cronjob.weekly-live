@@ -1,0 +1,57 @@
+#!/bin/bash
+
+now () {
+    date -u +%F:%H:%M:%S
+}
+
+START=`now`
+ERROR=0
+if [ "$NOOPENSTACK"x = ""x ] ; then
+    echo "  Running openstack build"
+    ~/live/bin/run-openstack
+    ERROR=$?
+    if [ $ERROR -eq 0 ] ; then
+	if [ "$RELEASE_BUILD"x = ""x ] ; then
+	    ~/build.jessie/sign-images /mnt/nfs-cdimage/.live/new/openstack-jessie ""
+	    mv /mnt/nfs-cdimage/.live/new/openstack-jessie/* /mnt/nfs-cdimage/openstack/testing
+	else
+	    mkdir -p /mnt/nfs-cdimage/.${RELEASE_BUILD}
+	    mv /mnt/nfs-cdimage/.live/new/openstack-jessie/* /mnt/nfs-cdimage/.${RELEASE_BUILD}/openstack
+	fi
+    fi
+    # Wait for the KVM to shut down cleanly
+    sleep 30
+fi
+END=`now`
+echo -e "start=$START\nend=$END\nerror=$ERROR\nlogfile=\n" > $PUBDIROSTRACE
+
+START=`now`
+ERROR=0
+if [ "$NOLIVE"x = ""x ] ; then
+    echo "  Running debian-live build"
+    ~/live/bin/run-live
+    ERROR=$?
+    if [ $ERROR -eq 0 ] ; then
+	if [ "$RELEASE_BUILD"x = ""x ] ; then
+	    ~/build.jessie/sign-images /mnt/nfs-cdimage/.live/new/free ""
+	    mv -f /mnt/nfs-cdimage/weekly-live-builds /mnt/nfs-cdimage/weekly-live-builds.old
+	    mv /mnt/nfs-cdimage/.live/new/free/ /mnt/nfs-cdimage/weekly-live-builds
+	    rm -rf /mnt/nfs-cdimage/weekly-live-builds.old
+
+	    ~/build.jessie/sign-images /mnt/nfs-cdimage/.live/new/non-free ""
+	    mv -f ${CD_I_F}/weekly-live-builds ${CD_I_F}/weekly-live-builds.old
+	    mv /mnt/nfs-cdimage/.live/new/non-free ${CD_I_F}/weekly-live-builds
+	    rm -rf ${CD_I_F}/weekly-live-builds.old
+	else
+	    mkdir -p /mnt/nfs-cdimage/.${RELEASE_BUILD}/
+	    mv /mnt/nfs-cdimage/.live/new/free/ /mnt/nfs-cdimage/.${RELEASE_BUILD}/live-free
+	    mv /mnt/nfs-cdimage/.live/new/non-free /mnt/nfs-cdimage/.${RELEASE_BUILD}/live-non-free
+	fi
+    fi
+    # Wait for the KVM to shut down cleanly
+    sleep 30
+fi
+END=`now`
+echo -e "start=$START\nend=$END\nerror=$ERROR\nlogfile=\n" > $PUBDIRLIVETRACE
+
+exit 0
