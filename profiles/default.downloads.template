@@ -2,3 +2,5 @@ untangle-gateway
 grub-pc
 grub-efi
 isolinux
+syslinux
+syslinux-common
