@@ -135,7 +135,7 @@ index 11c613d..ffea236 100644
  
  # Path where the images will be written
 -export OUT=/srv/mirror/debian-cd-test
-+export OUT=iso-images
++export OUT=/tmp/iso-images
  
  # Where we keep the temporary apt stuff.
  # This cannot reside on an NFS mount.
