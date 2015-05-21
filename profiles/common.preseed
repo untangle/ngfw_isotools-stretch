@@ -214,8 +214,6 @@ d-i grub-installer/with_other_os boolean true
 # or encrypted using an MD5 hash, see grub-md5-crypt(8).
 #d-i grub-installer/password-crypted password [MD5 hash]
 
-d-i grub-installer/grub2_instead_of_grub_legacy false
-
 ### Finishing up the installation
 # During installations from serial console, the regular virtual consoles
 # (VT1-VT6) are normally disabled in /etc/inittab. Uncomment the next
