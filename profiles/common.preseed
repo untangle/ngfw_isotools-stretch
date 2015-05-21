@@ -33,6 +33,7 @@ ddclient ddclient/server string
 ddclient ddclient/service string
 ddclient ddclient/username string
 ddclient ddclient/password string
+ddclient ddclient/password-repeat string
 
 # slapd
 slapd slapd/internal/adminpw string
