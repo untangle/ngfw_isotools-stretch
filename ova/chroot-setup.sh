@@ -30,6 +30,9 @@ KERNEL_ARCH="$(dpkg-architecture -qDEB_BUILD_ARCH)"
 perl -i -pe 's/3.2.0-4-amd64/3.2.0-4-amd64+fail/' /var/lib/dpkg/info/linux-image-3.2.0-4-amd64.prerm
 DEBIAN_FRONTEND=noninteractive apt-get remove --yes --force-yes linux-image-3.2.0-4-${KERNEL_ARCH}
 
+# dist-upgrade in case of security updates since base VMDK was assembled
+DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade --yes --force-yes
+
 # install vmware tools
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes open-vm-tools open-vm-tools-dkms
 
