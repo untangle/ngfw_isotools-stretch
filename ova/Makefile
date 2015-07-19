@@ -13,6 +13,7 @@ TS := $(shell date --iso-8601=seconds)
 HOST := $(shell hostname -s)
 NETBOOT_HOST := netboot-server
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
+MOUNT_SCRIPT := $(IMAGES_DIR)/mounts.py
 VERSION := $(shell cat $(OVA_DIR)/../resources/VERSION)
 VMDK_REFERENCE_NAME := jessie.vmdk
 VMDK_REFERENCE_URL := $(NETBOOT_HOST)/$(VMDK_REFERENCE_NAME)
