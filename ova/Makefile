@@ -6,7 +6,7 @@ REPOSITORY ?= jessie
 # distribution to draw packages from
 DISTRIBUTION ?= nightly
 # architecture
-ARCH ?= i386
+ARCH ?= amd64
 
 ## constants
 TS := $(shell date --iso-8601=seconds)
