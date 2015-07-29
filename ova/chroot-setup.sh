@@ -24,6 +24,9 @@ echo deb http://10.112.11.105/public/$REPOSITORY chaos main non-free >> $TMP_SOU
 apt-get update
 apt-get install --yes --force-yes dpkg-dev
 
+# remove user foo if present
+userdel -f -r foo || true
+
 # remove unncessary packages
 KERNEL_ARCH="$(dpkg-architecture -qDEB_BUILD_ARCH)"
 [[ $KERNEL_ARCH == "i386" ]] && KERNEL_ARCH="686"
