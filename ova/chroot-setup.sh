@@ -30,8 +30,8 @@ userdel -f -r foo || true
 # remove unncessary packages
 KERNEL_ARCH="$(dpkg-architecture -qDEB_BUILD_ARCH)"
 [[ $KERNEL_ARCH == "i386" ]] && KERNEL_ARCH="686"
-perl -i -pe 's/3.2.0-4-amd64/3.2.0-4-amd64+fail/' /var/lib/dpkg/info/linux-image-3.2.0-4-amd64.prerm
-DEBIAN_FRONTEND=noninteractive apt-get remove --yes --force-yes linux-image-3.2.0-4-${KERNEL_ARCH}
+perl -i -pe 's/3.16.0-4-amd64/3.16.0-4-amd64+fail/' /var/lib/dpkg/info/linux-image-3.16.0-4-amd64.prerm
+DEBIAN_FRONTEND=noninteractive apt-get remove --yes --force-yes linux-image-3.16.0-4-${KERNEL_ARCH}
 
 # dist-upgrade in case of security updates since base VMDK was assembled
 DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade --yes --force-yes
