@@ -10,11 +10,11 @@
   </DiskSection>
   <NetworkSection>
     <Info>The list of logical networks</Info>
-    <Network ovf:name="Engineering LAN">
-      <Description>The Engineering LAN network</Description>
+    <Network ovf:name="External">
+      <Description>The external network</Description>
     </Network>
-    <Network ovf:name="Dead Stub">
-      <Description>The Dead Stub network</Description>
+    <Network ovf:name="Internal">
+      <Description>The internal network</Description>
     </Network>
   </NetworkSection>
   <VirtualSystem ovf:id="Untangle">
@@ -103,8 +103,8 @@
       <Item>
         <rasd:AddressOnParent>7</rasd:AddressOnParent>
         <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
-        <rasd:Connection>Engineering LAN</rasd:Connection>
-        <rasd:Description>PCNet32 ethernet adapter on "Engineering LAN"</rasd:Description>
+        <rasd:Connection>External</rasd:Connection>
+        <rasd:Description>PCNet32 ethernet adapter on "External"</rasd:Description>
         <rasd:ElementName>Network adapter 1</rasd:ElementName>
         <rasd:InstanceID>9</rasd:InstanceID>
         <rasd:ResourceSubType>PCNet32</rasd:ResourceSubType>
@@ -115,8 +115,8 @@
       <Item>
         <rasd:AddressOnParent>8</rasd:AddressOnParent>
         <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
-        <rasd:Connection>Dead Stub</rasd:Connection>
-        <rasd:Description>PCNet32 ethernet adapter on "Dead Stub"</rasd:Description>
+        <rasd:Connection>Internal</rasd:Connection>
+        <rasd:Description>PCNet32 ethernet adapter on "Internal"</rasd:Description>
         <rasd:ElementName>Network adapter 2</rasd:ElementName>
         <rasd:InstanceID>10</rasd:InstanceID>
         <rasd:ResourceSubType>PCNet32</rasd:ResourceSubType>
