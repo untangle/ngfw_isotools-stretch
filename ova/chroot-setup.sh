@@ -49,7 +49,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --f
 # fix / and swap
 ROOT_UUID=$(blkid -o value /dev/nbd0p1 | head -1)
 SWAP_UUID=$(blkid -o value /dev/nbd0p2 | head -1)
-perl -i -pe 's|UUID=[^\s]+|UUID='${ROOT_UUID}'|' /boot/grub/grub.cfg
+perl -i -pe 's/(UUID=[^\s]+|\/dev\/nbd0p1)/UUID='${ROOT_UUID}'/' /boot/grub/grub.cfg
 perl -i -pe 's|UUID=[^\s]+\s+/|UUID='${ROOT_UUID}'\t/|' /etc/fstab
 perl -i -pe 's|UUID=[^\s]+\s+none\s+swap|UUID='${SWAP_UUID}'\tnone\tswap|' /etc/fstab
 
