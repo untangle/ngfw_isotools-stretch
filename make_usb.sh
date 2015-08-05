@@ -7,7 +7,7 @@ ISOTOOLS_DIR=$(dirname $0)
 
 IMG=$1
 ISOLINUX_CFG=$2
-ISO_IMG=$(ls /tmp/iso-images/UNTANGLE*iso)
+ISO_IMG=$(ls -t /tmp/iso-images/UNTANGLE*iso | head -1)
 
 IMG_NAME=$(basename $IMG)
 IMG_NOZIP=$(echo $IMG_NAME | perl -pe 's/\.gz$//')
