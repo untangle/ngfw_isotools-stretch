@@ -2,9 +2,9 @@
 
 ### debconf
 # debconf & d-i
-debconf debconf/priority string high
-unknown debconf/priority string high
-d-i     debconf/priority string high
+debconf debconf/priority string critical
+unknown debconf/priority string critical
+d-i     debconf/priority string critical
 
 # snort
 snort snort/address_range string 192.168.0.0/16
@@ -187,18 +187,20 @@ popularity-contest popularity-contest/participate boolean false
 ### Boot loader installation
 # Grub is the default boot loader (for x86). If you want lilo installed
 # instead, uncomment this:
-#d-i grub-installer/skip boolean true
+d-i grub-installer/skip boolean true
 # To also skip installing lilo, and install no bootloader, uncomment this
 # too:
-#d-i lilo-installer/skip boolean true
+d-i lilo-installer/skip boolean true
+
+grub-pc grub-pc/install_devices_empty boolean true
 
 # This is fairly safe to set, it makes grub install automatically to the MBR
 # if no other operating system is detected on the machine.
-d-i grub-installer/only_debian boolean true
+#d-i grub-installer/only_debian boolean true
 
 # This one makes grub-installer install to the MBR if it also finds some other
 # OS, which is less safe as it might not be able to boot that other OS.
-d-i grub-installer/with_other_os boolean true
+#d-i grub-installer/with_other_os boolean true
 
 # Alternatively, if you want to install to a location other than the mbr,
 # uncomment and edit these lines:
@@ -284,4 +286,4 @@ select 1024x768 @ 60 Hz
 # packages and run commands in the target system.
 #d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 
-d-i preseed/late_command string in-target dpkg-reconfigure untangle-linux-config ; sh -c "grep -q BOOTIF /proc/cmdline || sed -i -re 's/^root:[^:]+:/root:CHANGEME:/' /target/etc/shadow" ; in-target perl -i -pe 's/(.*debian)/# Commented by Untangle: $1/ unless m/^#/' /etc/apt/sources.list ; in-target rm -f /etc/udev/rules.d/70-persistent-net.rules
+d-i preseed/late_command string in-target dpkg-reconfigure untangle-linux-config ; sh -c "grep -q BOOTIF /proc/cmdline || sed -i -re 's/^root:[^:]+:/root:CHANGEME:/' /target/etc/shadow" ; in-target perl -i -pe 's/(.*debian)/# Commented by Untangle: $1/ unless m/^#/' /etc/apt/sources.list ; in-target rm -f /etc/udev/rules.d/70-persistent-net.rules ; in-target grub-install --force $(mount | grep '/target ' | sed -e 's/[1-9] .*//')
