@@ -8,7 +8,8 @@ set -x
 
 # constants
 CURRENT_DIR=$(dirname $0)
-CHROOT_DIR=$(mktemp -d /tmp/tmp.vmdk-chroot.XXXXX)
+BASE_TMP_DIR="/tmp/tmp.vmdk-chroot"
+CHROOT_DIR=$(mktemp -d ${BASE_TMP_DIR}.XXXXX)
 SETUP_SCRIPT="chroot-setup.sh"
 
 # CL args
@@ -19,6 +20,16 @@ VMDK=$4
 
 ## main
 QCOW2=${VMDK/.vmdk/.qcow2}
+
+# clean up if something went wrong during previous run make sure we do
+# it in the right order, or we'll mess up the host system since those
+# were bind mounts
+if mount | grep -q ${BASE_TMP_DIR} ; then
+  umount ${BASE_TMP_DIR}.*/*/* || true
+  umount ${BASE_TMP_DIR}.*/* || true
+  umount ${BASE_TMP_DIR}.* || true
+  qemu-nbd -d /dev/nbd0 || true
+fi
 
 # NBD support
 rmmod nbd || true
