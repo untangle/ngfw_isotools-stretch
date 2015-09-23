@@ -15,6 +15,7 @@ MOUNT_POINT=/mnt
 SYSLINUX_LOOP=$MOUNT_POINT/syslinux.cfg
 
 gunzip -c $IMG >| $IMG_NOZIP
+umount -f /mnt || true
 mount -o loop $IMG_NOZIP /mnt
 df -h
 cat $ISOLINUX_CFG | perl -pe 's|vmlinuz|linux| ; s|/install.\w+/|| ; s|gtk/initrd|initrdg|' >| $SYSLINUX_LOOP
