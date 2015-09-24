@@ -40,7 +40,7 @@ DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade --yes --force-yes
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes open-vm-tools open-vm-tools-dkms
 
 # install top-level Untangle package
-DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes untangle-gateway
+DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes -o Dpkg::Options::="--force-confnew" untangle-gateway
 rm -f /usr/share/untangle/settings/untangle-vm/network.js /usr/share/untangle/conf/uid
 
 # remove duplicate keys
