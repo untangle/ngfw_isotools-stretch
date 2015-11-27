@@ -19,7 +19,7 @@ chmod +x /usr/sbin/policy-rc.d
 rm -f /etc/apt/sources.list
 echo deb http://10.112.11.105/public/$REPOSITORY $DISTRIBUTION main non-free > $TMP_SOURCES_LIST
 # FIXME
-echo deb http://10.112.11.105/public/$REPOSITORY chaos main non-free >> $TMP_SOURCES_LIST
+echo deb http://10.112.11.105/public/$REPOSITORY ${DISTRIBUTION/nightly/chaos} main non-free >> $TMP_SOURCES_LIST
 
 apt-get update
 apt-get install --yes --force-yes dpkg-dev
