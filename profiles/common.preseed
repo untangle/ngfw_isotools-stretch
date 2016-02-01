@@ -286,4 +286,4 @@ select 1024x768 @ 60 Hz
 # packages and run commands in the target system.
 #d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 
-d-i preseed/late_command string in-target dpkg-reconfigure untangle-linux-config ; sh -c "grep -q BOOTIF /proc/cmdline || sed -i -re 's/^root:[^:]+:/root:CHANGEME:/' /target/etc/shadow" ; in-target perl -i -pe 's/(.*debian)/# Commented by Untangle: $1/ unless m/^#/' /etc/apt/sources.list ; in-target rm -f /etc/udev/rules.d/70-persistent-net.rules ; in-target grub-install --force $(mount | grep '/target ' | sed -e 's/[1-9] .*//')
+d-i preseed/late_command string in-target dpkg-reconfigure untangle-linux-config ; sh -c "grep -q BOOTIF /proc/cmdline || sed -i -re 's/^root:[^:]+:/root:CHANGEME:/' /target/etc/shadow" ; in-target perl -i -pe 's/(.*debian)/# Commented by Untangle: $1/ unless m/^#/' /etc/apt/sources.list ; in-target rm -f /etc/udev/rules.d/70-persistent-net.rules ; in-target grub-install --force $(mount | grep '/target ' | sed -e 's/[1-9] .*//' ; in-target update-grub)
