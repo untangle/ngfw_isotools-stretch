@@ -22,7 +22,7 @@ echo deb http://10.112.11.105/public/$REPOSITORY $DISTRIBUTION main non-free > $
 echo deb http://10.112.11.105/public/$REPOSITORY ${DISTRIBUTION/nightly/chaos} main non-free >> $TMP_SOURCES_LIST
 
 apt-get update
-apt-get install --yes --force-yes dpkg-dev
+apt-get install --yes --force-yes dpkg-dev untangle-debconf
 
 # remove user foo if present
 userdel -f -r foo || true
