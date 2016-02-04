@@ -147,8 +147,8 @@ index c6d397c..b523270 100644
      done
  fi
  
-+rm -fr boot$N/isolinux
-+cp -r ../../../cd-root/isolinux boot$N/
++rm -fr boot$N/isolinux/*
++cp -f ../../../cd-root/isolinux/* boot$N/isolinux/
 +rm -fr CD$N/README.*
 +cp -r ../../../cd-root/* CD$N/
 +
