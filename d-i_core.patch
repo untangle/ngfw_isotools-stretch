@@ -143,12 +143,11 @@ diff --git a/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86 b/isotools-jes
 index c6d397c..b523270 100644
 --- a/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86
 +++ b/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86
-@@ -429,6 +429,11 @@ if [ -n "$KERNEL_PARAMS" ]; then
+@@ -429,6 +429,10 @@ if [ -n "$KERNEL_PARAMS" ]; then
      done
  fi
  
-+rm -fr boot$N/isolinux/*{cfg,png}
-+cp ../../../cd-root/isolinux-$(dpkg-architecture -qDEB_BUILD_ARCH).cfg boot$N/isolinux/isolinux.cfg
++rm -fr boot$N/isolinux
 +rm -fr CD$N/README.*
 +cp -r ../../../cd-root/* CD$N/
 +
