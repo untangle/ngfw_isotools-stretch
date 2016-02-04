@@ -25,9 +25,9 @@ QCOW2=${VMDK/.vmdk/.qcow2}
 # it in the right order, or we'll mess up the host system since those
 # were bind mounts
 if mount | grep -q ${BASE_TMP_DIR} ; then
-  umount ${BASE_TMP_DIR}.*/*/* || true
-  umount ${BASE_TMP_DIR}.*/* || true
-  umount ${BASE_TMP_DIR}.* || true
+  umount ${BASE_TMP_DIR}.*/*/* 2> /dev/null || true
+  umount ${BASE_TMP_DIR}.*/* 2> /dev/null || true
+  umount ${BASE_TMP_DIR}.* 2> /dev/null || true
   qemu-nbd -d /dev/nbd0 || true
 fi
 
