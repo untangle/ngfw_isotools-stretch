@@ -97,7 +97,7 @@ image:
 	mv $(ISO_DIR)/debian-`perl -pe 's/(\d\.\d).*/\1/' /etc/debian_version`-$(ARCH)-CD-1.iso $(ISO_IMAGE)
 
 usb:
-	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG) $(ISOTOOLS_DIR)/cd-root/isolinux-$(ARCH).cfg
+	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG)
 
 push:
 	if [ -n "$(UP)" ] ; then \
