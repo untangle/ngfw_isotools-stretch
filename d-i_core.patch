@@ -52,7 +52,7 @@ diff --git a/isotools-jessie/d-i/build/config/i386/hd-media.cfg b/isotools-jessi
 index 9e1e49c..e3ace1d 100644
 --- a/isotools-jessie/d-i/build/config/i386/hd-media.cfg
 +++ b/isotools-jessie/d-i/build/config/i386/hd-media.cfg
-@@ -4,10 +4,10 @@ FLAVOUR_SUPPORTED = "" gtk
+@@ -4,7 +4,7 @@ FLAVOUR_SUPPORTED = "" gtk
  # netinst iso in (being able to fit the full CD on it is just a bonus..),
  # and small enough to fit on a low-end memory stick, such as those
  # advertised as being 1 gigabyte in size.
@@ -61,51 +61,6 @@ index 9e1e49c..e3ace1d 100644
  
  DISK_LABEL = "bootable drive"
  MEDIA_TYPE = bootable drive
-# diff --git a/isotools-jessie/d-i/debian/rules b/isotools-jessie/d-i/debian/rules
-# index 232e195..60e2f41 100755
-# --- a/isotools-jessie/d-i/debian/rules
-# +++ b/isotools-jessie/d-i/debian/rules
-# @@ -10,7 +10,7 @@ TRANSSTATUS=
-#  BOOTMENU_BEEP=n
-#  else
-#  USE_UDEBS_FROM=jessie
-# -USE_PROPOSED_UPDATES=1
-# +USE_PROPOSED_UPDATES=0
-#  TRANSSTATUS=translation-status
-#  BOOTMENU_BEEP=y
-#  endif
-# diff --git a/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86 b/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86
-# index 426c996..ecaead6 100644
-# --- a/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86
-# +++ b/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86
-# @@ -347,6 +347,12 @@ if [ -n "$KERNEL_PARAMS" ]; then
-#  	done
-#  fi
- 
-# +rm -fr boot$N/isolinux/*{cfg,png}
-# +cp ../../../cd-root/isolinux-$(dpkg-architecture -qDEB_BUILD_ARCH).cfg boot$N/isolinux/isolinux.cfg
-# +rm -fr CD$N/README.*
-# +cp -r ../../../cd-root/* CD$N/
-# +
-# +
-#  case "$ORIG_DESKTOP" in
-#  	all)
-#  		modify_for_all_desktop ;;
-# diff --git a/isotools-jessie/debian-cd/tools/boot/jessie/x86-desktop.sh b/isotools-jessie/debian-cd/tools/boot/jessie/x86-desktop.sh
-# index 07abb3f..90b0f09 100644
-# --- a/isotools-jessie/debian-cd/tools/boot/jessie/x86-desktop.sh
-# +++ b/isotools-jessie/debian-cd/tools/boot/jessie/x86-desktop.sh
-# @@ -48,8 +48,8 @@ create_desktop_dir() {
- 
-#  modify_for_single_desktop() {
-#  	# Cleanup
-# -	rm boot$N/isolinux/dtmenu.cfg
-# -	rm -r boot$N/isolinux/desktop
-# +	rm -f boot$N/isolinux/dtmenu.cfg
-# +	rm -fr boot$N/isolinux/desktop
- 
-#  	# Set default desktop, or remove if not applicable
-#  	if [ "$DESKTOP" ]; then
 diff --git a/isotools-jessie/debian-cd/CONF.sh b/isotools-jessie/debian-cd/CONF.sh
 index 11c613d..ffea236 100644
 --- a/isotools-jessie/debian-cd/CONF.sh
@@ -143,10 +98,11 @@ diff --git a/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86 b/isotools-jes
 index c6d397c..b523270 100644
 --- a/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86
 +++ b/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86
-@@ -429,6 +429,10 @@ if [ -n "$KERNEL_PARAMS" ]; then
+@@ -429,6 +429,11 @@ if [ -n "$KERNEL_PARAMS" ]; then
      done
  fi
  
++rm -f boot$N/isolinux/{*txt,*cat,ad*,exit*,prompt*,rq*,spk*}
 +cp -f ../../../cd-root/isolinux/* boot$N/isolinux/
 +rm -fr CD$N/README.*
 +cp -r ../../../cd-root/* CD$N/
