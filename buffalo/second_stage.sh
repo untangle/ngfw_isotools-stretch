@@ -4,11 +4,11 @@ set -e
 
 # constants
 TMP_SOURCES_LIST="/etc/apt/sources.list.d/tmp.list"
-KERNEL_VERSION="3.10.49-1-armel"
 
 # CL args
 REPOSITORY=$1
 DISTRIBUTION=$2
+KERNEL_VERSION=$3
 
 # complete installation
 /debootstrap/debootstrap --second-stage

@@ -11,7 +11,8 @@ SECOND_STAGE_SCRIPT="second_stage.sh"
 # CL args
 REPOSITORY=$1
 DISTRIBUTION=$2
-ARCHIVE=$3
+ARCH=$3
+ARCHIVE=$4
 
 # we may run via sudo
 export PATH=/sbin:/usr/sbin:${PATH}
@@ -24,10 +25,20 @@ apt-get install --yes qemu qemu-user-static binfmt-support debootstrap
 /etc/init.d/binfmt-support restart
 
 # debootstrap onto chroot
-debootstrap --arch=armel --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http://package-server/public/$REPOSITORY
+debootstrap --arch=$ARCH --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http://package-server/public/$REPOSITORY
 
 # armel static binary in chroot
-cp /usr/bin/qemu-arm-static ${CHROOT_DIR}/usr/bin/
+case $ARCH in
+  armel)
+    KERNEL_VERSION="3.10.49-1-armel"
+    cp /usr/bin/qemu-arm-static ${CHROOT_DIR}/usr/bin/ ;;
+  armhf)
+    KERNEL_VERSION="3.10.49-1-armel" # FIXME
+    cp /usr/bin/qemu-arm-static ${CHROOT_DIR}/usr/bin/ ;;
+  *)
+    echo "can not handle arch '$ARCH', aborting..."
+    exit 1 ;;
+esac
 
 # mount required PFS
 for pfs in dev proc sys ; do
@@ -39,7 +50,7 @@ cp ${CURRENT_DIR}/binary/modules.tar.bz2 ${CHROOT_DIR}/tmp/
 
 # copy 2nd stage install script in chroot, and run it
 cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
-chroot ${CHROOT_DIR} /tmp/${SECOND_STAGE_SCRIPT} $REPOSITORY $DISTRIBUTION
+chroot ${CHROOT_DIR} /tmp/${SECOND_STAGE_SCRIPT} $REPOSITORY $DISTRIBUTION $KERNEL_VERSION
 
 # umount PFS
 for pfs in sys proc dev/pts ; do
