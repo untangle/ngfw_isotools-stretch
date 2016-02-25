@@ -110,3 +110,24 @@ index c6d397c..b523270 100644
  set_default_desktop
  rm -rf cdrom
  
+diff --git a/isotools-jessie/d-i/build/boot/x86/gtk.cfg b/isotools-jessie/d-i/build/boot/x86/gtk.cfg
+index a0592c4..330edd4 100644
+--- a/isotools-jessie/d-i/build/boot/x86/gtk.cfg
++++ b/isotools-jessie/d-i/build/boot/x86/gtk.cfg
+@@ -1,4 +1,5 @@
+ label installgui
+ 	menu label ^Graphical install
++	menu default
+ 	kernel ${KERNEL}
+ 	append desktop=%desktop% ${VIDEO_MODE_GTK} initrd=${INITRD_GTK} --- quiet ${CONSOLE}
+diff --git a/isotools-jessie/d-i/build/boot/x86/txt.cfg b/isotools-jessie/d-i/build/boot/x86/txt.cfg
+index 04adb7d..22cecea 100644
+--- a/isotools-jessie/d-i/build/boot/x86/txt.cfg
++++ b/isotools-jessie/d-i/build/boot/x86/txt.cfg
+@@ -1,6 +1,5 @@
+ default install
+ label install
+ 	menu label ^Install
+-	menu default
+ 	kernel ${KERNEL}
+ 	append desktop=%desktop% ${VIDEO_MODE} initrd=${INITRD} --- quiet ${CONSOLE}
