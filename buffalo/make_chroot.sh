@@ -41,8 +41,11 @@ case $ARCH in
 esac
 
 # mount required PFS
-for pfs in dev proc sys ; do
+for pfs in dev dev/pts proc sys ; do
+  mkdir -p ${CHROOT_DIR}/$pfs
   mount --bind /$pfs ${CHROOT_DIR}/$pfs
+  mount
+  ls ${CHROOT_DIR}/$pfs
 done
 
 # copy modules in chroot
@@ -53,7 +56,7 @@ cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
 chroot ${CHROOT_DIR} /tmp/${SECOND_STAGE_SCRIPT} $REPOSITORY $DISTRIBUTION $KERNEL_VERSION
 
 # umount PFS
-for pfs in sys proc dev/pts ; do
+for pfs in sys proc dev/pts dev ; do
   umount -l ${CHROOT_DIR}/$pfs || true
 done
 
