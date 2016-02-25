@@ -11,7 +11,7 @@ TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 NETBOOT_HOST := netboot-server
 # FIXME ?
-ARCH := armel
+ARCH := armhf
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 VERSION := $(shell cat $(BUFFALO_DIR)/../resources/VERSION)
 FMK_DIR := $(BUFFALO_DIR)/firmware-mod-kit
