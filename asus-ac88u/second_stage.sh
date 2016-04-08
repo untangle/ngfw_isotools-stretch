@@ -19,7 +19,7 @@ chmod +x /usr/sbin/policy-rc.d
 
 # use internal Untangle repository
 # FIXME: switch to nightly later on
-for dist in $DISTRIBUTION nightly ; do
+for dist in $DISTRIBUTION chaos ; do
   echo deb http://10.112.11.105/public/$REPOSITORY $dist main non-free > $TMP_SOURCES_LIST
 done
 
