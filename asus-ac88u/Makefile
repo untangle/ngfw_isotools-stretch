@@ -6,7 +6,7 @@ NAME := asus-ac88u
 # repository
 REPOSITORY ?= jessie
 # distribution to draw packages from
-DISTRIBUTION ?= nightly
+DISTRIBUTION ?= chaos
 
 # constants
 TS := $(shell date +"%Y-%m-%dT%H%M%S")
