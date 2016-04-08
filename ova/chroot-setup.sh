@@ -47,7 +47,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --f
 rm -f /usr/share/untangle/settings/untangle-vm/network.js /usr/share/untangle/conf/uid
 
 # mark as OVA
-touch /usr/share/untangle/conf/ova.txt
+touch /usr/share/untangle/conf/ova-flag
 
 # remove duplicate keys
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes untangle-default-site
