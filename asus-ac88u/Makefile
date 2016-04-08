@@ -13,7 +13,7 @@ TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 NETBOOT_HOST := netboot-server
 # FIXME ?
-ARCH := armhf
+ARCH := armel
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 VERSION := $(shell cat $(CWD)/../resources/VERSION)
 BIN_DIR := $(CWD)/binary
