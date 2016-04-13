@@ -33,7 +33,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --f
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes untangle-hardware-asus-ac88u
 
 # install modules
-mkdir -p /lib/modules/${KERNEL_VERSION}
+mkdir -p /lib/modules/${KERNEL_VERSION}/extra
 tar -C / -xjf /tmp/modules.tar.bz2
 rm /lib/modules/${KERNEL_VERSION}/kernel/drivers/net/switch/switch-{adm,core,robo}.ko
 rm /lib/modules/${KERNEL_VERSION}/kernel/drivers/net/ethernet/et/et.ko
