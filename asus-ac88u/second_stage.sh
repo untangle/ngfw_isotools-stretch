@@ -26,7 +26,7 @@ done
 
 # install top-level Untangle package
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes untangle-gateway
+DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes -o DPkg::Options::=--force-confnew --fix-broken untangle-gateway
 rm -f /usr/share/untangle/settings/untangle-vm/network.js
 
 # for troubleshooting
