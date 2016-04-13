@@ -47,7 +47,7 @@ $(TMP_DIR):
 
 rootfs: $(ROOTFS_ARCHIVE)
 $(ROOTFS_ARCHIVE):
-	$(CWD)/make_chroot.sh $(REPOSITORY) chaos $(ARCH) $(ROOTFS_ARCHIVE)
+	$(CWD)/make_chroot.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $(ROOTFS_ARCHIVE)
 
 push:
 	scp $(ROOTFS_ARCHIVE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).tar.bz2
