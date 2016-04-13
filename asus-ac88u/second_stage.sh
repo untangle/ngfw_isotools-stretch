@@ -10,9 +10,6 @@ REPOSITORY=$1
 DISTRIBUTION=$2
 KERNEL_VERSION=$3
 
-# complete installation
-/debootstrap/debootstrap --second-stage
-
 # disable starting of services
 echo exit 101 > /usr/sbin/policy-rc.d
 chmod +x /usr/sbin/policy-rc.d

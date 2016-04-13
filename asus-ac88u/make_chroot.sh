@@ -27,6 +27,9 @@ apt-get install --yes qemu qemu-user-static binfmt-support debootstrap
 # debootstrap onto chroot
 debootstrap --arch=$ARCH --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http://package-server/public/$REPOSITORY
 
+# complete installation
+chroot ${CHROOT} /debootstrap/debootstrap --second-stage
+
 # armel static binary in chroot
 case $ARCH in
   armel)
