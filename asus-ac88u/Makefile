@@ -24,14 +24,14 @@ VMLINUZ_FILE := $(TMP_DIR)/vmlinuz.lzma
 IMAGE_FILE := $(TMP_DIR)/image.bin
 FIRMWARE_IMG := $(TMP_DIR)/$(NAME).bin
 FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)
-ROOTFS_ARCHIVE := $(TMP_DIR}/$(NAME)-rootfs.tar.bz2
+ROOTFS_ARCHIVE := /tmp/$(NAME)-rootfs.tar.bz2
 
 .PHONY: all clean image rootfs push
 
 all: image rootfs push
 
 clean:
-	rm -fr $(TMP_DIR)
+	rm -fr $(TMP_DIR) $(ROOTFS_ARCHIVE)
 
 vmlinuz: $(VMLINUZ_FILE)
 $(VMLINUZ_FILE): $(KERNEL_FILE) | $(TMP_DIR)
