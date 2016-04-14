@@ -26,6 +26,9 @@ apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes -o DPkg::Options::=--force-confnew --fix-broken untangle-gateway
 rm -f /usr/share/untangle/settings/untangle-vm/network.js
 
+# root password
+echo root:passwd | chpasswd
+
 # for troubleshooting
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes bash-static
 
