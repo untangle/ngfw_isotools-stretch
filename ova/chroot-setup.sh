@@ -34,9 +34,6 @@ perl -i -pe 's/3.16.0-4-amd64/3.16.0-4-amd64+fail/' /var/lib/dpkg/info/linux-ima
 DEBIAN_FRONTEND=noninteractive apt-get remove --yes --force-yes linux-image-3.16.0-4-${KERNEL_ARCH}
 
 # dist-upgrade in case of security updates since base VMDK was assembled
-for package in grub-pc grub-pc-bin grub2-common grub-common ; do
-  echo $package hold | dpkg --set-selections
-done
 DEBIAN_FRONTEND=noninteractive DEBCONF_DEBUG=developer apt-get dist-upgrade --yes --force-yes
 
 # install vmware tools
