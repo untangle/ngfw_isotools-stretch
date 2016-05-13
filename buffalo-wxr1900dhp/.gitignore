@@ -558,3 +558,4 @@ firmware-mod-kit/src/yaffs2utils/yaffs2/yaffs_ecc.o
 firmware-mod-kit/src/yaffs2utils/yaffs2/yaffs_hweight.o
 firmware-mod-kit/src/yaffs2utils/yaffs2/yaffs_packedtags1.o
 firmware-mod-kit/src/yaffs2utils/yaffs2/yaffs_packedtags2.o
+firmware-mod-kit/fmk/new-filesystem.squashfs
