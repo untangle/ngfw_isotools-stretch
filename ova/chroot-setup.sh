@@ -34,6 +34,7 @@ perl -i -pe 's/3.16.0-4-amd64/3.16.0-4-amd64+fail/' /var/lib/dpkg/info/linux-ima
 DEBIAN_FRONTEND=noninteractive apt-get remove --yes --force-yes linux-image-3.16.0-4-${KERNEL_ARCH}
 
 # install untangle-linux-config to work around #12857
+mkdir -p /var/log/uvm
 DEBIAN_FRONTEND=noninteractive DEBCONF_DEBUG=developer apt-get install --yes --force-yes untangle-linux-config
 # dist-upgrade in case of security updates since base VMDK was assembled
 DEBIAN_FRONTEND=noninteractive DEBCONF_DEBUG=developer apt-get dist-upgrade --yes --force-yes
