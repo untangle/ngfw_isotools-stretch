@@ -18,6 +18,8 @@ IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 VERSION := $(shell cat $(CWD)/../resources/VERSION)
 BIN_DIR := $(CWD)/binary
 TMP_DIR := $(CWD)/tmp
+ASUS_REFERENCE_NAME := asus-ac88u-rootfs.tar.bz2
+ASUS_REFERENCE_URL := $(NETBOOT_HOST)/$(ASUS_REFERENCE_NAME)
 SQUASHFS_FILE := $(BIN_DIR)/dd-wrt.squashfs
 KERNEL_FILE := $(BIN_DIR)/zImage-untangle
 VMLINUZ_FILE := $(TMP_DIR)/vmlinuz.lzma
@@ -26,12 +28,16 @@ FIRMWARE_IMG := $(TMP_DIR)/$(NAME).bin
 FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)
 ROOTFS_ARCHIVE := /tmp/$(NAME)-rootfs.tar.bz2
 
-.PHONY: all clean image rootfs push
+.PHONY: all clean image rootfs push download-asus-rootsf
 
 all: image rootfs push
 
 clean:
-	rm -fr $(TMP_DIR) $(ROOTFS_ARCHIVE)
+	rm -fr $(TMP_DIR) $(ROOTFS_ARCHIVE) $(ASUS_REFERENCE_NAME)
+
+download-asus-rootsf: $(ASUS_REFERENCE_NAME)
+$(ASUS_REFERENCE_NAME):
+	curl -s -o $@ $(ASUS_REFERENCE_URL)
 
 vmlinuz: $(VMLINUZ_FILE)
 $(VMLINUZ_FILE): $(KERNEL_FILE) | $(TMP_DIR)
@@ -46,8 +52,8 @@ $(TMP_DIR):
 	mkdir $@
 
 rootfs: $(ROOTFS_ARCHIVE)
-$(ROOTFS_ARCHIVE):
-	$(CWD)/make_chroot.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $(ROOTFS_ARCHIVE)
+$(ROOTFS_ARCHIVE): $(ASUS_REFERENCE_NAME)
+	$(CWD)/make_chroot.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $(ASUS_REFERENCE_NAME) $(ROOTFS_ARCHIVE)
 
 push:
 	scp $(ROOTFS_ARCHIVE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).tar.bz2

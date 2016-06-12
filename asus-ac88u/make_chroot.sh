@@ -12,7 +12,8 @@ SECOND_STAGE_SCRIPT="second_stage.sh"
 REPOSITORY=$1
 DISTRIBUTION=$2
 ARCH=$3
-ARCHIVE=$4
+ASUS_ROOTFS=$4
+ARCHIVE=$5
 
 # we may run via sudo
 export PATH=/sbin:/usr/sbin:${PATH}
@@ -51,6 +52,12 @@ done
 # copy modules in chroot
 cp ${CURRENT_DIR}/binary/modules.tar.bz2 ${CHROOT_DIR}/tmp/
 cp ${CURRENT_DIR}/binary/modules/*ko ${CHROOT_DIR}/tmp/
+
+# untar original Asus rootfs into /var/lib/asus-ac88u-rootfs
+ROOTFS_DEST_DIR="${CHROOT_DIR}/var/lib/asus-ac88u-rootfs"
+mkdir -p $ROOTFS_DEST_DIR
+tar xajf ${CURRENT_DIR}/${ASUS_ROOTFS} $ROOTFS_DEST_DIR
+exit 0
 
 # copy 2nd stage install script in chroot, and run it
 cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
