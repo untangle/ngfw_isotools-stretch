@@ -56,7 +56,7 @@ cp ${CURRENT_DIR}/binary/modules/*ko ${CHROOT_DIR}/tmp/
 # untar original Asus rootfs into /var/lib/asus-ac88u-rootfs
 ROOTFS_DEST_DIR="${CHROOT_DIR}/var/lib/asus-ac88u-rootfs"
 mkdir -p $ROOTFS_DEST_DIR
-tar xajf ${CURRENT_DIR}/${ASUS_ROOTFS} $ROOTFS_DEST_DIR
+tar -C $ROOTFS_DEST_DIR -xajf ${CURRENT_DIR}/${ASUS_ROOTFS}
 exit 0
 
 # copy 2nd stage install script in chroot, and run it
