@@ -6,14 +6,15 @@ set -x
 # constants
 CURRENT_DIR=$(dirname $0)
 CHROOT_DIR=$(mktemp -d /tmp/tmp.asus-ac88u-chroot.XXXXX)
+MNT_DIR=$(mktemp -d /tmp/tmp.asus-ac88u-img.XXXXX)
 SECOND_STAGE_SCRIPT="second_stage.sh"
-
+LOOP_DEVICE="/dev/loop0"
 # CL args
 REPOSITORY=$1
 DISTRIBUTION=$2
 ARCH=$3
 ASUS_ROOTFS=$4
-ARCHIVE=$5
+IMAGE=$5
 
 # we may run via sudo
 export PATH=/sbin:/usr/sbin:${PATH}
@@ -67,9 +68,28 @@ for pfs in sys proc dev/pts dev ; do
   umount -l ${CHROOT_DIR}/$pfs || true
 done
 
-# tar it all up
-tar -C $CHROOT_DIR -cjf $ARCHIVE .
-
 umount -l ${CHROOT_DIR}/dev || true
 
-rm -fr $CHROOT_DIR
+# create disk image
+dd if=/dev/zero of=$IMAGE bs=10M count=170
+fdisk $IMAGE <<EOF
+n
+p
+1
+
+
+w
+EOF
+
+# mount it
+losetup $LOOP_DEVICE  $IMAGE -o $(( 512 * 2048 ))
+mkfs.ext4 $LOOP_DEVICE
+mount $LOOP_DEVICE $MNT_DIR
+
+# copy content
+rsync -aHz ${CHROOT_DIR}/ ${MNT_DIR}
+
+# umount & cleanup
+umount $MNT_DIR
+losetup -d $LOOP_DEVICE
+rm -fr $CHROOT_DIR $MNT_DIR

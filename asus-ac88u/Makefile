@@ -26,14 +26,14 @@ VMLINUZ_FILE := $(TMP_DIR)/vmlinuz.lzma
 IMAGE_FILE := $(TMP_DIR)/image.bin
 FIRMWARE_IMG := $(TMP_DIR)/$(NAME).bin
 FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)
-ROOTFS_ARCHIVE := /tmp/$(NAME)-rootfs.tar.bz2
+ROOTFS_IMAGE := /tmp/$(NAME).rootfs
 
 .PHONY: all clean image rootfs push download-asus-rootsf
 
 all: image rootfs push
 
 clean:
-	rm -fr $(TMP_DIR) $(ROOTFS_ARCHIVE) $(ASUS_REFERENCE_NAME)
+	rm -fr $(TMP_DIR) $(ROOTFS_IMAGE) $(ASUS_REFERENCE_NAME)
 
 download-asus-rootsf: $(ASUS_REFERENCE_NAME)
 $(ASUS_REFERENCE_NAME):
@@ -51,10 +51,10 @@ $(FIRMWARE_IMG): $(VMLINUZ_FILE) $(SQUASHFS_FILE) | $(TMP_DIR)
 $(TMP_DIR):
 	mkdir $@
 
-rootfs: $(ROOTFS_ARCHIVE)
-$(ROOTFS_ARCHIVE): $(ASUS_REFERENCE_NAME)
-	$(CWD)/make_chroot.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $(ASUS_REFERENCE_NAME) $(ROOTFS_ARCHIVE)
+rootfs: $(ROOTFS_IMAGE)
+$(ROOTFS_IMAGE): $(ASUS_REFERENCE_NAME)
+	$(CWD)/make_chroot.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $(ASUS_REFERENCE_NAME) $(ROOTFS_IMAGE)
 
 push:
-	scp $(ROOTFS_ARCHIVE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).tar.bz2
-	scp $(FIRMWARE_IMG) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).img
+	scp $(ROOTFS_IMAGE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).rootfs
+	scp $(FIRMWARE_IMG) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).firmware
