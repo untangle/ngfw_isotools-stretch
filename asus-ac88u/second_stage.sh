@@ -19,7 +19,6 @@ chmod +x /usr/sbin/policy-rc.d
 rm -f /etc/apt/sources.list $TMP_SOURCES_LIST
 echo deb http://10.112.11.105/public/$REPOSITORY $DISTRIBUTION main non-free >> $TMP_SOURCES_LIST
 echo deb http://10.112.11.105/public/$REPOSITORY ${DISTRIBUTION/nightly/chaos} main non-free >> $TMP_SOURCES_LIST
-done
 
 # install top-level Untangle package
 apt-get update
