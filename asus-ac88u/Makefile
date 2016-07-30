@@ -15,6 +15,7 @@ NETBOOT_HOST := netboot-server
 # FIXME ?
 ARCH := armel
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
+MOUNT_SCRIPT := $(IMAGES_DIR)/mounts.py
 VERSION := $(shell cat $(CWD)/../resources/VERSION)
 BIN_DIR := $(CWD)/binary
 TMP_DIR := $(CWD)/tmp
