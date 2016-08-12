@@ -126,29 +126,29 @@ ova-push:
 ova-clean:
 	make -C $(ISO_DIR)/ova ova clean
 
-buffalo-wzr1900dhp-image:
-	make -C $(ISO_DIR)/buffalo-wzr1900dhp image
-buffalo-wzr1900dhp-rootfs:
-	make -C $(ISO_DIR)/buffalo-wzr1900dhp rootfs
-buffalo-wzr1900dhp-push:
+buffalo/wzr1900dhp-image:
+	make /C $(ISO_DIR)/buffalo-wzr1900dhp image
+buffalo/wzr1900dhp-rootfs:
+	make -C $(ISO_DIR)/buffalo/wzr1900dhp rootfs
+buffalo/wzr1900dhp-push:
 	make -C $(ISO_DIR)/buffalo-wzr1900dhp push
-buffalo-wzr1900dhp-clean:
+buffalo/wzr1900dhp-clean:
 	make -C $(ISO_DIR)/buffalo-wzr1900dhp clean
 
-asus-ac88u-image:
+asus/ac88u-image:
 	make -C $(ISO_DIR)/asus-ac88u image
-asus-ac88u-rootfs:
+asus/ac88u-rootfs:
 	make -C $(ISO_DIR)/asus-ac88u rootfs
-asus-ac88u-push:
+asus/ac88u-push:
 	make -C $(ISO_DIR)/asus-ac88u push
-asus-ac88u-clean:
+asus/ac88u-clean:
 	make -C $(ISO_DIR)/asus-ac88u clean
 
-linksys-wrt1900acs-image:
+linksys/wrt1900acs-image:
 	make -C $(ISO_DIR)/linksys-wrt1900acs image
-linksys-wrt1900acs-rootfs:
+linksys/wrt1900acs-rootfs:
 	make -C $(ISO_DIR)/linksys-wrt1900acs rootfs
-linksys-wrt1900acs-push:
+linksys/wrt1900acs-push:
 	make -C $(ISO_DIR)/linksys-wrt1900acs push
-linksys-wrt1900acs-clean:
+linksys/wrt1900acs-clean:
 	make -C $(ISO_DIR)/linksys-wrt1900acs clean
