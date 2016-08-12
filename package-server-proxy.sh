@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -x
+
 # FIMXE: does it get any nastier than this ??
 # make that a CGI on package-server, for fucksake...
 
