@@ -30,7 +30,7 @@ ROOTFS_IMAGE := /tmp/$(NAME).rootfs
 
 .PHONY: all clean image rootfs push download-asus-rootsf
 
-all: image rootfs push
+all: image rootfs
 
 clean:
 	rm -fr $(TMP_DIR) $(ROOTFS_IMAGE) $(VENDOR_REFERENCE_NAME)

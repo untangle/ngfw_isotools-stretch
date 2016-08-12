@@ -26,7 +26,7 @@ FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(H
 ## targets
 .PHONY: all clean download-jessie-vmdk vmdk ova push
 
-all: download-jessie-vmdk vmdk ova push
+all: download-jessie-vmdk vmdk image
 
 clean:
 	rm -fr $(VMDK_REFERENCE_NAME) $(QCOW2_NAME) $(VMDK_NAME) *.ova
@@ -39,7 +39,7 @@ vmdk: $(VMDK_NAME)
 $(VMDK_NAME): $(VMDK_REFERENCE_NAME)
 	$(OVA_DIR)/vmdk.sh $(REPOSITORY) $(DISTRIBUTION) $< $@
 
-ova: $(OVA_NAME)
+image: $(OVA_NAME)
 $(OVA_NAME): $(OVF_FILE) $(VMDK_NAME)
 	tar cvf $@ $^
 	chmod 644 $@

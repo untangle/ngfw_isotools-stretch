@@ -27,7 +27,7 @@ ROOTFS_ARCHIVE := /tmp/buffalo-rootfs.tar.bz2
 
 .PHONY: all clean image rootfs push
 
-all: image rootfs push
+all: image rootfs
 
 clean:
 	rm -fr $(BUFFALO_DIR)/tmp $(ISO_DIR) $(BUFFALO_DIR)/debian-installer*

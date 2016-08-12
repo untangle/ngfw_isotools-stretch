@@ -49,11 +49,9 @@ DI_CORE_PATCH := $(ISOTOOLS_DIR)/d-i_core.patch
 
 .PHONY: all patch unpatch installer image push 
 
-# original only needs to be called when Knoppix changes.
-# prepare only needs to be called when upstream packages change (ie: new pull from sarge/updates)
-all: installer image usb
+all: installer iso-image
 
-clean: unpatch
+iso-clean: unpatch
 	cd $(ISOTOOLS_DIR)/d-i ; fakeroot debian/rules clean
 	rm -fr $(ISOTOOLS_DIR)/tmp $(ISO_DIR) $(ISOTOOLS_DIR)/debian-installer*
 	rm -f $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
@@ -82,7 +80,7 @@ unpatch:
 	rm -f $(NETBOOT_PRESEED_FINAL) $(DEFAULT_PRESEED_FINAL) $(CONF_FILE) $(DOWNLOAD_FILE)
 	rm -fr $(NETBOOT_PRESEED_FINAL) $(DEFAULT_PRESEED_FINAL) $(NETBOOT_PRESEED_EXPERT) $(DEFAULT_PRESEED_EXPERT)
 
-installer: patch repoint-stable installer-stamp
+iso-installer: patch repoint-stable installer-stamp
 installer-stamp:
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
 	touch installer-stamp
@@ -90,16 +88,16 @@ installer-stamp:
 repoint-stable:
 	$(ISOTOOLS_DIR)/package-server-proxy.sh ./create-di-links.sh $(REPOSITORY) $(DISTRIBUTION)
 
-image:
+iso-image:
 	mkdir -p $(ISO_DIR)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --profiles default,expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro ; \
 	mv $(ISO_DIR)/debian-`perl -pe 's/(\d)\..*/\1/' /etc/debian_version`.*-$(ARCH)-CD-1.iso $(ISO_IMAGE)
 
-usb:
+usb-image:
 	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG)
 
-push:
+iso-push:
 	if [ -n "$(UP)" ] ; then \
 	  sudo pkill openvpn 2> /dev/null ; \
 	  sudo /usr/sbin/openvpn --cd /home/seb/UP --config up.conf --daemon ; \
@@ -121,11 +119,36 @@ push:
 	  sudo pkill openvpn 2> /dev/null ;\
 	fi
 
-upstream-sync:
-	rsync -a --exclude packages --exclude .svn $(UPSTREAM_DI)/installer/ $(ISOTOOLS_DIR)/d-i/
-	make -C installer-pkgs-modified unpatch
-	for pkg in `/usr/bin/find $(ISOTOOLS_DIR)/installer-pkgs-modified -mindepth 1 -maxdepth 1 -type d` ; do \
-	  case $$pkg in *.svn) continue ;; esac ; \
-	  rsync -a --exclude .svn $(UPSTREAM_DI)/packages/`basename $$pkg`/ $$pkg/ ; \
-	done
-	make -C installer-pkgs-modified unpatch
+ova-image:
+	make -C $(ISO_DIR)/ova all
+ova-push:
+	make -C $(ISO_DIR)/ova ova push
+ova-clean:
+	make -C $(ISO_DIR)/ova ova clean
+
+buffalo-wzr1900dhp-image:
+	make -C $(ISO_DIR)/buffalo-wzr1900dhp image
+buffalo-wzr1900dhp-image:
+	make -C $(ISO_DIR)/buffalo-wzr1900dhp rootfs
+buffalo-wzr1900dhp-push:
+	make -C $(ISO_DIR)/buffalo-wzr1900dhp push
+buffalo-wzr1900dhp-clean:
+	make -C $(ISO_DIR)/buffalo-wzr1900dhp clean
+
+asus-ac88u-image:
+	make -C $(ISO_DIR)/asus-ac88u image
+asus-ac88u-image:
+	make -C $(ISO_DIR)/asus-ac88u rootfs
+asus-ac88u-push:
+	make -C $(ISO_DIR)/asus-ac88u push
+asus-ac88u-clean:
+	make -C $(ISO_DIR)/asus-ac88u clean
+
+linksys-wrt1900acs-image:
+	make -C $(ISO_DIR)/linksys-wrt1900acs image
+linksys-wrt1900acs-rootfs:
+	make -C $(ISO_DIR)/linksys-wrt1900acs rootfs
+linksys-wrt1900acs-push:
+	make -C $(ISO_DIR)/linksys-wrt1900acs push
+linksys-wrt1900acs-clean:
+	make -C $(ISO_DIR)/linksys-wrt1900acs clean
