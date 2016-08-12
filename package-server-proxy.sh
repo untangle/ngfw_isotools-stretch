@@ -1,12 +1,10 @@
 #! /bin/bash
 
-set -x
-
 # FIMXE: does it get any nastier than this ??
 # make that a CGI on package-server, for fucksake...
 
 REMOTE_USER="buildbot@package-server"
-SSH_OPTIONS="-o StrictHostKeyChecking=no -i $HOME/.ssh/id_rsa"
+SSH_OPTIONS="-o StrictHostKeyChecking=no"
 TMP_DIR=/tmp/package-server-proxy_$$
 
 ssh $SSH_OPTIONS $REMOTE_USER "rm -fr $TMP_DIR ; mkdir $TMP_DIR"
