@@ -8,12 +8,7 @@ DISTRIBUTION ?= testing
 # upstream d-i
 UPSTREAM_DI ?= ~/svn/d-i_lenny
 
-# where to upload
-ifeq ($(origin UP), undefined)
-  NETBOOT_HOST := netboot-server
-else
-  NETBOOT_HOST := root@192.168.0.170
-endif
+NETBOOT_HOST := netboot-server
 
 # constants
 ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
@@ -98,15 +93,6 @@ usb-image:
 	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG)
 
 iso-push:
-	if [ -n "$(UP)" ] ; then \
-	  sudo pkill openvpn 2> /dev/null ; \
-	  sudo /usr/sbin/openvpn --cd /home/seb/UP --config up.conf --daemon ; \
-	  sleep 3 ; \
-	# elif [ "$$USER" = "buildbot" ] ; then \
-	#   echo "Not getting TGT, as the buildbot should have done this himself earlier." ; \
-	#   klist -5 ; \
-	fi
-
 	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) new $(VERSION) $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1 | perl -npe 'if (m/(i386|amd64).*iso/) { s/.*(\d{4}(-\d{2}){2}T(\d{2}:?){3}).*/$$1/ } else { s/.*\n// }' | tail -1) $(ARCH) $(REPOSITORY)"
 	scp `ls --sort=time $(ISO_DIR)/*$(VERSION)*$(ARCH)*.iso | head -1` $(NETBOOT_PRESEED_FINAL) $(NETBOOT_PRESEED_EXPERT) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)
 	scp $(BOOT_IMG_UNTANGLE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_`date --iso-8601=seconds`_`hostname -s`.img
