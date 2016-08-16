@@ -101,40 +101,16 @@ iso-push:
 	scp $(NETBOOT_KERNEL) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/linux-$(ARCH)
 
 	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) all foo foo foo $(REPOSITORY)"
-	if [ -n "$(UP)" ] ; then \
-	  sudo pkill openvpn 2> /dev/null ;\
-	fi
 
-ova-image:
-	make -C $(ISOTOOLS_DIR)/ova all
-ova-push:
-	make -C $(ISOTOOLS_DIR)/ova ova push
-ova-clean:
-	make -C $(ISOTOOLS_DIR)/ova ova clean
+# the next 4 rules are generic ones meant for OVA and firmware images
+# they'll make something like "buffalo/wzr1900dhp-image" and make it
+# into "make -C buffalo-wzr1900dhp image"
 
-buffalo/wzr1900dhp-image:
-	make -C $(ISOTOOLS_DIR)/buffalo-wzr1900dhp image
-buffalo/wzr1900dhp-rootfs:
-	make -C $(ISOTOOLS_DIR)/buffalo/wzr1900dhp rootfs
-buffalo/wzr1900dhp-push:
-	make -C $(ISOTOOLS_DIR)/buffalo-wzr1900dhp push
-buffalo/wzr1900dhp-clean:
-	make -C $(ISOTOOLS_DIR)/buffalo-wzr1900dhp clean
-
-asus/ac88u-image:
-	make -C $(ISOTOOLS_DIR)/asus-ac88u image
-asus/ac88u-rootfs:
-	make -C $(ISOTOOLS_DIR)/asus-ac88u rootfs
-asus/ac88u-push:
-	make -C $(ISOTOOLS_DIR)/asus-ac88u push
-asus/ac88u-clean:
-	make -C $(ISOTOOLS_DIR)/asus-ac88u clean
-
-linksys/wrt1900acs-image:
-	make -C $(ISOTOOLS_DIR)/linksys-wrt1900acs image
-linksys/wrt1900acs-rootfs:
-	make -C $(ISOTOOLS_DIR)/linksys-wrt1900acs rootfs
-linksys/wrt1900acs-push:
-	make -C $(ISOTOOLS_DIR)/linksys-wrt1900acs push
-linksys/wrt1900acs-clean:
-	make -C $(ISOTOOLS_DIR)/linksys-wrt1900acs clean
+%-image:
+	make -C $(ISOTOOLS_DIR)/$(subst /,-,$*) image
+%-rootfs:
+	make -C $(ISOTOOLS_DIR)/$(subst /,-,$*) rootfs
+%-push:
+	make -C $(ISOTOOLS_DIR)/$(subst /,-,$*) push
+%-clean:
+	make -C $(ISOTOOLS_DIR)/$(subst /,-,$*) clean
