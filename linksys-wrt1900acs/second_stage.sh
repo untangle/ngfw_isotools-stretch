@@ -43,6 +43,9 @@ for mod in /tmp/*ko ; do
 done
 depmod -a ${KERNEL_VERSION}
 
+# install firmware
+rsync -aH /tmp/firmware/ /lib/firmware/
+
 # cleanup
 apt-get clean
 rm -fr $TMP_SOURCES_LIST /tmp/*

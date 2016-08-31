@@ -54,6 +54,9 @@ done
 cp ${CURRENT_DIR}/binary/modules.tar.bz2 ${CHROOT_DIR}/tmp/
 cp ${CURRENT_DIR}/binary/modules/*ko ${CHROOT_DIR}/tmp/
 
+# copy firmware in chroot
+cp -r ${CURRENT_DIR}/binary/firmware ${CHROOT_DIR}/tmp/
+
 # copy 2nd stage install script in chroot, and run it
 cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
 chroot ${CHROOT_DIR} /tmp/${SECOND_STAGE_SCRIPT} $REPOSITORY $DISTRIBUTION $KERNEL_VERSION
