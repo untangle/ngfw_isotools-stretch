@@ -41,7 +41,8 @@ $(VENDOR_REFERENCE_NAME):
 
 image: $(FIRMWARE_IMG)
 $(FIRMWARE_IMG): $(VMLINUZ_FILE) $(SQUASHFS_FILE) | $(TMP_DIR)
-	$(BIN_DIR)/trx -m 40000000 -o $(IMAGE_FILE) $(KERNEL_FILE) $(SQUASHFS_FILE)
+	(dd if=$(KERNEL_FILE) bs=3072k conv=sync; dd if=$(SQUASHFS_FILE) bs=2048 conv=sync; ) > tmp/foo
+	$(BIN_DIR)/trx_n -m 40000000 -o $(IMAGE_FILE) tmp/foo
 
 $(TMP_DIR):
 	mkdir $@
