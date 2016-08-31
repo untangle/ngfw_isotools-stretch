@@ -28,14 +28,14 @@ FIRMWARE_IMG := $(TMP_DIR)/$(NAME).bin
 FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)
 ROOTFS_IMAGE := /tmp/$(NAME).rootfs
 
-.PHONY: all clean image rootfs push download-asus-rootsf
+.PHONY: all clean image rootfs push
 
 all: image rootfs
 
 clean:
 	rm -fr $(TMP_DIR) $(ROOTFS_IMAGE) $(VENDOR_REFERENCE_NAME)
 
-download-asus-rootsf: $(VENDOR_REFERENCE_NAME)
+download-vendor-rootfs: $(VENDOR_REFERENCE_NAME)
 $(VENDOR_REFERENCE_NAME):
 	curl -s -o $@ $(VENDOR_REFERENCE_URL)
 
@@ -48,7 +48,7 @@ $(TMP_DIR):
 	mkdir $@
 
 rootfs: $(ROOTFS_IMAGE)
-$(ROOTFS_IMAGE): $(VENDOR_REFERENCE_NAME)
+$(ROOTFS_IMAGE):
 	$(CWD)/make_chroot.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $(VENDOR_REFERENCE_NAME) $(ROOTFS_IMAGE)
 
 push:

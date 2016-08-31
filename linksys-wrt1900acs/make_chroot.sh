@@ -5,8 +5,8 @@ set -x
 
 # constants
 CURRENT_DIR=$(dirname $0)
-CHROOT_DIR=$(mktemp -d /tmp/tmp.asus-ac88u-chroot.XXXXX)
-MNT_DIR=$(mktemp -d /tmp/tmp.asus-ac88u-img.XXXXX)
+CHROOT_DIR=$(mktemp -d /tmp/tmp.linksys-wrt1900acs-chroot.XXXXX)
+MNT_DIR=$(mktemp -d /tmp/tmp.linksys-wrt1900acs-img.XXXXX)
 SECOND_STAGE_SCRIPT="second_stage.sh"
 LOOP_DEVICE="/dev/loop0"
 # CL args
@@ -32,7 +32,7 @@ debootstrap --arch=$ARCH --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http
 # armel static binary in chroot
 case $ARCH in
   armel)
-    KERNEL_VERSION="4.4.3"
+    KERNEL_VERSION="3.18.38"
     cp /usr/bin/qemu-arm-static ${CHROOT_DIR}/usr/bin/ ;;
   *)
     echo "can not handle arch '$ARCH', aborting..."
@@ -53,11 +53,6 @@ done
 # copy modules in chroot
 cp ${CURRENT_DIR}/binary/modules.tar.bz2 ${CHROOT_DIR}/tmp/
 cp ${CURRENT_DIR}/binary/modules/*ko ${CHROOT_DIR}/tmp/
-
-# untar original Asus rootfs into /var/lib/asus-ac88u-rootfs
-ROOTFS_DEST_DIR="${CHROOT_DIR}/var/lib/asus-ac88u-rootfs"
-mkdir -p $ROOTFS_DEST_DIR
-tar -C $ROOTFS_DEST_DIR -xajf ${CURRENT_DIR}/${ASUS_ROOTFS}
 
 # copy 2nd stage install script in chroot, and run it
 cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
