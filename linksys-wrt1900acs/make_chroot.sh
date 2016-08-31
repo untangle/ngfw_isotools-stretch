@@ -13,7 +13,7 @@ LOOP_DEVICE="/dev/loop0"
 REPOSITORY=$1
 DISTRIBUTION=$2
 ARCH=$3
-ASUS_ROOTFS=$4
+ROOTFS=$4
 IMAGE=$5
 
 # we may run via sudo

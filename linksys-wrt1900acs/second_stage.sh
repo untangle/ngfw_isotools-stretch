@@ -32,7 +32,7 @@ echo root:passwd | chpasswd
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes bash-static
 
 # install hardware-specific config
-DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes untangle-hardware-asus-ac88u
+DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes untangle-hardware-linksys-wrt1900acs
 
 # install modules
 mkdir -p /lib/modules/${KERNEL_VERSION}/extra
