@@ -1,5 +1,7 @@
 BUFFALO_DIR := $(shell dirname $(MAKEFILE_LIST))
 
+PKGTOOLS_DIR := $(CWD)/../../ngfw_pkgtools
+
 PRODUCT := "buffalo-xzr1900dhp"
 
 ## overridables
@@ -15,7 +17,7 @@ NETBOOT_HOST := netboot-server
 # FIXME ?
 ARCH := armhf
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
-VERSION := $(shell cat $(BUFFALO_DIR)/../resources/VERSION)
+VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 FMK_DIR := $(BUFFALO_DIR)/firmware-mod-kit
 BIN_DIR := $(BUFFALO_DIR)/binary
 KERNEL_FILE := $(BIN_DIR)/zImage-untangle

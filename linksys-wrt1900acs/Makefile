@@ -1,5 +1,7 @@
 CWD := $(shell dirname $(MAKEFILE_LIST))
 
+PKGTOOLS_DIR := $(CWD)/../../ngfw_pkgtools
+
 NAME := linksys-wrt1900acs
 
 ## overridables
@@ -16,7 +18,7 @@ NETBOOT_HOST := netboot-server
 ARCH := armel
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 MOUNT_SCRIPT := $(IMAGES_DIR)/mounts.py
-VERSION := $(shell cat $(CWD)/../resources/VERSION)
+VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 BIN_DIR := $(CWD)/binary
 TMP_DIR := $(CWD)/tmp
 VENDOR_REFERENCE_NAME := $(NAME)-rootfs.tar.bz2
