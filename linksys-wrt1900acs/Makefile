@@ -25,7 +25,6 @@ VENDOR_REFERENCE_NAME := $(NAME)-rootfs.tar.bz2
 VENDOR_REFERENCE_URL := $(NETBOOT_HOST)/$(VENDOR_REFERENCE_NAME)
 SQUASHFS_FILE := $(BIN_DIR)/dd-wrt.squashfs
 KERNEL_FILE := $(BIN_DIR)/uImage-untangle
-IMAGE_FILE := $(TMP_DIR)/image.bin
 FIRMWARE_IMG := $(TMP_DIR)/$(NAME).bin
 FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)
 ROOTFS_IMAGE := /tmp/$(NAME).rootfs
@@ -44,7 +43,7 @@ $(VENDOR_REFERENCE_NAME):
 image: $(FIRMWARE_IMG)
 $(FIRMWARE_IMG): $(VMLINUZ_FILE) $(SQUASHFS_FILE) | $(TMP_DIR)
 	(dd if=$(KERNEL_FILE) bs=3072k conv=sync; dd if=$(SQUASHFS_FILE) bs=2048 conv=sync; ) > tmp/foo
-	$(BIN_DIR)/trx_n -m 40000000 -o $(IMAGE_FILE) tmp/foo
+	$(BIN_DIR)/trx_n -m 40000000 -o $(FIRMWARE_IMG) tmp/foo
 
 $(TMP_DIR):
 	mkdir $@
