@@ -28,7 +28,7 @@ KERNEL_FILE := $(BIN_DIR)/zImage-untangle
 VMLINUZ_FILE := $(TMP_DIR)/vmlinuz.lzma
 IMAGE_FILE := $(TMP_DIR)/image.bin
 FIRMWARE_IMG := $(TMP_DIR)/$(NAME).bin
-FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)
+FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)_$(NAME)
 ROOTFS_IMAGE := /tmp/$(NAME).rootfs
 
 .PHONY: all clean image rootfs push download-asus-rootsf

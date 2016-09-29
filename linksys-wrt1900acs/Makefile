@@ -26,7 +26,7 @@ VENDOR_REFERENCE_URL := $(NETBOOT_HOST)/$(VENDOR_REFERENCE_NAME)
 SQUASHFS_FILE := $(BIN_DIR)/dd-wrt.squashfs
 KERNEL_FILE := $(BIN_DIR)/uImage-untangle
 FIRMWARE_IMG := $(TMP_DIR)/$(NAME).bin
-FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)
+FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)_$(NAME)
 ROOTFS_IMAGE := /tmp/$(NAME).rootfs
 
 .PHONY: all clean image rootfs push
