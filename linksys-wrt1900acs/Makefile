@@ -14,8 +14,7 @@ DISTRIBUTION ?= nightly
 TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 NETBOOT_HOST := netboot-server
-# FIXME ?
-ARCH := armel
+ARCH := armhf
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 MOUNT_SCRIPT := $(IMAGES_DIR)/mounts.py
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)

@@ -29,9 +29,9 @@ apt-get install --yes qemu qemu-user-static binfmt-support debootstrap
 # debootstrap onto chroot
 debootstrap --arch=$ARCH --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http://package-server/public/$REPOSITORY
 
-# armel static binary in chroot
+# arm static binary in chroot
 case $ARCH in
-  armel)
+  arm*)
     KERNEL_VERSION="3.18.38"
     cp /usr/bin/qemu-arm-static ${CHROOT_DIR}/usr/bin/ ;;
   *)
