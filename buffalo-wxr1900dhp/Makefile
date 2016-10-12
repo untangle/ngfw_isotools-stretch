@@ -1,4 +1,4 @@
-BUFFALO_DIR := $(shell dirname $(MAKEFILE_LIST))
+CWD := $(shell dirname $(MAKEFILE_LIST))
 
 PKGTOOLS_DIR := $(CWD)/../../ngfw_pkgtools
 
@@ -18,8 +18,8 @@ NETBOOT_HOST := netboot-server
 ARCH := armhf
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
-FMK_DIR := $(BUFFALO_DIR)/firmware-mod-kit
-BIN_DIR := $(BUFFALO_DIR)/binary
+FMK_DIR := $(CWD)/firmware-mod-kit
+BIN_DIR := $(CWD)/binary
 KERNEL_FILE := $(BIN_DIR)/zImage-untangle
 TRX_FILE := $(BIN_DIR)/trx-header
 HEADER_IMG := $(FMK_DIR)/fmk/image_parts/header.img
@@ -32,7 +32,7 @@ ROOTFS_ARCHIVE := /tmp/buffalo-rootfs.tar.bz2
 all: image rootfs
 
 clean:
-	rm -fr $(BUFFALO_DIR)/tmp $(ISO_DIR) $(BUFFALO_DIR)/debian-installer*
+	rm -fr $(CWD)/tmp $(ISO_DIR) $(CWD)/debian-installer*
 	rm -f $(HEADER_IMG) $(FIRMWARE_IMG) $(ROOTFS_ARCHIVE)
 	rm -fr /tmp/debootstrap.*
 
@@ -47,7 +47,7 @@ $(HEADER_IMG): $(TRX_FILE) $(KERNEL_FILE)
 
 rootfs: $(ROOTFS_ARCHIVE)
 $(ROOTFS_ARCHIVE):
-	$(BUFFALO_DIR)/make_chroot.sh $(REPOSITORY) chaos $(ARCH) $(ROOTFS_ARCHIVE)
+	$(CWD)/make_chroot.sh $(REPOSITORY) chaos $(ARCH) $(ROOTFS_ARCHIVE)
 
 push:
 	scp $(ROOTFS_ARCHIVE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).tar.bz2
