@@ -8,7 +8,7 @@ CURRENT_DIR=$(dirname $0)
 CHROOT_DIR=$(mktemp -d /tmp/tmp.linksys-wrt1900acs-chroot.XXXXX)
 MNT_DIR=$(mktemp -d /tmp/tmp.linksys-wrt1900acs-img.XXXXX)
 SECOND_STAGE_SCRIPT="second_stage.sh"
-LOOP_DEVICE="/dev/loop0"
+LOOP_DEVICE="/dev/loop1"
 # CL args
 REPOSITORY=$1
 DISTRIBUTION=$2
