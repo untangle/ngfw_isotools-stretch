@@ -1,5 +1,7 @@
 OVA_DIR := $(shell dirname $(MAKEFILE_LIST))
 
+PKGTOOLS_DIR := $(OVA_DIR)/../../ngfw_pkgtools
+
 ## overridables
 # repository
 REPOSITORY ?= jessie
