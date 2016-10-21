@@ -54,6 +54,9 @@ unset DEBOOTSTRAP_OPTS   || true
 unset ARCHIVE_KEYRING_PACKAGE || true
 unset ARCHIVE_KEYRING_FILE    || true
 
+export EXCLUDE_486_KERNEL=1
+export EXCLUDE_586_KERNEL=1
+
 # The debian-cd dir
 # Where I am (hoping I'm in the debian-cd dir)
 export BASEDIR=`pwd`
