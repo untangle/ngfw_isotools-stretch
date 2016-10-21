@@ -131,3 +131,15 @@ index 04adb7d..22cecea 100644
 -	menu default
  	kernel ${KERNEL}
  	append desktop=%desktop% ${VIDEO_MODE} initrd=${INITRD} --- quiet ${CONSOLE}
+diff --git a/d-i/build/config/i386.cfg b/d-i/build/config/i386.cfg
+--- a/d-i/build/config/i386.cfg
++++ b/d-i/build/config/i386.cfg
+@@ -3,7 +3,7 @@ MEDIUM_SUPPORTED_EXTRA = monolithic
+ 
+ # The version of the kernel to use.
+ BASEVERSION = $(LINUX_KERNEL_ABI)
+-KERNELVERSION = $(BASEVERSION)-586
++KERNELVERSION = $(BASEVERSION)-686-pae
+ KERNELMAJOR = 2.6
+ KERNELNAME = vmlinuz
+ 
