@@ -132,8 +132,8 @@ index 04adb7d..22cecea 100644
  	kernel ${KERNEL}
  	append desktop=%desktop% ${VIDEO_MODE} initrd=${INITRD} --- quiet ${CONSOLE}
 diff --git a/d-i/build/config/i386.cfg b/d-i/build/config/i386.cfg
---- a/d-i/build/config/i386.cfg
-+++ b/d-i/build/config/i386.cfg
+--- a/isotools-jessie/d-i/build/config/i386.cfg
++++ b/isotools-jessie/d-i/build/config/i386.cfg
 @@ -3,7 +3,7 @@ MEDIUM_SUPPORTED_EXTRA = monolithic
  
  # The version of the kernel to use.
