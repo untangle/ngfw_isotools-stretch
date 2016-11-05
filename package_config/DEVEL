@@ -1,0 +1,8 @@
+PACKAGES install
+build-essential
+debian-keyring
+wdiff
+git
+git-man
+devscripts
+debconf-utils

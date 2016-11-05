@@ -1,0 +1,4 @@
+#!/bin/bash
+
+fcopy -M /etc/apt/sources.list
+
