@@ -5,10 +5,13 @@ set -x
 
 # constants
 CURRENT_DIR=$(dirname $0)
-CHROOT_DIR=$(mktemp -d /tmp/tmp.linksys-wrt1900acs-chroot.XXXXX)
-MNT_DIR=$(mktemp -d /tmp/tmp.linksys-wrt1900acs-img.XXXXX)
+NAME=$(basename $CURRENT_DIR)
+
+source ${CURRENT_DIR}/image.conf
+
+CHROOT_DIR=$(mktemp -d /tmp/tmp.${NAME}-chroot.XXXXX)
+MNT_DIR=$(mktemp -d /tmp/tmp.${NAME}-img.XXXXX)
 SECOND_STAGE_SCRIPT="second_stage.sh"
-LOOP_DEVICE="/dev/loop1"
 # CL args
 REPOSITORY=$1
 DISTRIBUTION=$2
@@ -32,7 +35,6 @@ debootstrap --arch=$ARCH --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http
 # arm static binary in chroot
 case $ARCH in
   arm*)
-    KERNEL_VERSION="3.18.38"
     cp /usr/bin/qemu-arm-static ${CHROOT_DIR}/usr/bin/ ;;
   *)
     echo "can not handle arch '$ARCH', aborting..."
@@ -54,8 +56,17 @@ done
 cp ${CURRENT_DIR}/binary/modules.tar.bz2 ${CHROOT_DIR}/tmp/
 cp ${CURRENT_DIR}/binary/modules/*ko ${CHROOT_DIR}/tmp/
 
-# copy firmware in chroot
-cp -r ${CURRENT_DIR}/binary/firmware ${CHROOT_DIR}/tmp/
+# copy firmware in chroot if necessary
+if [ -d ${CURRENT_DIR}/binary/firmware ] ; then
+  cp -r ${CURRENT_DIR}/binary/firmware ${CHROOT_DIR}/tmp/
+fi
+
+# untar original rootfs into /var/lib/${NAME}-rootfs if necessary
+if [ -f $ROOTFS ] ; then
+  ROOTFS_DEST_DIR="${CHROOT_DIR}/var/lib/${NAME}-rootfs"
+  mkdir -p $ROOTFS_DEST_DIR
+  tar -C $ROOTFS_DEST_DIR -xajf ${CURRENT_DIR}/${ROOTFS}
+fi
 
 # copy 2nd stage install script in chroot, and run it
 cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
