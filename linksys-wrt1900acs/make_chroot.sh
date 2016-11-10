@@ -15,9 +15,8 @@ SECOND_STAGE_SCRIPT="second_stage.sh"
 # CL args
 REPOSITORY=$1
 DISTRIBUTION=$2
-ARCH=$3
-ROOTFS=$4
-IMAGE=$5
+ROOTFS=$3
+IMAGE=$4
 
 # we may run via sudo
 export PATH=/sbin:/usr/sbin:${PATH}

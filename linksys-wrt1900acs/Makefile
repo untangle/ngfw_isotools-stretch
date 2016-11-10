@@ -1,9 +1,9 @@
 CWD := $(shell dirname $(MAKEFILE_LIST))
+NAME := $(shell basename $CWD)
+
+include $(CWD)/image.conf
 
 PKGTOOLS_DIR := $(CWD)/../../ngfw_pkgtools
-
-NAME := linksys-wrt1900acs
-ARCH := armhf
 
 ## overridables
 # repository
