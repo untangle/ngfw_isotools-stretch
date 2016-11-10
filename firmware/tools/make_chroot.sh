@@ -63,7 +63,7 @@ if [ -d ${VENDOR_DIR}/binary/firmware ] ; then
 fi
 
 # untar original rootfs into /var/lib/${NAME}-rootfs if necessary
-if [ -f $ROOTFS ] ; then
+if [ $NEED_ORIGINAL_ROOTFS = "yes" ] ; then
   ROOTFS_DEST_DIR="${CHROOT_DIR}/var/lib/${NAME}-rootfs"
   mkdir -p $ROOTFS_DEST_DIR
   tar -C $ROOTFS_DEST_DIR -xajf ${VENDOR_DIR}/${ROOTFS}
