@@ -3,6 +3,7 @@ CWD := $(shell dirname $(MAKEFILE_LIST))
 PKGTOOLS_DIR := $(CWD)/../../ngfw_pkgtools
 
 NAME := linksys-wrt1900acs
+ARCH := armhf
 
 ## overridables
 # repository
@@ -14,7 +15,6 @@ DISTRIBUTION ?= nightly
 TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 NETBOOT_HOST := netboot-server
-ARCH := armhf
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 MOUNT_SCRIPT := $(IMAGES_DIR)/mounts.py
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
@@ -47,7 +47,7 @@ $(TMP_DIR):
 	mkdir $@
 
 rootfs: $(ROOTFS_IMAGE)
-$(ROOTFS_IMAGE):
+$(ROOTFS_IMAGE): $(VENDOR_REFERENCE_NAME)
 	$(CWD)/make_chroot.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $(VENDOR_REFERENCE_NAME) $(ROOTFS_IMAGE)
 
 push:
