@@ -4,6 +4,7 @@ NAME := $(shell basename $(shell readlink -f $(CWD)))
 include $(CWD)/image.conf
 
 PKGTOOLS_DIR := $(CWD)/../../../ngfw_pkgtools
+FIRMWARE_TOOLS_DIR := $(CWD)/../tools
 
 ## overridables
 # repository
@@ -54,7 +55,7 @@ $(TMP_DIR):
 
 rootfs: $(ROOTFS_IMAGE)
 $(ROOTFS_IMAGE): $(VENDOR_REFERENCE_NAME)
-	$(CWD)/make_chroot.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $(VENDOR_REFERENCE_NAME) $(ROOTFS_IMAGE)
+	$(FIRMWARE_TOOLS_DIR)/make_chroot.sh $(NAME) $(REPOSITORY) $(DISTRIBUTION) $(VENDOR_REFERENCE_NAME) $(ROOTFS_IMAGE)
 
 push:
 	scp $(ROOTFS_IMAGE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).rootfs

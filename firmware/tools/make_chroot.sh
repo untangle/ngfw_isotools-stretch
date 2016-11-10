@@ -6,16 +6,18 @@ set -x
 # constants
 CURRENT_DIR=$(dirname $0)
 
-source ${CURRENT_DIR}/image.conf
+# CL args
+NAME=$1
+REPOSITORY=$2
+DISTRIBUTION=$3
+ROOTFS=$4
+IMAGE=$5
+
+source ${CURRENT_DIR}/../${NAME}/image.conf
 
 CHROOT_DIR=$(mktemp -d /tmp/tmp.${NAME}-chroot.XXXXX)
 MNT_DIR=$(mktemp -d /tmp/tmp.${NAME}-img.XXXXX)
 SECOND_STAGE_SCRIPT="${CURRENT_DIR}/../tools/second_stage.sh"
-# CL args
-REPOSITORY=$1
-DISTRIBUTION=$2
-ROOTFS=$3
-IMAGE=$4
 
 # we may run via sudo
 export PATH=/sbin:/usr/sbin:${PATH}
