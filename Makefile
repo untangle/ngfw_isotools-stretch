@@ -109,10 +109,10 @@ iso-push:
 # into "make -C buffalo-wzr1900dhp image"
 
 %-image:
-	make -C $(ISOTOOLS_DIR)/$(subst /,-,$*) image
+	make -C $(ISOTOOLS_DIR)/firmware/$(subst /,-,$*) image
 %-rootfs:
-	make -C $(ISOTOOLS_DIR)/$(subst /,-,$*) rootfs
+	make -C $(ISOTOOLS_DIR)/firmware/$(subst /,-,$*) rootfs
 %-push:
-	make -C $(ISOTOOLS_DIR)/$(subst /,-,$*) push
+	make -C $(ISOTOOLS_DIR)/firmware/$(subst /,-,$*) push
 %-clean:
-	make -C $(ISOTOOLS_DIR)/$(subst /,-,$*) clean
+	make -C $(ISOTOOLS_DIR)/firmware/$(subst /,-,$*) clean

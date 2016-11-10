@@ -5,13 +5,12 @@ set -x
 
 # constants
 CURRENT_DIR=$(dirname $0)
-NAME=$(basename $CURRENT_DIR)
 
 source ${CURRENT_DIR}/image.conf
 
 CHROOT_DIR=$(mktemp -d /tmp/tmp.${NAME}-chroot.XXXXX)
 MNT_DIR=$(mktemp -d /tmp/tmp.${NAME}-img.XXXXX)
-SECOND_STAGE_SCRIPT="second_stage.sh"
+SECOND_STAGE_SCRIPT="${CURRENT_DIR}/../tools/second_stage.sh"
 # CL args
 REPOSITORY=$1
 DISTRIBUTION=$2
