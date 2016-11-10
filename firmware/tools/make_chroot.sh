@@ -13,11 +13,12 @@ DISTRIBUTION=$3
 ROOTFS=$4
 IMAGE=$5
 
-source ${CURRENT_DIR}/../${NAME}/image.conf
+VENDOR_DIR=${CURRENT_DIR}/../${NAME}
+source ${VENDOR_DIR}/image.conf
 
 CHROOT_DIR=$(mktemp -d /tmp/tmp.${NAME}-chroot.XXXXX)
 MNT_DIR=$(mktemp -d /tmp/tmp.${NAME}-img.XXXXX)
-SECOND_STAGE_SCRIPT="${CURRENT_DIR}/../tools/second_stage.sh"
+SECOND_STAGE_SCRIPT="${CURRENT_DIR}/second_stage.sh"
 
 # we may run via sudo
 export PATH=/sbin:/usr/sbin:${PATH}
@@ -53,19 +54,19 @@ for pfs in dev dev/pts proc sys ; do
 done
 
 # copy modules in chroot
-cp ${CURRENT_DIR}/binary/modules.tar.bz2 ${CHROOT_DIR}/tmp/
-cp ${CURRENT_DIR}/binary/modules/*ko ${CHROOT_DIR}/tmp/
+cp ${VENDOR_DIR}/binary/modules.tar.bz2 ${CHROOT_DIR}/tmp/
+cp ${VENDOR_DIR}/binary/modules/*ko ${CHROOT_DIR}/tmp/
 
 # copy firmware in chroot if necessary
-if [ -d ${CURRENT_DIR}/binary/firmware ] ; then
-  cp -r ${CURRENT_DIR}/binary/firmware ${CHROOT_DIR}/tmp/
+if [ -d ${VENDOR_DIR}/binary/firmware ] ; then
+  cp -r ${VENDOR_DIR}/binary/firmware ${CHROOT_DIR}/tmp/
 fi
 
 # untar original rootfs into /var/lib/${NAME}-rootfs if necessary
 if [ -f $ROOTFS ] ; then
   ROOTFS_DEST_DIR="${CHROOT_DIR}/var/lib/${NAME}-rootfs"
   mkdir -p $ROOTFS_DEST_DIR
-  tar -C $ROOTFS_DEST_DIR -xajf ${CURRENT_DIR}/${ROOTFS}
+  tar -C $ROOTFS_DEST_DIR -xajf ${VENDOR_DIR}/${ROOTFS}
 fi
 
 # copy 2nd stage install script in chroot, and run it
