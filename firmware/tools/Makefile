@@ -43,11 +43,11 @@ $(VENDOR_REFERENCE_NAME):
 
 vmlinuz: $(VMLINUZ_FILE)
 $(VMLINUZ_FILE): $(KERNEL_FILE) | $(TMP_DIR)
-	$(CWD)/kernel.sh $^ $@
+	$(CWD)/kernel.sh $@ $^
 
 image: $(FIRMWARE_IMG)
 $(FIRMWARE_IMG): $(VMLINUZ_FILE) $(SQUASHFS_FILE) | $(TMP_DIR)
-	$(CWD)/firmware.sh $^ $@
+	$(CWD)/firmware.sh $@ $^
 
 $(TMP_DIR):
 	mkdir $@

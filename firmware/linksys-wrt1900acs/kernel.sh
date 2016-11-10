@@ -1,4 +1,4 @@
 #! /bin/bash
 
 # nothing to do here
-cp $1 $2
+cp $2 $1
