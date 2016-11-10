@@ -9,6 +9,7 @@ TMP_SOURCES_LIST="/etc/apt/sources.list.d/tmp.list"
 REPOSITORY=$1
 DISTRIBUTION=$2
 KERNEL_VERSION=$3
+NAME=$4
 
 # disable starting of services
 echo exit 101 > /usr/sbin/policy-rc.d
@@ -32,19 +33,25 @@ echo root:passwd | chpasswd
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes bash-static
 
 # install hardware-specific config
-DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes untangle-hardware-asus-ac88u
+DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes untangle-hardware-${NAME}
 
 # install modules
 mkdir -p /lib/modules/${KERNEL_VERSION}/extra
 tar -C / -xjf /tmp/modules.tar.bz2
-rm /lib/modules/${KERNEL_VERSION}/kernel/drivers/net/switch/switch-{adm,core,robo}.ko
-rm /lib/modules/${KERNEL_VERSION}/kernel/drivers/net/ethernet/et/et.ko
-cp /tmp/*ko /lib/modules/${KERNEL_VERSION}/extra
+for mod in /tmp/*ko ; do 
+  find /lib/modules/${KERNEL_VERSION} -name $(basename $mod) -exec rm -f {} \;
+  cp $mod /lib/modules/${KERNEL_VERSION}/extra
+done
 depmod -a ${KERNEL_VERSION}
+
+# install firmware if necessary
+if [ -d /tmp/firmware ] ; then
+  rsync -aH /tmp/firmware/ /lib/firmware/
+fi
 
 # cleanup
 apt-get clean
-rm $TMP_SOURCES_LIST
+rm -fr $TMP_SOURCES_LIST /tmp/*
 
 # re-enable starting of services
 rm /usr/sbin/policy-rc.d
