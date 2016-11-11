@@ -96,9 +96,10 @@ usb-image:
 
 ova-image:
 	make -C $(ISOTOOLS_DIR)/ova image
-
 ova-push:
 	make -C $(ISOTOOLS_DIR)/ova push
+ova-clean:
+	make -C $(ISOTOOLS_DIR)/ova clean
 
 iso-push:
 	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) new $(VERSION) $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1 | perl -npe 'if (m/(i386|amd64).*iso/) { s/.*(\d{4}(-\d{2}){2}T(\d{2}:?){3}).*/$$1/ } else { s/.*\n// }' | tail -1) $(ARCH) $(REPOSITORY)"
