@@ -35,20 +35,6 @@ DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --f
 # install hardware-specific config
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes untangle-hardware-${NAME}
 
-# install modules
-mkdir -p /lib/modules/${KERNEL_VERSION}/extra
-tar -C / -xjf /tmp/modules.tar.bz2
-for mod in /tmp/*ko ; do 
-  find /lib/modules/${KERNEL_VERSION} -name $(basename $mod) -exec rm -f {} \;
-  cp $mod /lib/modules/${KERNEL_VERSION}/extra
-done
-depmod -a ${KERNEL_VERSION}
-
-# install firmware if necessary
-if [ -d /tmp/firmware ] ; then
-  rsync -aH /tmp/firmware/ /lib/firmware/
-fi
-
 # cleanup
 apt-get clean
 rm -fr $TMP_SOURCES_LIST /tmp/*

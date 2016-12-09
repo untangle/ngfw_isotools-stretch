@@ -27,7 +27,7 @@ SQUASHFS_FILE := $(BIN_DIR)/dd-wrt.squashfs
 KERNEL_FILE := $(wildcard $(BIN_DIR)/?Image-untangle)
 VMLINUZ_FILE := $(TMP_DIR)/vmlinuz.lzma
 IMAGE_FILE := $(TMP_DIR)/image.bin
-FIRMWARE_IMG := $(TMP_DIR)/$(NAME).bin
+FIRMWARE_IMG := $(TMP_DIR)/firmware.trx
 FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)_$(NAME)
 ROOTFS_IMAGE := /tmp/$(NAME).rootfs
 
@@ -42,14 +42,6 @@ download-vendor-rootfs: $(VENDOR_REFERENCE_NAME)
 $(VENDOR_REFERENCE_NAME):
 	curl -s -o $@ $(VENDOR_REFERENCE_URL)
 
-vmlinuz: $(VMLINUZ_FILE)
-$(VMLINUZ_FILE): $(KERNEL_FILE) | $(TMP_DIR)
-	$(CWD)/kernel.sh $@ $^
-
-image: $(FIRMWARE_IMG)
-$(FIRMWARE_IMG): $(VMLINUZ_FILE) $(SQUASHFS_FILE) | $(TMP_DIR)
-	$(CWD)/firmware.sh $@ $^
-
 $(TMP_DIR):
 	mkdir $@
 
@@ -59,5 +51,5 @@ $(ROOTFS_IMAGE): $(VENDOR_REFERENCE_NAME)
 
 push:
 	scp $(ROOTFS_IMAGE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).rootfs
-	scp $(FIRMWARE_IMG) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).firmware
+	scp $(FIRMWARE_IMG) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).trx
 	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) all foo foo foo $(REPOSITORY)"

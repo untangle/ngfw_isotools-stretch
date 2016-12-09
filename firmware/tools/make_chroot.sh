@@ -53,15 +53,6 @@ for pfs in dev dev/pts proc sys ; do
   ls ${CHROOT_DIR}/$pfs
 done
 
-# copy modules in chroot
-cp ${VENDOR_DIR}/binary/modules.tar.bz2 ${CHROOT_DIR}/tmp/
-cp ${VENDOR_DIR}/binary/modules/*ko ${CHROOT_DIR}/tmp/
-
-# copy firmware in chroot if necessary
-if [ -d ${VENDOR_DIR}/binary/firmware ] ; then
-  cp -r ${VENDOR_DIR}/binary/firmware ${CHROOT_DIR}/tmp/
-fi
-
 # untar original rootfs into /var/lib/${NAME}-rootfs if necessary
 if [ $NEED_ORIGINAL_ROOTFS = "yes" ] ; then
   ROOTFS_DEST_DIR="${CHROOT_DIR}/var/lib/${NAME}-rootfs"
@@ -72,6 +63,9 @@ fi
 # copy 2nd stage install script in chroot, and run it
 cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
 chroot ${CHROOT_DIR} /tmp/$(basename ${SECOND_STAGE_SCRIPT}) $REPOSITORY $DISTRIBUTION $KERNEL_VERSION $NAME
+
+# grab TRX
+cp ${CHROOT_DIR}/boot/*trx tmp/
 
 # umount PFS
 for pfs in sys proc dev/pts dev ; do
