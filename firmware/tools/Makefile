@@ -27,7 +27,7 @@ SQUASHFS_FILE := $(BIN_DIR)/dd-wrt.squashfs
 KERNEL_FILE := $(wildcard $(BIN_DIR)/?Image-untangle)
 VMLINUZ_FILE := $(TMP_DIR)/vmlinuz.lzma
 IMAGE_FILE := $(TMP_DIR)/image.bin
-FIRMWARE_IMG := $(TMP_DIR)/firmware.trx
+FIRMWARE_IMG := $(TMP_DIR)/*.trx
 FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_chaos_$(TS)_$(HOST)_$(NAME)
 ROOTFS_IMAGE := /tmp/$(NAME).rootfs
 
