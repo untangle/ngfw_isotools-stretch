@@ -83,8 +83,10 @@ installer-stamp:
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
 	touch installer-stamp
 
-repoint-stable:
+repoint-stable: repoint-stable-stamp
+repoint-stable-stamp:
 	$(ISOTOOLS_DIR)/package-server-proxy.sh ./create-di-links.sh $(REPOSITORY) $(DISTRIBUTION)
+	touch $@
 
 iso-image:
 	mkdir -p $(ISO_DIR)
