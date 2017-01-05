@@ -110,9 +110,9 @@ iso-push:
 
 	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) all foo foo foo $(REPOSITORY)"
 
-# the next 4 rules are generic ones meant for OVA and firmware images
-# they'll make something like "buffalo/wzr1900dhp-image" and make it
-# into "make -C buffalo-wzr1900dhp image"
+# the next 4 rules are generic ones meant for firmware images; they
+# take something like "buffalo/wzr1900dhp-image" and make it into
+# "make -C buffalo-wzr1900dhp image"
 
 %-image:
 	make -C $(ISOTOOLS_DIR)/firmware/$(subst /,-,$*) image
