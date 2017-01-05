@@ -1,3 +1,5 @@
+PKGS := debiandoc-sgml libbogl-dev glibc-pic libslang2-pic libnewt-pic genext2fs mklibs syslinux-utils isolinux pxelinux grub-efi-amd64-bin xorriso tofrodos module-init-tools bf-utf-source win32-loader librsvg2-bin
+
 ISOTOOLS_DIR := $(shell dirname $(MAKEFILE_LIST))
 
 PKGTOOLS_DIR := $(ISOTOOLS_DIR)/../ngfw_pkgtools
