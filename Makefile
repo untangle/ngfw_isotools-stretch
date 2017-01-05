@@ -88,10 +88,16 @@ repoint-stable-stamp:
 	$(ISOTOOLS_DIR)/package-server-proxy.sh ./create-di-links.sh $(REPOSITORY) $(DISTRIBUTION)
 	touch $@
 
-iso-image:
+iso-image-untangle: iso-installer
 	mkdir -p $(ISO_DIR)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --profiles default,expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro
+	mv $(ISO_DIR)/debian-$(cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(ISO_IMAGE)
+
+iso-image-apc: iso-installer
+	mkdir -p $(ISO_DIR)
+	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --profiles default,apc --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro
 	mv $(ISO_DIR)/debian-$(cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(ISO_IMAGE)
 
 usb-image:
