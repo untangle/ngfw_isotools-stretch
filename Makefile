@@ -20,7 +20,8 @@ KERNELS_i386 := "linux-image-3.16.0-4-untangle-686-pae"
 KERNELS_amd64 := "linux-image-3.16.0-4-untangle-amd64"
 ISO_DIR := /tmp/untangle-images
 VERSION = $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
-ISO_IMAGE := $(ISO_DIR)/+FLAVOR+-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_`date --iso-8601=seconds`_`hostname -s`.iso
+ISO_IMAGE := $(ISO_DIR)/+FLAVOR+-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(shell date --iso-8601=seconds)_$(shell hostname -s).iso
+USB_IMAGE := $(subst .iso,.img,$(ISO_IMAGE))
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 MOUNT_SCRIPT := $(IMAGES_DIR)/mounts.py
 NETBOOT_DIR_TXT := $(ISOTOOLS_DIR)/d-i/build/dest/netboot/debian-installer/$(ARCH)
@@ -29,7 +30,6 @@ NETBOOT_INITRD_TXT := $(NETBOOT_DIR_TXT)/initrd.gz
 NETBOOT_INITRD_GTK := $(NETBOOT_DIR_GTK)/initrd.gz
 NETBOOT_KERNEL := $(NETBOOT_DIR_TXT)/linux
 BOOT_IMG := $(ISOTOOLS_DIR)/d-i/build/dest/hd-media/boot.img.gz
-BOOT_IMG_UNTANGLE := $(ISOTOOLS_DIR)/boot.img
 PROFILES_DIR := $(ISOTOOLS_DIR)/profiles
 COMMON_PRESEED :=  $(PROFILES_DIR)/common.preseed
 AUTOPARTITION_PRESEED :=  $(PROFILES_DIR)/auto-partition.preseed
@@ -93,8 +93,9 @@ iso/%-image: debian-installer iso-conf
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --profiles $(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro
 	mv $(ISO_DIR)/debian-$(shell cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(subst +FLAVOR+,$(patsubst iso/%-image,%,$*),$(ISO_IMAGE))
 
-usb-image:
-	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG)
+usb/%-image:
+	$(eval iso_image := $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
+	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG) $(iso_image) $(subst +FLAVOR+,$(patsubst usb/%-image,%,$*),$(USB_IMAGE))
 
 ova-image:
 	make -C $(ISOTOOLS_DIR)/ova image
@@ -103,11 +104,11 @@ ova-push:
 ova-clean:
 	make -C $(ISOTOOLS_DIR)/ova clean
 
-iso-push: # this only pushes the most recent image, regardless of flavor
+iso/%-push: # pushes the most recent images
 	$(eval iso_image := $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
-	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) new $(VERSION) $(shell echo $iso_image | perl -npe 'if (m/(i386|amd64).*iso/) { s/.*(\d{4}(-\d{2}){2}T(\d{2}:?){3}).*/$$1/ } else { s/.*\n// }') $(ARCH) $(REPOSITORY)"
-	scp $(iso_image) $(NETBOOT_PRESEED_FINAL) $(NETBOOT_PRESEED_EXPERT) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)
-	scp $(BOOT_IMG_UNTANGLE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_`date --iso-8601=seconds`_`hostname -s`.img
+	$(eval usb_image := $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.img | head -1))
+	echo ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) new $(VERSION) $(shell echo $iso_image | perl -npe 'if (m/(i386|amd64).*iso/) { s/.*(\d{4}(-\d{2}){2}T(\d{2}:?){3}).*/$$1/ } else { s/.*\n// }') $(ARCH) $(REPOSITORY)"
+	scp $(iso_image) $(usb_image) $(NETBOOT_PRESEED_FINAL) $(NETBOOT_PRESEED_EXPERT) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)
 	scp $(NETBOOT_INITRD_TXT) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/initrd-$(ARCH)-txt.gz
 	scp $(NETBOOT_INITRD_GTK) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/initrd-$(ARCH)-gtk.gz
 	scp $(NETBOOT_KERNEL) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/linux-$(ARCH)

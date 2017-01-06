@@ -5,17 +5,17 @@ set -x
 
 ISOTOOLS_DIR=$(dirname $0)
 
-IMG=$1
-ISO_IMG=$(ls -t /tmp/iso-images/UNTANGLE*iso | head -1)
+BASE_IMG=$1
+ISO_IMG=$2
+OUT_IMG=$3
 
-IMG_NAME=$(basename $IMG)
-IMG_NOZIP=$(echo $IMG_NAME | perl -pe 's/\.gz$//')
+IMG_NAME=$(basename $BASE_IMG)
 MOUNT_POINT=$(mktemp -d /tmp/tmp.untangle-usb.XXXXX)
 ISO_MOUNT_POINT=$(mktemp -d /tmp/tmp.untangle-usb.XXXXX)
 
-gunzip -c $IMG >| $IMG_NOZIP
+gunzip -c $BASE_IMG >| $OUT_IMG
 umount -f $MOUNT_POINT || true
-mount -o loop $IMG_NOZIP $MOUNT_POINT
+mount -o loop $OUT_IMG $MOUNT_POINT
 df -h
 
 # grab isolinux conf directly from the ISO image
@@ -32,4 +32,4 @@ perl -i -pe 's|vmlinuz|linux| ; s|/install.\w+/|| ; s|gtk/initrd|initrdg|' $MOUN
 cp -r $ISOTOOLS_DIR/cd-root/images $ISOTOOLS_DIR/tmp/extras/simple-cdd $MOUNT_POINT
 cp $ISO_IMG $MOUNT_POINT/$(echo $(basename $ISO_IMG) | perl -pe 's|:||g')
 umount $MOUNT_POINT
-rm -r $MOUNT_POINT
+rm -r $MOUNT_POINT $ISO_MOUNT_POINT
