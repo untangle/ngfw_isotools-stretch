@@ -93,7 +93,8 @@ LSB_DISTRIB_RELEASE="$(DEBIAN_VERSION) - installer build $(BUILD_DATE)"
 
 # This keyring is only used to verify udeb downloads using apt. Since the
 # build process does not run as root, apt cannot read /etc/apt/trusted.gpg.
-KEYRING=/usr/share/keyrings/debian-archive-keyring.gpg
+#KEYRING=/usr/share/keyrings/debian-archive-keyring.gpg
+KEYRING=/etc/apt/trusted.gpg
 
 # All images that include cdebconf should include symbols needed by these
 # plugins.

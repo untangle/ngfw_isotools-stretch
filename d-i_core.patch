@@ -90,7 +90,7 @@ index 11c613d..ffea236 100644
  
  # Path where the images will be written
 -export OUT=/srv/mirror/debian-cd-test
-+export OUT=/tmp/iso-images
++export OUT=/tmp/untangle-images
  
  # Where we keep the temporary apt stuff.
  # This cannot reside on an NFS mount.

@@ -18,7 +18,7 @@ NETBOOT_HOST := netboot-server
 ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 KERNELS_i386 := "linux-image-3.16.0-4-untangle-686-pae"
 KERNELS_amd64 := "linux-image-3.16.0-4-untangle-amd64"
-ISO_DIR := /tmp/iso-images
+ISO_DIR := /tmp/untangle-images
 VERSION = $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 ISO_IMAGE := $(ISO_DIR)/+FLAVOR+-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_`date --iso-8601=seconds`_`hostname -s`.iso
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
@@ -46,20 +46,38 @@ DOWNLOAD_FILE := $(PROFILES_DIR)/default.downloads
 DOWNLOAD_FILE_TEMPLATE := $(DOWNLOAD_FILE).template
 DI_CORE_PATCH := $(ISOTOOLS_DIR)/d-i_core.patch
 
-.PHONY: all patch unpatch installer image push 
+all:
 
-all: installer iso-image
-
-iso-clean: unpatch
+installer-clean:
 	cd $(ISOTOOLS_DIR)/d-i ; fakeroot debian/rules clean
-	rm -fr $(ISOTOOLS_DIR)/tmp $(ISO_DIR) $(ISOTOOLS_DIR)/debian-installer*
-	rm -f $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
-	rm -f $(ISOTOOLS_DIR)/debian-cd/CONF.sh.orig
-	rm -f installer-stamp
+	rm -fr $(ISOTOOLS_DIR)/debian-installer* $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 
-patch: patch-stamp
-patch-stamp:
+iso-clean:
+	rm -fr $(ISOTOOLS_DIR)/tmp $(ISO_DIR) $(ISOTOOLS_DIR)/debian-installer*
+
+patch-installer: patch-installer-stamp
+patch-installer-stamp:
 	patch -p2 < $(DI_CORE_PATCH)
+	touch $@
+
+unpatch-installer:
+	if [ -f patch-installer-stamp ] ; then \
+	  patch -p2 -R < $(DI_CORE_PATCH) ; \
+	  rm -f patch-installer-stamp ; \
+	fi
+
+debian-installer: repoint-stable installer-stamp
+installer-stamp:
+	perl -pe 's|\+DISTRIBUTION\+|'testing'| ; s|\+REPOSITORY\+|'jessie'|' ./d-i.sources.template >| ./d-i/build/sources.list.udeb.local
+	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
+	touch installer-stamp
+
+repoint-stable: repoint-stable-stamp
+repoint-stable-stamp:
+	$(ISOTOOLS_DIR)/package-server-proxy.sh ./create-di-links.sh $(REPOSITORY) $(DISTRIBUTION)
+	touch $@
+
+iso-conf:
 	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'$(REPOSITORY)'|' $(ISOTOOLS_DIR)/d-i.sources.template >| $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 	perl -pe 's|\+ISOTOOLS_DIR\+|'`pwd`/$(ISOTOOLS_DIR)'|g' $(CONF_FILE_TEMPLATE) >| $(CONF_FILE)
 	perl -pe 's|\+KERNELS\+|'$(KERNELS_$(ARCH))'|' $(DOWNLOAD_FILE_TEMPLATE) >| $(DOWNLOAD_FILE)
@@ -69,37 +87,11 @@ patch-stamp:
 	cat $(COMMON_PRESEED) $(NETBOOT_PRESEED_EXTRA) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+ARCH\+|'$(ARCH)'|g ; s|\+REPOSITORY\+|'$(REPOSITORY)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g' >| $(NETBOOT_PRESEED_EXPERT)
 	cat $(COMMON_PRESEED) $(DEFAULT_PRESEED_EXTRA) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g' >| $(DEFAULT_PRESEED_EXPERT)
 
-	touch patch-stamp
-
-unpatch: 
-	if [ -f patch-stamp ] ; then \
-	  patch -p2 -R < $(DI_CORE_PATCH) ; \
-	  rm -f patch-stamp ; \
-	fi
-	rm -f $(NETBOOT_PRESEED_FINAL) $(DEFAULT_PRESEED_FINAL) $(CONF_FILE) $(DOWNLOAD_FILE)
-	rm -fr $(NETBOOT_PRESEED_FINAL) $(DEFAULT_PRESEED_FINAL) $(NETBOOT_PRESEED_EXPERT) $(DEFAULT_PRESEED_EXPERT)
-
-iso-installer: patch repoint-stable installer-stamp
-installer-stamp:
-	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
-	touch installer-stamp
-
-repoint-stable: repoint-stable-stamp
-repoint-stable-stamp:
-	$(ISOTOOLS_DIR)/package-server-proxy.sh ./create-di-links.sh $(REPOSITORY) $(DISTRIBUTION)
-	touch $@
-
-iso/%-image: iso-installer
+iso/%-image: debian-installer iso-conf
 	mkdir -p $(ISO_DIR)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --profiles $(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro
 	mv $(ISO_DIR)/debian-$(shell cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(subst +FLAVOR+,$(patsubst iso/%-image,%,$*),$(ISO_IMAGE))
-
-iso-image-apc: iso-installer
-	mkdir -p $(ISO_DIR)
-	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --profiles default,apc --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro
-	mv $(ISO_DIR)/debian-$(cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(ISO_IMAGE)
 
 usb-image:
 	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG)
@@ -134,3 +126,5 @@ iso-push: # this only pushes the most recent image, regardless of flavor
 	make -C $(ISOTOOLS_DIR)/firmware/$(subst /,-,$*) push
 %-clean:
 	make -C $(ISOTOOLS_DIR)/firmware/$(subst /,-,$*) clean
+
+.PHONY: all

@@ -65,7 +65,7 @@ export BASEDIR=`pwd`
 # export CDNAME=debian
 
 # Building wheezy cd set ...
-export CODENAME=wheezy
+export CODENAME=jessie
 
 # By default use Debian installer packages from $CODENAME
 if [ -z "$DI_CODENAME" ]; then
@@ -79,7 +79,7 @@ fi
 #export DI_WWW_HOME=default
 
 # Version number, "2.2 r0", "2.2 r1" etc.
-export DEBVERSION="7.0"
+export DEBVERSION="8.0"
 
 # Official or non-official set.
 # NOTE: THE "OFFICIAL" DESIGNATION IS ONLY ALLOWED FOR IMAGES AVAILABLE
@@ -118,7 +118,7 @@ export MIRROR=/srv/mirror/debian
 export TDIR=/srv/mirror/tmp
 
 # Path where the images will be written
-export OUT=/srv/mirror/debian-cd-test
+export OUT=/tmp/untangle-images
 
 # Where we keep the temporary apt stuff.
 # This cannot reside on an NFS mount.
