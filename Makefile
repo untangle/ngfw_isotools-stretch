@@ -111,11 +111,10 @@ ova-push:
 ova-clean:
 	make -C $(ISOTOOLS_DIR)/ova clean
 
-iso-push: iso-push-default
-
-iso-push-%:
-	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) new $(VERSION) $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1 | perl -npe 'if (m/(i386|amd64).*iso/) { s/.*(\d{4}(-\d{2}){2}T(\d{2}:?){3}).*/$$1/ } else { s/.*\n// }' | tail -1) $(ARCH) $(REPOSITORY)"
-	scp `ls --sort=time $(ISO_DIR)/*$(VERSION)*$(ARCH)*.iso | head -1` $(NETBOOT_PRESEED_FINAL) $(NETBOOT_PRESEED_EXPERT) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)
+iso-push: # this only pushes the most recent image, regardless of flavor
+	$(eval iso_image := $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
+	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) new $(VERSION) $(shell echo $iso_image | perl -npe 'if (m/(i386|amd64).*iso/) { s/.*(\d{4}(-\d{2}){2}T(\d{2}:?){3}).*/$$1/ } else { s/.*\n// }') $(ARCH) $(REPOSITORY)"
+	scp $(iso_image) $(NETBOOT_PRESEED_FINAL) $(NETBOOT_PRESEED_EXPERT) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)
 	scp $(BOOT_IMG_UNTANGLE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_`date --iso-8601=seconds`_`hostname -s`.img
 	scp $(NETBOOT_INITRD_TXT) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/initrd-$(ARCH)-txt.gz
 	scp $(NETBOOT_INITRD_GTK) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/initrd-$(ARCH)-gtk.gz
