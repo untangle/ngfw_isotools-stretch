@@ -78,23 +78,23 @@ unpatch:
 	rm -f $(NETBOOT_PRESEED_FINAL) $(DEFAULT_PRESEED_FINAL) $(CONF_FILE) $(DOWNLOAD_FILE)
 	rm -fr $(NETBOOT_PRESEED_FINAL) $(DEFAULT_PRESEED_FINAL) $(NETBOOT_PRESEED_EXPERT) $(DEFAULT_PRESEED_EXPERT)
 
-iso-installer: patch repoint-stable installer-stamp
-installer-stamp:
+debian-installer: patch repoint-stable debian-installer-stamp
+debian-installer-stamp:
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
-	touch installer-stamp
+	touch $@
 
 repoint-stable: repoint-stable-stamp
 repoint-stable-stamp:
 	$(ISOTOOLS_DIR)/package-server-proxy.sh ./create-di-links.sh $(REPOSITORY) $(DISTRIBUTION)
 	touch $@
 
-iso-image-untangle: iso-installer
+iso-image-untangle: debian-installer
 	mkdir -p $(ISO_DIR)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --profiles default,expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro
 	mv $(ISO_DIR)/debian-$(cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(ISO_IMAGE)
 
-iso-image-apc: iso-installer
+iso-image-apc: debian-installer
 	mkdir -p $(ISO_DIR)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --profiles default,apc --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro
