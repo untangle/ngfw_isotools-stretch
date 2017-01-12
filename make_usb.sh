@@ -32,4 +32,4 @@ perl -i -pe 's|vmlinuz|linux| ; s|/install.\w+/|| ; s|gtk/initrd|initrdg|' $MOUN
 cp -r $ISOTOOLS_DIR/cd-root/images $ISOTOOLS_DIR/tmp/extras/simple-cdd $MOUNT_POINT
 cp $ISO_IMG $MOUNT_POINT/$(echo $(basename $ISO_IMG) | perl -pe 's|:||g')
 umount $MOUNT_POINT
-rm -r $MOUNT_POINT $ISO_MOUNT_POINT
+rm -r $MOUNT_POINT
