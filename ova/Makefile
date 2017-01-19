@@ -23,8 +23,8 @@ VMDK_REFERENCE_NAME := jessie.vmdk
 VMDK_REFERENCE_URL := $(NETBOOT_HOST)/$(VMDK_REFERENCE_NAME)
 VMDK_NAME := untangle.vmdk
 QCOW2_NAME := untangle.qcow2
-OVF_FILE := Untangle.ovf
-OVA_NAME := Untangle.ova
+OVF_FILE := untangle.ovf
+OVA_NAME := untangle.ova
 FULL_NAME := $(FLAVOR)-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST).ova
 
 ## targets
