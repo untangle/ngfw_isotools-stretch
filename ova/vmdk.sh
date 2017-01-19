@@ -15,8 +15,11 @@ SETUP_SCRIPT="chroot-setup.sh"
 # CL args
 REPOSITORY=$1
 DISTRIBUTION=$2
-ORIGINAL_VMDK=$3
-VMDK=$4
+ARCH=$3
+ORIGINAL_VMDK=$4
+VMDK=$5
+shift 5
+EXTRA_PACKAGES=$@
 
 ## main
 QCOW2=${VMDK/.vmdk/.qcow2}
@@ -51,7 +54,7 @@ done
 
 # setup Untangle in chroot
 cp ${CURRENT_DIR}/${SETUP_SCRIPT} ${CHROOT_DIR}/tmp/
-chroot ${CHROOT_DIR} /tmp/${SETUP_SCRIPT} ${REPOSITORY} ${DISTRIBUTION}
+chroot ${CHROOT_DIR} /tmp/${SETUP_SCRIPT} ${REPOSITORY} ${DISTRIBUTION} ${ARCH} ${EXTRA_PACKAGES}
 
 # umount PFS
 for pfs in sys proc dev/pts dev ; do

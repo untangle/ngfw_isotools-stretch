@@ -43,7 +43,6 @@ DEFAULT_PRESEED_EXTRA := $(DEFAULT_PRESEED_FINAL).extra
 CONF_FILE := $(PROFILES_DIR)/default.conf
 CONF_FILE_TEMPLATE := $(CONF_FILE).template
 DOWNLOAD_FILE := $(PROFILES_DIR)/default.downloads
-DOWNLOAD_FILE_TEMPLATE := $(DOWNLOAD_FILE).template
 DI_CORE_PATCH := $(ISOTOOLS_DIR)/d-i_core.patch
 
 all:
@@ -80,7 +79,6 @@ repoint-stable-stamp:
 iso-conf:
 	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'$(REPOSITORY)'|' $(ISOTOOLS_DIR)/d-i.sources.template >| $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 	perl -pe 's|\+ISOTOOLS_DIR\+|'`pwd`/$(ISOTOOLS_DIR)'|g' $(CONF_FILE_TEMPLATE) >| $(CONF_FILE)
-	perl -pe 's|\+KERNELS\+|'$(KERNELS_$(ARCH))'|' $(DOWNLOAD_FILE_TEMPLATE) >| $(DOWNLOAD_FILE)
 
 	cat $(COMMON_PRESEED) $(AUTOPARTITION_PRESEED) $(NETBOOT_PRESEED_EXTRA) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+ARCH\+|'$(ARCH)'|g ; s|\+REPOSITORY\+|'$(REPOSITORY)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g' >| $(NETBOOT_PRESEED_FINAL)
 	cat $(COMMON_PRESEED) $(AUTOPARTITION_PRESEED) $(DEFAULT_PRESEED_EXTRA) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+REPOSITORY\+|'$(REPOSITORY)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g' >| $(DEFAULT_PRESEED_FINAL)
@@ -97,11 +95,11 @@ usb/%-image:
 	$(eval iso_image := $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
 	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG) $(iso_image) $(subst +FLAVOR+,$(patsubst usb/%-image,%,$*),$(USB_IMAGE))
 
-ova-image:
-	make -C $(ISOTOOLS_DIR)/ova image
-ova-push:
-	make -C $(ISOTOOLS_DIR)/ova push
-ova-clean:
+ova/%-image:
+	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$(patsubst ova/%-image,%,$*) image
+ova/%-push:
+	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$(patsubst ova/%-push,%,$*) push
+ova/%-clean:
 	make -C $(ISOTOOLS_DIR)/ova clean
 
 iso/%-push: # pushes the most recent images

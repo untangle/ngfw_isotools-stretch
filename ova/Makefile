@@ -9,6 +9,8 @@ REPOSITORY ?= jessie
 DISTRIBUTION ?= nightly
 # architecture
 ARCH ?= amd64
+# FLAVOR
+FLAVOR ?= untangle
 
 ## constants
 TS := $(shell date --iso-8601=seconds)
@@ -23,7 +25,7 @@ VMDK_NAME := untangle.vmdk
 QCOW2_NAME := untangle.qcow2
 OVF_FILE := Untangle.ovf
 OVA_NAME := Untangle.ova
-FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST).ova
+FULL_NAME := $(FLAVOR)-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST).ova
 
 ## targets
 .PHONY: all clean download-jessie-vmdk vmdk ova push
@@ -31,15 +33,14 @@ FULL_NAME := UNTANGLE-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(H
 all: download-jessie-vmdk vmdk image
 
 clean:
-	rm -fr $(VMDK_REFERENCE_NAME) $(QCOW2_NAME) $(VMDK_NAME) *.ova
+	rm -fr *-stamp $(VMDK_REFERENCE_NAME) $(QCOW2_NAME) $(VMDK_NAME) *.ova
 
-download-jessie-vmdk: $(VMDK_REFERENCE_NAME)
 $(VMDK_REFERENCE_NAME):
 	curl -s -o $@ $(VMDK_REFERENCE_URL)
 
 vmdk: $(VMDK_NAME)
 $(VMDK_NAME): $(VMDK_REFERENCE_NAME)
-	$(OVA_DIR)/vmdk.sh $(REPOSITORY) $(DISTRIBUTION) $< $@
+	$(OVA_DIR)/vmdk.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $< $@ $(shell xargs < ../profiles/$(FLAVOR).packages)
 
 image: $(OVA_NAME)
 $(OVA_NAME): $(OVF_FILE) $(VMDK_NAME)
@@ -47,5 +48,5 @@ $(OVA_NAME): $(OVF_FILE) $(VMDK_NAME)
 	chmod 644 $@
 
 push:
-	scp `ls --sort=time *ova | head -1` $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME)
+	scp $(shell ls --sort=time $(FLAVOR)*ova | head -1) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME)
 	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) all foo foo foo $(REPOSITORY)"
