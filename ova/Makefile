@@ -48,5 +48,5 @@ $(OVA_NAME): $(OVF_FILE) $(VMDK_NAME)
 	chmod 644 $@
 
 push:
-	scp $(shell ls --sort=time $(FLAVOR)*ova | head -1) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME)
+	scp $(shell ls --sort=time *ova | head -1) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME)
 	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) all foo foo foo $(REPOSITORY)"
