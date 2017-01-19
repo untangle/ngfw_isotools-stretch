@@ -6,6 +6,30 @@ set -x
 # constants
 CURRENT_DIR=$(dirname $0)
 
+# functions
+umountPFS() {
+  for pfs in sys proc dev/pts dev ; do
+    umount -l ${CHROOT_DIR}/$pfs || true
+  done
+  umount -l ${CHROOT_DIR}/dev || true
+}
+
+umountTmpDir() {
+  umount $MNT_DIR || true
+  losetup -d $LOOP_DEVICE || true
+}
+
+removeTmpDirs() {
+  rm -fr $CHROOT_DIR $MNT_DIR
+  rm -fr ${CHROOT_DIR} ${MNT_DIR}
+}
+
+cleanup() {
+  umountPFS
+  umountTmpDir
+  removeTmpDirs
+}
+
 # CL args
 NAME=$1
 REPOSITORY=$2
@@ -19,6 +43,9 @@ source ${VENDOR_DIR}/image.conf
 CHROOT_DIR=$(mktemp -d /tmp/tmp.${NAME}-chroot.XXXXX)
 MNT_DIR=$(mktemp -d /tmp/tmp.${NAME}-img.XXXXX)
 SECOND_STAGE_SCRIPT="${CURRENT_DIR}/second_stage.sh"
+
+# traps
+trap cleanup EXIT
 
 # we may run via sudo
 export PATH=/sbin:/usr/sbin:${PATH}
@@ -68,11 +95,7 @@ chroot ${CHROOT_DIR} /tmp/$(basename ${SECOND_STAGE_SCRIPT}) $REPOSITORY $DISTRI
 cp ${CHROOT_DIR}/boot/*trx tmp/
 
 # umount PFS
-for pfs in sys proc dev/pts dev ; do
-  umount -l ${CHROOT_DIR}/$pfs || true
-done
-
-umount -l ${CHROOT_DIR}/dev || true
+umountPFS
 
 # create disk image
 dd if=/dev/zero of=$IMAGE bs=10M count=170
@@ -94,6 +117,5 @@ mount $LOOP_DEVICE $MNT_DIR
 rsync -aHz ${CHROOT_DIR}/ ${MNT_DIR}
 
 # umount & cleanup
-umount $MNT_DIR
-losetup -d $LOOP_DEVICE
-rm -fr $CHROOT_DIR $MNT_DIR
+umountTmpDir
+removeTmpDirs
