@@ -58,7 +58,7 @@ apt-get install --yes qemu qemu-user-static binfmt-support debootstrap
 /etc/init.d/binfmt-support restart
 
 # debootstrap onto chroot
-debootstrap --arch=$ARCH --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http://package-server/public/$REPOSITORY
+debootstrap --arch=$ARCH --variant=minbase --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http://package-server/public/$REPOSITORY
 
 # arm static binary in chroot
 case $ARCH in
