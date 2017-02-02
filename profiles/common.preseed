@@ -173,7 +173,7 @@ tasksel tasksel/first multiselect none
 #tasksel tasksel/desktop select gnome
 
 # Individual additional packages to install
-d-i pkgsel/include string untangle-gateway
+# d-i pkgsel/include string untangle-gateway
 # Whether to upgrade packages after debootstrap.
 # Allowed values: none, safe-upgrade, full-upgrade
 #d-i pkgsel/upgrade select none
