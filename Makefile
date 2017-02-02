@@ -66,10 +66,10 @@ unpatch-installer:
 	fi
 
 debian-installer: repoint-stable debian-installer-stamp
-installer-stamp:
+debian-installer-stamp:
 	perl -pe 's|\+DISTRIBUTION\+|'testing'| ; s|\+REPOSITORY\+|'jessie'|' ./d-i.sources.template >| ./d-i/build/sources.list.udeb.local
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
-	touch debian-installer-stamp
+	touch $@
 
 repoint-stable: repoint-stable-stamp
 repoint-stable-stamp:
