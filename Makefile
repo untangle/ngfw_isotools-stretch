@@ -1,4 +1,4 @@
-PKGS := debiandoc-sgml libbogl-dev glibc-pic libslang2-pic libnewt-pic genext2fs mklibs syslinux-utils isolinux pxelinux grub-efi-amd64-bin xorriso tofrodos module-init-tools bf-utf-source win32-loader librsvg2-bin
+PKGS := bf-utf-source debiandoc-sgml genext2fs glibc-pic grub-common grub-efi-amd64-bin isolinux libbogl-dev libnewt-pic librsvg2-bin libslang2-pic mklibs module-init-tools pxelinux syslinux-utils tofrodos win32-loader xorriso
 
 ISOTOOLS_DIR := $(shell dirname $(MAKEFILE_LIST))
 
@@ -42,7 +42,6 @@ DEFAULT_PRESEED_EXPERT := $(PROFILES_DIR)/expert.preseed
 DEFAULT_PRESEED_EXTRA := $(DEFAULT_PRESEED_FINAL).extra
 CONF_FILE := $(PROFILES_DIR)/default.conf
 CONF_FILE_TEMPLATE := $(CONF_FILE).template
-DOWNLOAD_FILE := $(PROFILES_DIR)/default.downloads
 DI_CORE_PATCH := $(ISOTOOLS_DIR)/d-i_core.patch
 
 all:
@@ -88,7 +87,7 @@ iso-conf:
 iso/%-image: debian-installer iso-conf
 	mkdir -p $(ISO_DIR)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --profiles $(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --auto-profiles default,untangle,$(patsubst iso/%-image,%,$*) --profiles untangle,$(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro
 	mv $(ISO_DIR)/debian-$(shell cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(subst +FLAVOR+,$(patsubst iso/%-image,%,$*),$(ISO_IMAGE))
 
 usb/%-image:
