@@ -51,7 +51,7 @@ installer-clean:
 	cd $(ISOTOOLS_DIR)/d-i ; fakeroot debian/rules clean
 	rm -fr $(ISOTOOLS_DIR)/debian-installer* $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 
-iso-clean:
+iso-clean: installer-clean
 	rm -fr $(ISOTOOLS_DIR)/tmp $(ISO_DIR) $(ISOTOOLS_DIR)/debian-installer*
 
 patch-installer: patch-installer-stamp
