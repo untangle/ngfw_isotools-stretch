@@ -37,6 +37,7 @@ DISTRIBUTION=$3
 ROOTFS=$4
 IMAGE=$5
 
+# include vendor-specific configuration
 VENDOR_DIR=${CURRENT_DIR}/../${NAME}
 source ${VENDOR_DIR}/image.conf
 
@@ -108,7 +109,7 @@ p
 w
 EOF
 
-# mount it
+# format and mount it
 losetup $LOOP_DEVICE  $IMAGE -o $(( 512 * 2048 ))
 mkfs.ext4 $LOOP_DEVICE
 mount $LOOP_DEVICE $MNT_DIR
