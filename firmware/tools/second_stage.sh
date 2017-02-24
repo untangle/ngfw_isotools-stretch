@@ -16,10 +16,8 @@ echo exit 101 > /usr/sbin/policy-rc.d
 chmod +x /usr/sbin/policy-rc.d
 
 # use internal Untangle repository
-# FIXME: switch to only nightly later on
 rm -f /etc/apt/sources.list $TMP_SOURCES_LIST
 echo deb http://10.112.11.105/public/$REPOSITORY $DISTRIBUTION main non-free >> $TMP_SOURCES_LIST
-echo deb http://10.112.11.105/public/$REPOSITORY ${DISTRIBUTION/nightly/chaos} main non-free >> $TMP_SOURCES_LIST
 apt-get update
 
 # for troubleshooting

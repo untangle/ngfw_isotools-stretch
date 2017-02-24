@@ -1,7 +1,7 @@
 #! /bin/bash
 
-set -e
-set -x
+# set -e
+# set -x
 
 # constants
 TMP_SOURCES_LIST="/etc/apt/sources.list.d/tmp.list"
@@ -21,8 +21,6 @@ chmod +x /usr/sbin/policy-rc.d
 # use internal Untangle repository
 rm -f /etc/apt/sources.list
 echo deb http://10.112.11.105/public/$REPOSITORY $DISTRIBUTION main non-free > $TMP_SOURCES_LIST
-# FIXME
-echo deb http://10.112.11.105/public/$REPOSITORY ${DISTRIBUTION/nightly/chaos} main non-free >> $TMP_SOURCES_LIST
 
 apt-get update
 apt-get install $APT_OPTIONS dpkg-dev untangle-debconf-manager
