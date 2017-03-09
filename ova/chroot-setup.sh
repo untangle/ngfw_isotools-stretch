@@ -44,7 +44,7 @@ DEBIAN_FRONTEND=noninteractive DEBCONF_DEBUG=developer apt-get dist-upgrade $APT
 DEBIAN_FRONTEND=noninteractive apt-get install $APT_OPTIONS open-vm-tools open-vm-tools-dkms
 
 # install top-level Untangle package
-DEBIAN_FRONTEND=noninteractive apt-get install $APT_OPTIONS untangle-gateway
+DEBIAN_FRONTEND=noninteractive apt-get install $APT_OPTIONS untangle-gateway untangle-extra-utils
 rm -f /usr/share/untangle/settings/untangle-vm/network.js /usr/share/untangle/conf/uid
 
 # install extra packages if any
