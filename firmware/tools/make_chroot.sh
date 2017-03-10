@@ -98,8 +98,12 @@ cp ${CHROOT_DIR}/boot/*trx tmp/
 # umount PFS
 umountPFS
 
+# compute size
+BLOCK_SIZE="10M"
+BLOCK_COUNT=$(du -s --block-size=$BLOCK_SIZE $CHROOT_DIR | cut -f 1)
+
 # create disk image
-dd if=/dev/zero of=$IMAGE bs=10M count=170
+dd if=/dev/zero of=$IMAGE bs=$((${BLOCK_SIZE}+2)) count=$BLOCK_COUNT
 fdisk $IMAGE <<EOF
 n
 p
