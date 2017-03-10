@@ -14,7 +14,8 @@ umountPFS() {
   umount -l ${CHROOT_DIR}/dev || true
 }
 
-umountTmpDir() {
+umountDirs() {
+  umount $CHROOT_DIR || true
   umount $MNT_DIR || true
   losetup -d $LOOP_DEVICE || true
 }
@@ -26,7 +27,7 @@ removeTmpDirs() {
 
 cleanup() {
   umountPFS
-  umountTmpDir
+  umountDirs
   removeTmpDirs
 }
 
@@ -57,6 +58,9 @@ export LC_ALL=C
 # arm emulation via binfmt
 apt-get install --yes qemu qemu-user-static binfmt-support debootstrap
 /etc/init.d/binfmt-support restart
+
+# create tmpfs
+mount -t tmpfs -o size=1500M tmpfs ${CHROOT_DIR}
 
 # debootstrap onto chroot
 debootstrap --arch=$ARCH --variant=minbase --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http://package-server/public/$REPOSITORY
@@ -122,5 +126,5 @@ mount $LOOP_DEVICE $MNT_DIR
 rsync -aH ${CHROOT_DIR}/ ${MNT_DIR}
 
 # umount & cleanup
-umountTmpDir
+umountDirs
 removeTmpDirs
