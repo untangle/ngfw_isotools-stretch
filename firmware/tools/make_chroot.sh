@@ -102,8 +102,8 @@ umountPFS
 BLOCK_SIZE="10M"
 BLOCK_COUNT=$(du -s --block-size=$BLOCK_SIZE $CHROOT_DIR | cut -f 1)
 
-# create disk image
-dd if=/dev/zero of=$IMAGE bs=$((${BLOCK_SIZE}+2)) count=$BLOCK_COUNT
+# create disk image, adding 10M
+dd if=/dev/zero of=$IMAGE bs=$BLOCK_SIZE count=$(($BLOCK_COUNT+1))
 fdisk $IMAGE <<EOF
 n
 p
