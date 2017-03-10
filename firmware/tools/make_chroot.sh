@@ -60,7 +60,7 @@ apt-get install --yes qemu qemu-user-static binfmt-support debootstrap
 /etc/init.d/binfmt-support restart
 
 # create tmpfs
-mount -t tmpfs -o size=1500M tmpfs ${CHROOT_DIR}
+mount -t tmpfs -o size=2000M tmpfs ${CHROOT_DIR}
 
 # debootstrap onto chroot
 debootstrap --arch=$ARCH --variant=minbase --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http://package-server/public/$REPOSITORY
