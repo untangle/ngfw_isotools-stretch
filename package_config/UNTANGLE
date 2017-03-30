@@ -1,3 +1,4 @@
 PACKAGES install
 linux-image-3.16.0-4-untangle-amd64
-untangle-extra-utils
+untangle-linux-config
+
