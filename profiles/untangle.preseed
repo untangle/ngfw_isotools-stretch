@@ -1,1 +1,1 @@
-d-i pkgsel/include string untangle-gateway
+d-i pkgsel/include string untangle-gateway untangle-client-local
