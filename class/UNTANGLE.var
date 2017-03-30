@@ -1,5 +1,7 @@
-release=beat
+untangle_mirror=http://foo:untangle@updates.untangle.com/public/jessie
+untangle_release=beat
+release=jessie
 apt_cdn=http://ftp.us.debian.org
-FAI_DEBOOTSTRAP="jessie $apt_cdn/debian/"
+FAI_DEBOOTSTRAP="$release $apt_cdn/debian/"
 KEYMAP=us-latin1
 CONSOLEFONT=

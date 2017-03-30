@@ -1,4 +1,6 @@
-deb http://foo:untangle@updates.untangle.com/public/jessie {release} main non-free
+#deb {untangle_mirror} {untangle_release} main non-free
+deb http://foo:untangle@updates.untangle.com/public/jessie beat main non-free
+
 # FIXME
-deb {cdn}/debian jessie main
-deb {cdn}/debian jessie-backports main
+deb {cdn}/debian {release} main
+deb {cdn}/debian {release}-backports main
