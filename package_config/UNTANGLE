@@ -1,11 +1,3 @@
-PACKAGES install UNTANGLE-KERNEL
+PACKAGES install
 linux-image-3.16.0-4-untangle-amd64
-
-PACKAGES install UNTANGLE-USERLAND
 untangle-extra-utils
-
-PACKAGES install GRUB_PC
-grub-pc grub-legacy- lilo-
-
-PACKAGES install LVM
-lvm2
