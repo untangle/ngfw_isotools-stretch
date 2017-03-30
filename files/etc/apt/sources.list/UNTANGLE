@@ -1,1 +1,4 @@
 deb http://foo:untangle@updates.untangle.com/public/jessie {release} main non-free
+# FIXME
+deb {cdn}/debian jessie main
+deb {cdn}/debian jessie-backports main
