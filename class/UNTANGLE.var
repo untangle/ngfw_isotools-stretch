@@ -1,5 +1,5 @@
 release=beat
 apt_cdn=http://updates.untangle.com/public/jessie
-FAI_DEBOOTSTRAP="$release $apt_cdn/debian/"
+FAI_DEBOOTSTRAP="jessie $apt_cdn/debian/"
 KEYMAP=us-latin1
 CONSOLEFONT=
