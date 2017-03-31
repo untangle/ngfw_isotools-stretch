@@ -1,5 +1,6 @@
 #deb {untangle_mirror} {untangle_release} main non-free
-deb http://foo:untangle@updates.untangle.com/public/jessie beat main non-free
+# deb http://foo:untangle@updates.untangle.com/public/jessie beat main non-free
+deb http://localhost:8080/public/jessie chaos main non-free
 
 # FIXME
 deb {cdn}/debian {release} main
