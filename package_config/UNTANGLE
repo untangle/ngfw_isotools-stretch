@@ -1,4 +1,5 @@
 PACKAGES install
 linux-image-3.16.0-4-untangle-amd64
-
-
+untangle-gateway
+untangle-client-local
+untangle-kiosk
