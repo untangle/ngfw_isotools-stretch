@@ -1,4 +1,4 @@
 #! /bin/sh
 
 update-rc.d -f untangle-vm disable
-mv /etc/network/if-up.d/netd /root/etc_network_if-up.d_netd
+#mv /etc/network/if-up.d/netd /root/etc_network_if-up.d_netd
