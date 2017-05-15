@@ -56,7 +56,8 @@ fi
 touch /usr/share/untangle/conf/ova-flag
 
 # remove duplicate keys
-DEBIAN_FRONTEND=noninteractive apt-get install $APT_OPTIONS untangle-default-site
+rm /etc/ssh/ssh_host_*key*
+DEBIAN_FRONTEND=noninteractive dpkg-reconfigure openssh-server
 
 # fix / and swap
 ROOT_UUID=$(blkid -o value /dev/nbd0p1 | head -1)
@@ -64,8 +65,6 @@ SWAP_UUID=$(blkid -o value /dev/nbd0p2 | head -1)
 perl -i -pe 's/(UUID=[^\s]+|\/dev\/nbd0p1)/UUID='${ROOT_UUID}'/' /boot/grub/grub.cfg
 perl -i -pe 's|UUID=[^\s]+\s+/|UUID='${ROOT_UUID}'\t/|' /etc/fstab
 perl -i -pe 's|UUID=[^\s]+\s+none\s+swap|UUID='${SWAP_UUID}'\tnone\tswap|' /etc/fstab
-
-# FIXME: remove keys, history, etc
 
 # cleanup
 apt-get clean
