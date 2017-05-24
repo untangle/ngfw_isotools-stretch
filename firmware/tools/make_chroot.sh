@@ -97,7 +97,7 @@ cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
 chroot ${CHROOT_DIR} /tmp/$(basename ${SECOND_STAGE_SCRIPT}) $REPOSITORY $DISTRIBUTION $KERNEL_VERSION $NAME
 
 # grab TRX
-cp ${CHROOT_DIR}/boot/*trx tmp/
+cp ${CHROOT_DIR}/boot/vmlinu*trx tmp/
 
 # umount PFS
 umountPFS
