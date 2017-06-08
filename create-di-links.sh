@@ -14,5 +14,5 @@ for d in $STABLE_DISTRIBUTION jessie jessie-updates ; do
 done
 
 cd $DISTRIBUTION_DIR/$DISTRIBUTION
-sudo rm -f updates
+#sudo rm -f updates
 #sudo ln -sf ./ ./updates
