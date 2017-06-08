@@ -10,7 +10,7 @@ FIRMWARE_TOOLS_DIR := $(CWD)/../tools
 # repository
 REPOSITORY ?= jessie
 # distribution to draw packages from
-DISTRIBUTION ?= nightly
+DISTRIBUTION ?= current
 
 # constants
 TS := $(shell date +"%Y-%m-%dT%H%M%S")
@@ -28,7 +28,7 @@ KERNEL_FILE := $(wildcard $(BIN_DIR)/?Image-untangle)
 VMLINUZ_FILE := $(TMP_DIR)/vmlinuz.lzma
 IMAGE_FILE := $(TMP_DIR)/image.bin
 FIRMWARE_IMG := $(TMP_DIR)/*.trx
-FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_nightly_$(TS)_$(HOST)_$(NAME)
+FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_current_$(TS)_$(HOST)_$(NAME)
 ROOTFS_IMAGE := /tmp/$(NAME).rootfs
 
 .PHONY: all clean image rootfs push

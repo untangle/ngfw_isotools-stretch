@@ -152,7 +152,7 @@ d-i apt-setup/services-select multiselect
 
 # Additional repositories, local[0-9] available
 #d-i apt-setup/local0/repository string \
-#         http://mephisto/public/+REPOSITORY+ nightly main premium upstream
+#         http://mephisto/public/+REPOSITORY+ current main premium upstream
 #d-i apt-setup/local0/comment string local server
 # Enable deb-src lines
 #d-i apt-setup/local0/source boolean true
