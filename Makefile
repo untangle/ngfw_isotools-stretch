@@ -88,7 +88,7 @@ iso-conf:
 iso/%-image: debian-installer iso-conf
 	mkdir -p $(ISO_DIR)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --auto-profiles default,untangle,$(patsubst iso/%-image,%,$*) --profiles untangle,$(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(DISTRIBUTION) -g --require-optional-packages --mirror-tools reprepro
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --auto-profiles default,untangle,$(patsubst iso/%-image,%,$*) --profiles untangle,$(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(DISTRIBUTION) -g --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION)
 	mv $(ISO_DIR)/debian-$(shell cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(subst +FLAVOR+,$(patsubst iso/%-image,%,$*),$(ISO_IMAGE))
 
 usb/%-image:
