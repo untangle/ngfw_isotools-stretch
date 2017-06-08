@@ -6,7 +6,7 @@ PKGTOOLS_DIR := $(OVA_DIR)/../../ngfw_pkgtools
 # repository
 REPOSITORY ?= jessie
 # distribution to draw packages from
-DISTRIBUTION ?= nightly
+DISTRIBUTION ?= current
 # architecture
 ARCH ?= amd64
 # FLAVOR
