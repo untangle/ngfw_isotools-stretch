@@ -67,7 +67,7 @@ unpatch-installer:
 
 debian-installer: repoint-stable debian-installer-stamp
 debian-installer-stamp:
-	perl -pe 's|\+DISTRIBUTION\+|'testing'| ; s|\+REPOSITORY\+|'jessie'|' ./d-i.sources.template >| ./d-i/build/sources.list.udeb.local
+	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'jessie'|' ./d-i.sources.template >| ./d-i/build/sources.list.udeb.local
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
 	touch $@
 
