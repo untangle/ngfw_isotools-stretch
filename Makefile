@@ -52,7 +52,7 @@ installer-clean:
 #	rm -fr $(ISOTOOLS_DIR)/debian-installer* $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 
 iso-clean: installer-clean
-	rm -fr $(ISOTOOLS_DIR)/tmp $(ISO_DIR)
+	rm -fr $(ISOTOOLS_DIR)/tmp
 
 patch-installer: patch-installer-stamp
 patch-installer-stamp:
