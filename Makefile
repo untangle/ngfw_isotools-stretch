@@ -18,7 +18,7 @@ NETBOOT_HOST := netboot-server
 ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 KERNELS_i386 := "linux-image-3.16.0-4-untangle-686-pae"
 KERNELS_amd64 := "linux-image-3.16.0-4-untangle-amd64"
-ISO_DIR := /tmp/untangle-images
+ISO_DIR := $(mktemp -d /tmp/untangle-images-XXXXXXXX)
 VERSION = $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 ISO_IMAGE := $(ISO_DIR)/+FLAVOR+-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(shell date --iso-8601=seconds)_$(shell hostname -s).iso
 USB_IMAGE := $(subst .iso,.img,$(ISO_IMAGE))
@@ -51,7 +51,7 @@ installer-clean:
 	true
 
 iso-clean: installer-clean
-	rm -fr $(ISOTOOLS_DIR)/tmp
+	rm -fr $(ISOTOOLS_DIR)/tmp $(ISO_DIR)
 
 patch-installer: patch-installer-stamp
 patch-installer-stamp:
