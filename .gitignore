@@ -1,2 +1,4 @@
 resources
 tmp/
+debian-installer*
+d-i/build/sources.list.udeb.local
