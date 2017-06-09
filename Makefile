@@ -49,7 +49,7 @@ all:
 
 installer-clean:
 	cd $(ISOTOOLS_DIR)/d-i ; fakeroot debian/rules clean
-	rm -fr $(ISOTOOLS_DIR)/debian-installer* $(ISOTOOLS_DIR)/repoint-stable-stamp $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
+	rm -fr $(ISOTOOLS_DIR)/debian-installer* $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 
 iso-clean: installer-clean
 	rm -fr $(ISOTOOLS_DIR)/tmp $(ISO_DIR) $(ISOTOOLS_DIR)/debian-installer*
@@ -65,15 +65,10 @@ unpatch-installer:
 	  rm -f patch-installer-stamp ; \
 	fi
 
-debian-installer: repoint-stable debian-installer-stamp
-debian-installer-stamp:
-	perl -pe 's|\+DISTRIBUTION\+|'testing'| ; s|\+REPOSITORY\+|'jessie'|' ./d-i.sources.template >| ./d-i/build/sources.list.udeb.local
+debian-installer: debian-installer-stamp
+debian-installer-stamp: 
+	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'jessie'|' ./d-i.sources.template >| ./d-i/build/sources.list.udeb.local
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
-	touch $@
-
-repoint-stable: repoint-stable-stamp
-repoint-stable-stamp:
-	$(ISOTOOLS_DIR)/package-server-proxy.sh ./create-di-links.sh $(REPOSITORY) $(DISTRIBUTION)
 	touch $@
 
 iso-conf:
@@ -88,7 +83,7 @@ iso-conf:
 iso/%-image: debian-installer iso-conf
 	mkdir -p $(ISO_DIR)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --auto-profiles default,untangle,$(patsubst iso/%-image,%,$*) --profiles untangle,$(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --auto-profiles default,untangle,$(patsubst iso/%-image,%,$*) --profiles untangle,$(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(DISTRIBUTION) -g --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION)
 	mv $(ISO_DIR)/debian-$(shell cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(subst +FLAVOR+,$(patsubst iso/%-image,%,$*),$(ISO_IMAGE))
 
 usb/%-image:
