@@ -55,9 +55,10 @@ export PATH=/sbin:/usr/sbin:${PATH}
 # sane default locale
 export LC_ALL=C
 
-# arm emulation via binfmt
-apt-get install --yes qemu qemu-user-static binfmt-support debootstrap
-/etc/init.d/binfmt-support restart
+# Now done via puppet
+# # arm emulation via binfmt
+# apt-get install --yes qemu qemu-user-static binfmt-support debootstrap
+# /etc/init.d/binfmt-support restart
 
 # create tmpfs
 mount -t tmpfs -o size=2000M tmpfs ${CHROOT_DIR}
