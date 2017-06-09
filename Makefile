@@ -64,7 +64,7 @@ unpatch-installer:
 	  rm -f patch-installer-stamp ; \
 	fi
 
-debian-installer: repoint-stable debian-installer-stamp
+debian-installer: debian-installer-stamp
 debian-installer-stamp: 
 	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'jessie'|' ./d-i.sources.template >| ./d-i/build/sources.list.udeb.local
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
@@ -84,7 +84,7 @@ iso-conf:
 	cat $(COMMON_PRESEED) $(NETBOOT_PRESEED_EXTRA) $(UNTANGLE_PRESEED) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+ARCH\+|'$(ARCH)'|g ; s|\+REPOSITORY\+|'$(REPOSITORY)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g ; s/^(d-i preseed\/early_command string anna-install.*)/#$1/' >| $(NETBOOT_PRESEED_EXPERT)
 	cat $(COMMON_PRESEED) $(DEFAULT_PRESEED_EXTRA) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g' >| $(DEFAULT_PRESEED_EXPERT)
 
-iso/%-image: debian-installer iso-conf
+iso/%-image: debian-installer iso-conf repoint-stable
 	mkdir -p $(ISO_DIR)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
 	export CDNAME=$(patsubst iso/%-image,%,$*) ; \
