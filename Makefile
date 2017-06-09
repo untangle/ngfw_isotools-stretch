@@ -49,8 +49,6 @@ all:
 
 installer-clean:
 	true
-#	cd $(ISOTOOLS_DIR)/d-i ; fakeroot debian/rules clean
-#	rm -fr $(ISOTOOLS_DIR)/debian-installer* $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 
 iso-clean: installer-clean
 	rm -fr $(ISOTOOLS_DIR)/tmp
@@ -72,6 +70,11 @@ debian-installer-stamp:
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
 	touch $@
 
+repoint-stable: repoint-stable-stamp
+repoint-stable-stamp:
+	$(ISOTOOLS_DIR)/package-server-proxy.sh ./create-di-links.sh $(REPOSITORY) $(DISTRIBUTION)
+	touch $@
+
 iso-conf:
 	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'$(REPOSITORY)'|' $(ISOTOOLS_DIR)/d-i.sources.template >| $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 	perl -pe 's|\+ISOTOOLS_DIR\+|'`pwd`/$(ISOTOOLS_DIR)'|g' $(CONF_FILE_TEMPLATE) >| $(CONF_FILE)
@@ -81,12 +84,11 @@ iso-conf:
 	cat $(COMMON_PRESEED) $(NETBOOT_PRESEED_EXTRA) $(UNTANGLE_PRESEED) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+ARCH\+|'$(ARCH)'|g ; s|\+REPOSITORY\+|'$(REPOSITORY)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g ; s/^(d-i preseed\/early_command string anna-install.*)/#$1/' >| $(NETBOOT_PRESEED_EXPERT)
 	cat $(COMMON_PRESEED) $(DEFAULT_PRESEED_EXTRA) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g' >| $(DEFAULT_PRESEED_EXPERT)
 
-iso/%-image: debian-installer iso-conf
+iso/%-image: debian-installer iso-conf repoint-stable
 	mkdir -p $(ISO_DIR)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
 	export CDNAME=$(patsubst iso/%-image,%,$*) ; \
-	export CODENAME=$(DISTRIBUTION) ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --auto-profiles default,untangle,$(patsubst iso/%-image,%,$*) --profiles untangle,$(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(DISTRIBUTION) -g --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) ; \
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --auto-profiles default,untangle,$(patsubst iso/%-image,%,$*) --profiles untangle,$(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) ; \
 	mv $(ISO_DIR)/$(patsubst iso/%-image,%,$*)-$(shell cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(subst +FLAVOR+,$(patsubst iso/%-image,%,$*),$(ISO_IMAGE))
 
 usb/%-image:
