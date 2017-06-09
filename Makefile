@@ -48,7 +48,7 @@ DI_CORE_PATCH := $(ISOTOOLS_DIR)/d-i_core.patch
 all:
 
 installer-clean:
-	cd $(ISOTOOLS_DIR)/d-i ; fakeroot debian/rules clean
+#	cd $(ISOTOOLS_DIR)/d-i ; fakeroot debian/rules clean
 #	rm -fr $(ISOTOOLS_DIR)/debian-installer* $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 
 iso-clean: installer-clean
