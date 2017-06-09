@@ -49,8 +49,6 @@ all:
 
 installer-clean:
 	true
-#	cd $(ISOTOOLS_DIR)/d-i ; fakeroot debian/rules clean
-#	rm -fr $(ISOTOOLS_DIR)/debian-installer* $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 
 iso-clean: installer-clean
 	rm -fr $(ISOTOOLS_DIR)/tmp
@@ -66,10 +64,15 @@ unpatch-installer:
 	  rm -f patch-installer-stamp ; \
 	fi
 
-debian-installer: debian-installer-stamp
+debian-installer: repoint-stable debian-installer-stamp
 debian-installer-stamp: 
 	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'jessie'|' ./d-i.sources.template >| ./d-i/build/sources.list.udeb.local
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
+	touch $@
+
+repoint-stable: repoint-stable-stamp
+repoint-stable-stamp:
+	$(ISOTOOLS_DIR)/package-server-proxy.sh ./create-di-links.sh $(REPOSITORY) $(DISTRIBUTION)
 	touch $@
 
 iso-conf:
