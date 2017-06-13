@@ -118,7 +118,7 @@ export MIRROR=/srv/mirror/debian
 export TDIR=/srv/mirror/tmp
 
 # Path where the images will be written
-export OUT=/tmp/untangle-images
+#export OUT=/tmp/untangle-images
 
 # Where we keep the temporary apt stuff.
 # This cannot reside on an NFS mount.

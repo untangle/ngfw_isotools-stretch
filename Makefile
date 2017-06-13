@@ -18,9 +18,8 @@ NETBOOT_HOST := netboot-server
 ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 KERNELS_i386 := "linux-image-3.16.0-4-untangle-686-pae"
 KERNELS_amd64 := "linux-image-3.16.0-4-untangle-amd64"
-ISO_DIR := /tmp/untangle-images
 VERSION = $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
-ISO_IMAGE := $(ISO_DIR)/+FLAVOR+-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(shell date --iso-8601=seconds)_$(shell hostname -s).iso
+ISO_IMAGE := +FLAVOR+-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(shell date --iso-8601=seconds)_$(shell hostname -s).iso
 USB_IMAGE := $(subst .iso,.img,$(ISO_IMAGE))
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 MOUNT_SCRIPT := $(IMAGES_DIR)/mounts.py
@@ -49,9 +48,6 @@ all:
 
 installer-clean:
 	true
-
-iso-clean: installer-clean
-	rm -fr $(ISOTOOLS_DIR)/tmp $(ISO_DIR)
 
 patch-installer: patch-installer-stamp
 patch-installer-stamp:
@@ -83,15 +79,25 @@ iso-conf:
 	cat $(COMMON_PRESEED) $(DEFAULT_PRESEED_EXTRA) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g' >| $(DEFAULT_PRESEED_EXPERT)
 
 iso/%-image: debian-installer iso-conf repoint-stable
-	mkdir -p $(ISO_DIR)
+	$(eval flavor := $(patsubst iso/%-image,%,$*))
+	$(eval iso_dir := /tmp/untangle-images-$(flavor))
+	mkdir -p $(iso_dir)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
-	export CDNAME=$(patsubst iso/%-image,%,$*) ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --auto-profiles default,untangle,$(patsubst iso/%-image,%,$*) --profiles untangle,$(patsubst iso/%-image,%,$*),expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) ; \
-	mv $(ISO_DIR)/$(patsubst iso/%-image,%,$*)-$(shell cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(subst +FLAVOR+,$(patsubst iso/%-image,%,$*),$(ISO_IMAGE))
+	export CDNAME=$(flavor) ; \
+	export OUT=$(iso_dir) ; \
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) ; \
+	mv $(iso_dir)/$(flavor)-$(shell cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
+
+iso/%-clean: installer-clean
+	$(eval flavor := $(patsubst iso/%-clean,%,$*))
+	$(eval iso_dir := /tmp/untangle-images-$(flavor))
+	rm -fr $(ISOTOOLS_DIR)/tmp $(iso_dir)
 
 usb/%-image:
-	$(eval iso_image := $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
-	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG) $(iso_image) $(subst +FLAVOR+,$(patsubst usb/%-image,%,$*),$(USB_IMAGE))
+	$(eval flavor := $(patsubst usb/%-image,%,$*))
+	$(eval iso_dir := /tmp/untangle-images-$(flavor))
+	$(eval iso_image := $(shell ls --sort=time $(iso_dir)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
+	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG) $(iso_image) $(subst +FLAVOR+,$(flavor),$(USB_IMAGE))
 
 ova/%-image:
 	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$(patsubst ova/%-image,%,$*) image
@@ -101,8 +107,10 @@ ova/%-clean:
 	make -C $(ISOTOOLS_DIR)/ova clean
 
 iso/%-push: # pushes the most recent images
-	$(eval iso_image := $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
-	$(eval usb_image := $(shell ls --sort=time $(ISO_DIR)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.img | head -1))
+	$(eval flavor := $(patsubst iso/%-push,%,$*))
+	$(eval iso_dir := /tmp/untangle-images-$(flavor))
+	$(eval iso_image := $(shell ls --sort=time $(iso_dir)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
+	$(eval usb_image := $(shell ls --sort=time $(iso_dir)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.img | head -1))
 	$(eval timestamp := $(shell echo $(iso_image) | perl -pe 's/.*(\d{4}(-\d{2}){2}T(\d{2}:?){3}).*/$$1/'))
 	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) new $(VERSION) $(timestamp) $(ARCH) $(REPOSITORY)"
 	scp $(iso_image) $(usb_image) $(NETBOOT_PRESEED_FINAL) $(NETBOOT_PRESEED_EXPERT) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)
