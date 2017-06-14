@@ -21,10 +21,10 @@ MOUNT_SCRIPT := $(IMAGES_DIR)/mounts.py
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 VMDK_REFERENCE_NAME := jessie.vmdk
 VMDK_REFERENCE_URL := $(NETBOOT_HOST)/$(VMDK_REFERENCE_NAME)
-VMDK_NAME := untangle.vmdk
-QCOW2_NAME := untangle.qcow2
-OVF_FILE := untangle.ovf
-OVA_NAME := untangle.ova
+VMDK_NAME := $(FLAVOR).vmdk
+QCOW2_NAME := $(FLAVOR).qcow2
+OVF_FILE := $(FLAVOR).ovf
+OVA_NAME := $(FLAVOR).ova
 FULL_NAME := $(FLAVOR)-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST).ova
 
 ## targets
@@ -40,7 +40,7 @@ $(VMDK_REFERENCE_NAME):
 
 vmdk: $(VMDK_NAME)
 $(VMDK_NAME): $(VMDK_REFERENCE_NAME)
-	$(OVA_DIR)/vmdk.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $< $@ $(shell xargs < ../profiles/$(FLAVOR).packages)
+	$(OVA_DIR)/vmdk.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $(FLAVOR) $< $@ $(shell xargs < ../profiles/$(FLAVOR).packages)
 
 image: $(OVA_NAME)
 $(OVA_NAME): $(OVF_FILE) $(VMDK_NAME)
