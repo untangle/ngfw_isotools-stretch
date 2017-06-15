@@ -40,7 +40,7 @@ $(VMDK_REFERENCE_NAME):
 
 vmdk: $(VMDK_NAME)
 $(VMDK_NAME): $(VMDK_REFERENCE_NAME)
-	$(OVA_DIR)/vmdk.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $(FLAVOR) $< $@ $(shell xargs < ../profiles/$(FLAVOR).packages)
+	$(OVA_DIR)/vmdk.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $< $@ $(FLAVOR) $(shell xargs < ../profiles/$(FLAVOR).packages)
 
 image: $(OVA_NAME)
 $(OVA_NAME): $(OVF_FILE) $(VMDK_NAME)
