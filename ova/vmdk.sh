@@ -24,6 +24,7 @@ EXTRA_PACKAGES=$@
 QCOW2=${VMDK/.vmdk/.qcow2}
 BASE_TMP_DIR="/tmp/tmp.vmdk-chroot-${FLAVOR}"
 CHROOT_DIR=$(mktemp -d ${BASE_TMP_DIR}.XXXXX)
+TMP_VMDK="/tmp/${FLAVOR}.vmdk"
 
 case $FLAVOR in
   untangle)
@@ -77,5 +78,5 @@ qemu-nbd -d ${NBD_DEV}
 rm -fr ${CHROOT_DIR}
 
 # convert back to an ESX-compatible VMDK
-qemu-img convert -O vmdk -o subformat=streamOptimized ${QCOW2} /tmp/tmp.vmdk
-vboxmanage clonehd /tmp/tmp.vmdk ${VMDK} --format VMDK --variant Stream
+qemu-img convert -O vmdk -o subformat=streamOptimized ${QCOW2} ${TMP_VMDK}
+vboxmanage clonehd ${TMP_VMDK} ${VMDK} --format VMDK --variant Stream
