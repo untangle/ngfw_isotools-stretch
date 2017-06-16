@@ -79,4 +79,5 @@ rm -fr ${CHROOT_DIR}
 
 # convert back to an ESX-compatible VMDK
 qemu-img convert -O vmdk -o subformat=streamOptimized ${QCOW2} ${TMP_VMDK}
+rm -f ${VMDK}
 vboxmanage clonehd ${TMP_VMDK} ${VMDK} --format VMDK --variant Stream
