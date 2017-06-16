@@ -39,10 +39,11 @@ esac
 # sure we do it in the right order, or we'll mess up the host system
 # since those were bind mounts
 if mount | grep -q ${BASE_TMP_DIR} ; then
-  umount ${BASE_TMP_DIR}.*/*/* 2> /dev/null || true
-  umount ${BASE_TMP_DIR}.*/* 2> /dev/null || true
-  umount ${BASE_TMP_DIR}.* 2> /dev/null || true
-  qemu-nbd -d ${NBD_DEV} || true
+  for dir in ${BASE_TMP_DIR}.* ; do
+    for pfs in sys proc dev/pts dev ; do
+      umount ${dir}/$pfs || true
+    done
+  done
 fi
 
 # NBD support

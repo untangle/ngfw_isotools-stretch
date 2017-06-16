@@ -13,6 +13,7 @@ REPOSITORY ?= jessie
 DISTRIBUTION ?= current
 
 # constants
+ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 NETBOOT_HOST := netboot-server
@@ -53,4 +54,4 @@ $(ROOTFS_IMAGE): $(VENDOR_REFERENCE_NAME) $(TMP_DIR)
 push:
 	scp $(ROOTFS_IMAGE) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).rootfs
 	scp $(FIRMWARE_IMG) $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME).trx
-	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) all foo foo foo $(REPOSITORY)"
+	ssh $(NETBOOT_HOST) "sudo python $(MOUNT_SCRIPT) all $(VERSION) foo $(ARCH) $(REPOSITORY)"
