@@ -97,7 +97,7 @@ usb/%-image:
 	$(eval flavor := $(patsubst usb/%-image,%,$*))
 	$(eval iso_dir := /tmp/untangle-images-$(flavor))
 	$(eval iso_image := $(shell ls --sort=time $(iso_dir)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
-	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG) $(iso_image) $(subst +FLAVOR+,$(flavor),$(USB_IMAGE))
+	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG) $(iso_image) $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(USB_IMAGE))
 
 ova/%-image:
 	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$(patsubst ova/%-image,%,$*) image
