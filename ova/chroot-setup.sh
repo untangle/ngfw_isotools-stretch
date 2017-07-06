@@ -35,7 +35,7 @@ perl -i -pe 's/3.16.0-4-amd64/3.16.0-4-amd64+fail/' /var/lib/dpkg/info/linux-ima
 DEBIAN_FRONTEND=noninteractive apt-get remove $APT_OPTIONS linux-image-3.16.0-4-${KERNEL_ARCH}
 extraPackagesFile=/tmp/extra-packages.txt
 if [ -f $extraPackagesFile ] ; then
-  apt-get remove --purge $APT_OPTIONS $(cat $extraPackagesFile)
+  DEBIAN_FRONTEND=noninteractive apt-get remove --purge $APT_OPTIONS $(cat $extraPackagesFile)
   rm $extraPackagesFile
 fi
 
