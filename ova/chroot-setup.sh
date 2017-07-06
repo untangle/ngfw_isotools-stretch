@@ -33,7 +33,7 @@ KERNEL_ARCH="$(dpkg-architecture -qDEB_BUILD_ARCH)"
 [[ $KERNEL_ARCH == "i386" ]] && KERNEL_ARCH="686"
 perl -i -pe 's/3.16.0-4-amd64/3.16.0-4-amd64+fail/' /var/lib/dpkg/info/linux-image-3.16.0-4-amd64.prerm
 DEBIAN_FRONTEND=noninteractive apt-get remove $APT_OPTIONS linux-image-3.16.0-4-${KERNEL_ARCH}
-extraPackagesFile=/tmp/extra-packages-${DISTRIBUTION}.txt
+extraPackagesFile=/tmp/extra-packages.txt
 if [ -f $extraPackagesFile ] ; then
   apt-get remove --purge $APT_OPTIONS $(cat $extraPackagesFile)
   rm $extraPackagesFile
