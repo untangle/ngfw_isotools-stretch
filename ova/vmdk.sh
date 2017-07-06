@@ -66,6 +66,10 @@ done
 
 # setup Untangle in chroot
 cp ${CURRENT_DIR}/${SETUP_SCRIPT} ${CHROOT_DIR}/tmp/
+extraPackagesFile=${CURRENT_DIR}/extra-packages-${DISTRIBUTION}.txt
+if [ -f $extraPackagesFile ] ; then
+  cp $extraPackagesFile ${CHROOT_DIR}/tmp/
+fi
 chroot ${CHROOT_DIR} /tmp/${SETUP_SCRIPT} ${REPOSITORY} ${DISTRIBUTION} ${ARCH} ${EXTRA_PACKAGES}
 
 # umount PFS
