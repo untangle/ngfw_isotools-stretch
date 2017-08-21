@@ -27,6 +27,9 @@ DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --f
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes untangle-hardware-${NAME}
 
 # install top-level Untangle package
+# re-run apt-get update once, as it's cheap and may avoid problems in
+# case current's content changed since the beginning of this script
+apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install --allow-unauthenticated --yes --force-yes -o DPkg::Options::=--force-confnew --fix-broken untangle-gateway
 rm -f /usr/share/untangle/settings/untangle-vm/network.js
 
