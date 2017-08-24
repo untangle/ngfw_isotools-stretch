@@ -1,0 +1,5 @@
+#! /bin/sh
+
+rm $target/etc/apt/sources.list
+rm $target/etc/apt/sources.list.d/backports.list
+$ROOTCMD apt-get update
