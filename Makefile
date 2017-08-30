@@ -106,6 +106,13 @@ ova/%-push:
 ova/%-clean:
 	make -C $(ISOTOOLS_DIR)/ova clean
 
+cloud/%-image:
+	make -C $(ISOTOOLS_DIR)/cloud/$(patsubst cloud/%-image,%,$*) image
+cloud/%-push:
+	make -C $(ISOTOOLS_DIR)/cloud/$(patsubst cloud/%-image,%,$*) push
+cloud/%-clean:
+	make -C $(ISOTOOLS_DIR)/cloud/$(patsubst cloud/%-clean,%,$*) clean
+
 iso/%-push: # pushes the most recent images
 	$(eval flavor := $(patsubst iso/%-push,%,$*))
 	$(eval iso_dir := /tmp/untangle-images-$(flavor))
@@ -122,7 +129,7 @@ iso/%-push: # pushes the most recent images
 
 # the next 4 rules are generic ones meant for firmware images; they
 # take something like "buffalo/wzr1900dhp-image" and make it into
-# "make -C buffalo-wzr1900dhp image"
+# "make -C firmware/buffalo-wzr1900dhp image"
 
 %-image:
 	make -C $(ISOTOOLS_DIR)/firmware/$(subst /,-,$*) image
