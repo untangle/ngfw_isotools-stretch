@@ -107,11 +107,11 @@ ova/%-clean:
 	make -C $(ISOTOOLS_DIR)/ova clean
 
 cloud/%-image:
-	make -C $(ISOTOOLS_DIR)/cloud/$(patsubst cloud/%-image,%,$*) image
+	make -C $(ISOTOOLS_DIR)/cloud $(patsubst cloud/%-image,%,$*)-image
 cloud/%-push:
-	make -C $(ISOTOOLS_DIR)/cloud/$(patsubst cloud/%-image,%,$*) push
+	make -C $(ISOTOOLS_DIR)/cloud $(patsubst cloud/%-image,%,$*)-push
 cloud/%-clean:
-	make -C $(ISOTOOLS_DIR)/cloud/$(patsubst cloud/%-clean,%,$*) clean
+	make -C $(ISOTOOLS_DIR)/cloud clean
 
 iso/%-push: # pushes the most recent images
 	$(eval flavor := $(patsubst iso/%-push,%,$*))

@@ -33,10 +33,10 @@ $(TMP_DIR):
 	mkdir -p $@
 
 # FIXME: extract AMI ID once done
-image: $(TMP_DIR)
+aws-image: $(TMP_DIR)
 	fai-diskimage --hostname untangle-image --size 3G --class DEBIAN,JESSIE,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	bash volume-to-ami.sh $(EBS_ID)
 
 # FIXME: share/make public ?
-push:
+aws-push:
