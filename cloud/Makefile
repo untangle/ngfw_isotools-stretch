@@ -15,12 +15,15 @@ TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 IMAGE_FILE := $(TMP_DIR)/image.bin
-TMP_DIR := $(CWD)/tmp
-TMP_IMAGE := $(TMP_DIR)/image.raw
+TMP_DIR := $(shell mktemp -d $(CWD)/tmp-aws-XXXX)
+AMI_LOG := $(shell mktemp $(TMP_DIR)/ami-XXXX.log)
+TMP_IMAGE := $(shell mktemp $(TMP_DIR)/ami-XXXX.raw)
+NETBOOT_HOST := netboot-server
+IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 # FIXME: find device dynamically, and then derive its ID
 EBS_DEVICE := /dev/xvdf
 EBS_ID := vol-06da60b13f650af2a
-FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_current_$(TS)_$(HOST)_$(NAME)
+FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_current_$(TS)_$(HOST)_$(NAME).ami.txt
 
 .PHONY: all clean image push
 
@@ -29,14 +32,12 @@ all: image
 clean:
 	rm -fr $(TMP_DIR)
 
-$(TMP_DIR):
-	mkdir -p $@
-
 # FIXME: extract AMI ID once done
-aws-image: $(TMP_DIR)
+aws-image:
 	fai-diskimage --hostname untangle-image --size 3G --class DEBIAN,JESSIE,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
-	bash volume-to-ami.sh $(EBS_ID)
+	bash volume-to-ami.sh $(EBS_ID) | tee $(AMI_LOG)
 
 # FIXME: share/make public ?
 aws-push:
+	awk '/"ImageId":/ { gsub(/"/,"",$2); print $2 }' $(AMI_LOG) | ssh $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME) "cat > $(FULL_NAME)"
