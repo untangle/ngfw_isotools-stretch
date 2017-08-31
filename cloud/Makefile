@@ -8,15 +8,17 @@ PKGTOOLS_DIR := $(CWD)/../../ngfw_pkgtools
 REPOSITORY ?= jessie
 # distribution to draw packages from
 DISTRIBUTION ?= current
+# flavor
+FLAVOR ?= untangle
 
 # constants
 ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
-TMP_DIR := $(shell mktemp -d $(CWD)/tmp-aws-XXXX)
-AMI_LOG := $(shell mktemp $(TMP_DIR)/ami-XXXX.log)
-TMP_IMAGE := $(shell mktemp $(TMP_DIR)/ami-XXXX.raw)
+TMP_DIR := $(CWD)/tmp-$(FLAVOR)
+AMI_LOG := $(TMP_DIR)/ami.log
+TMP_IMAGE := $(TMP_DIR)/ami.raw
 NETBOOT_HOST := $(shell dig +short @10.112.0.1 netboot-server.untangle.int)
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 # FIXME: find device dynamically, and then derive its ID
@@ -29,16 +31,17 @@ FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_current_$(TS)_$(HOST)_$(N
 all: image
 
 clean:
+	rm -fr $(TMP_DIR)
 
-#	rm -fr tmp-aws-*
+$(TMP_DIR):
+	mkdir -p $(TMP_DIR)
 
 # FIXME: extract AMI ID once done
-aws-image:
+aws-image: $(TMP_DIR)
 	fai-diskimage --hostname untangle-image --size 3G --class DEBIAN,JESSIE,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	bash volume-to-ami.sh $(EBS_ID) | tee $(AMI_LOG)
 
 # FIXME: share/make public ?
 aws-push:
-	$(eval ami_log := $(shell ls --sort=time tmp-aws*/ami-*.log | tail -1))
-	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(ami_log) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(FULL_NAME)"
+	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(AMI_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(FULL_NAME)"
