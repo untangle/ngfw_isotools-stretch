@@ -14,7 +14,6 @@ ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
-IMAGE_FILE := $(TMP_DIR)/image.bin
 TMP_DIR := $(shell mktemp -d $(CWD)/tmp-aws-XXXX)
 AMI_LOG := $(shell mktemp $(TMP_DIR)/ami-XXXX.log)
 TMP_IMAGE := $(shell mktemp $(TMP_DIR)/ami-XXXX.raw)
@@ -40,5 +39,5 @@ aws-image:
 
 # FIXME: share/make public ?
 aws-push:
-	$(eval ami_log := $(shell ls --sort=time tmp-aws*/ami-*.log | head -1))
+	$(eval ami_log := $(shell ls --sort=time tmp-aws*/ami-*.log | tail -1))
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(ami_log) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(FULL_NAME)"
