@@ -18,7 +18,7 @@ IMAGE_FILE := $(TMP_DIR)/image.bin
 TMP_DIR := $(shell mktemp -d $(CWD)/tmp-aws-XXXX)
 AMI_LOG := $(shell mktemp $(TMP_DIR)/ami-XXXX.log)
 TMP_IMAGE := $(shell mktemp $(TMP_DIR)/ami-XXXX.raw)
-NETBOOT_HOST := netboot-server
+NETBOOT_HOST := $(shell dig +short @10.112.0.1 netboot-server.untangle.int)
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 # FIXME: find device dynamically, and then derive its ID
 EBS_DEVICE := /dev/xvdf
