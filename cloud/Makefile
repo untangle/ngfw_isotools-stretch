@@ -40,4 +40,4 @@ aws-image:
 
 # FIXME: share/make public ?
 aws-push:
-	awk '/"ImageId":/ { gsub(/"/,"",$2); print $2 }' $(AMI_LOG) | ssh $(NETBOOT_HOST):$(IMAGES_DIR)/$(VERSION)/$(FULL_NAME) "cat > $(FULL_NAME)"
+	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(AMI_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(FULL_NAME)"
