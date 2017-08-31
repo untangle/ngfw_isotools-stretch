@@ -30,7 +30,7 @@ FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_current_$(TS)_$(HOST)_$(N
 all: image
 
 clean:
-	rm -fr $(TMP_DIR)
+	rm -fr tmp-aws-*
 
 # FIXME: extract AMI ID once done
 aws-image:
