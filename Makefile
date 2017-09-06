@@ -66,7 +66,7 @@ unpatch-installer:
 
 debian-installer: debian-installer-stamp
 debian-installer-stamp: 
-	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'jessie'|' ./d-i.sources.template >| ./d-i/build/sources.list.udeb.local
+	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'$(REPOSITORY)'|' $(ISOTOOLS_DIR)/d-i.sources.template >| $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
 	touch $@
 
