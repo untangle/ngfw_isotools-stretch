@@ -42,7 +42,8 @@ DEFAULT_PRESEED_EXPERT := $(PROFILES_DIR)/expert.preseed
 DEFAULT_PRESEED_EXTRA := $(DEFAULT_PRESEED_FINAL).extra
 CONF_FILE := $(PROFILES_DIR)/default.conf
 CONF_FILE_TEMPLATE := $(CONF_FILE).template
-DI_CORE_PATCH := $(ISOTOOLS_DIR)/d-i_core.patch
+DEBIAN_INSTALLER_PATCH := $(ISOTOOLS_DIR)/d-i.patch
+DEBIAN_CD_PATCH := $(ISOTOOLS_DIR)/debian-cd.patch
 
 all:
 
@@ -51,12 +52,14 @@ installer-clean:
 
 patch-installer: patch-installer-stamp
 patch-installer-stamp:
-	patch -p2 < $(DI_CORE_PATCH)
+	patch -p2 < $(DEBIAN_INSTALLER_PATCH)
+	patch -p2 < $(DEBIAN_CD_PATCH)
 	touch $@
 
 unpatch-installer:
 	if [ -f patch-installer-stamp ] ; then \
-	  patch -p2 -R < $(DI_CORE_PATCH) ; \
+	  patch -p2 -R < $(DEBIAN_INSTALLER_PATCH) ; \
+	  patch -p2 -R < $(DEBIAN_CD_PATCH) ; \
 	  rm -f patch-installer-stamp ; \
 	fi
 
