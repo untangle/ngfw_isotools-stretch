@@ -16,6 +16,7 @@ NETBOOT_HOST := netboot-server
 
 # constants
 ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+DEBVERSION := 8.0
 KERNELS_i386 := "linux-image-3.16.0-4-untangle-686-pae"
 KERNELS_amd64 := "linux-image-3.16.0-4-untangle-amd64"
 VERSION = $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
@@ -86,8 +87,7 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	$(eval iso_dir := /tmp/untangle-images-$(flavor))
 	mkdir -p $(iso_dir)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
-	export CDNAME=$(flavor) ; \
-	export OUT=$(iso_dir) ; \
+	export CDNAME=$(flavor) CODENAME=$(REPOSITORY) DEBVERSION=$(DEBVERSION) OUT=$(iso_dir) ; \
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) ; \
 	mv $(iso_dir)/$(flavor)-$(shell cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
 
