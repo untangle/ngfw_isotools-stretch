@@ -1,5 +1,5 @@
 DI_PKGS_DIR := $(shell dirname $(MAKEFILE_LIST))
-DI_PKGS_PATCH := $(DI_PKGS_DIR)/d-i_pkgs.patch
+DI_PKGS_PATCH := $(DI_PKGS_DIR)/installer-pkgs.patch
 
 patch: patch-stamp
 patch-stamp:

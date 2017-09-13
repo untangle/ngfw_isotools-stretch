@@ -1,0 +1,98 @@
+diff --git a/installer-pkgs-modified/base-installer/library.sh b/installer-pkgs-modified/base-installer/library.sh
+index 23fa232..9d6887f 100644
+--- a/installer-pkgs-modified/base-installer/library.sh
++++ b/installer-pkgs-modified/base-installer/library.sh
+@@ -23,7 +23,7 @@ case $KERNEL_NAME in
+ 	hurd)		KERNEL_NAME=gnumach ; KERNEL_MAJOR="$(uname -v | cut -d ' ' -f 2 | cut -d . -f 1)" ;;
+ esac
+ KERNEL_VERSION="$(uname -r | cut -d - -f 1)"
+-KERNEL_ABI="$(uname -r | cut -d - -f 1,2)"
++KERNEL_ABI="$(uname -r | cut -d - -f 1,2)-untangle"
+ KERNEL_FLAVOUR=$(uname -r | cut -d - -f 3-)
+ MACHINE="$(uname -m)"
+ NUMCPUS=$(cat /var/numcpus 2>/dev/null) || true
+diff --git a/installer-pkgs-modified/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h b/installer-pkgs-modified/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h
+index 64fd8ff..84d0cec 100644
+--- a/installer-pkgs-modified/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h
++++ b/installer-pkgs-modified/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h
+@@ -70,7 +70,7 @@
+  * @see create_banner()
+  */
+ #define LOGO_IMAGE_PATH \
+-    BASE_IMAGE_PATH "/logo_installer.png"
++    BASE_IMAGE_PATH "/logo_untangle.png"
+ #define LOGO_DARK_IMAGE_PATH \
+     BASE_IMAGE_PATH "/logo_installer_dark.png"
+ 
+diff --git a/installer-pkgs-modified/cdebconf/src/modules/frontend/gtk/go.c b/installer-pkgs-modified/cdebconf/src/modules/frontend/gtk/go.c
+index b4044a7..2bfc02c 100644
+--- a/installer-pkgs-modified/cdebconf/src/modules/frontend/gtk/go.c
++++ b/installer-pkgs-modified/cdebconf/src/modules/frontend/gtk/go.c
+@@ -531,6 +531,7 @@ int cdebconf_gtk_go(struct frontend * fe)
+ {
+     struct frontend_data * fe_data = fe->data;
+     GtkWidget * question_box;
++    GtkWidget * screenshot_button = NULL;
+     struct question * question;
+     int ret;
+ 
+@@ -545,7 +546,7 @@ int cdebconf_gtk_go(struct frontend * fe)
+ #ifdef DI_UDEB
+     /* XXX: rename */
+     cdebconf_gtk_di_run_dialog(fe);
+-    cdebconf_gtk_create_screenshot_button(fe);
++    screenshot_button = cdebconf_gtk_create_screenshot_button(fe);
+ #endif /* DI_UDEB */
+     if (NULL != fe_data->progress_data) {
+         cdebconf_gtk_hide_progress(fe);
+@@ -585,6 +586,7 @@ int cdebconf_gtk_go(struct frontend * fe)
+ 
+     cdebconf_gtk_show_target_box(fe);
+     cdebconf_gtk_show_buttons(fe);
++    gtk_widget_hide(GTK_WIDGET(screenshot_button));
+     gdk_threads_leave();
+ 
+     /* frontend blocked here until a button has been pressed */
+diff --git a/installer-pkgs-modified/pkgsel/debian/postinst b/installer-pkgs-modified/pkgsel/debian/postinst
+index 4614438..6065c6a 100755
+--- a/installer-pkgs-modified/pkgsel/debian/postinst
++++ b/installer-pkgs-modified/pkgsel/debian/postinst
+@@ -172,4 +172,6 @@ fi
+ db_progress STEP 30
+ db_progress STOP
+ 
++touch /target/etc/default/google-chrome
++
+ load_install_cd
+diff --git a/installer-pkgs-modified/rootskel-gtk/src/etc/gtk-2.0/gtkrc b/installer-pkgs-modified/rootskel-gtk/src/etc/gtk-2.0/gtkrc
+index f8e5d96..e2cd4fd 100644
+--- a/installer-pkgs-modified/rootskel-gtk/src/etc/gtk-2.0/gtkrc
++++ b/installer-pkgs-modified/rootskel-gtk/src/etc/gtk-2.0/gtkrc
+@@ -1,2 +1,2 @@
+-gtk-theme-name = "Clearlooks"
++gtk-theme-name = "ClearlooksGreen"
+ gtk-font-name="DejaVu Sans 9"
+diff --git a/installer-pkgs-modified/rootskel-gtk/src/usr/share/graphics/Makefile b/installer-pkgs-modified/rootskel-gtk/src/usr/share/graphics/Makefile
+index 88ce5ee..1873657 100644
+--- a/installer-pkgs-modified/rootskel-gtk/src/usr/share/graphics/Makefile
++++ b/installer-pkgs-modified/rootskel-gtk/src/usr/share/graphics/Makefile
+@@ -3,6 +3,7 @@ dir = usr/share/graphics
+ files = \
+ 	logo_debian.png \
+ 	logo_debian_dark.png \
++	logo_untangle.png \
+ 	note_icon.png \
+ 	warning_icon.png
+ 
+diff --git a/installer-pkgs-modified/rootskel-gtk/src/usr/share/themes/Makefile b/installer-pkgs-modified/rootskel-gtk/src/usr/share/themes/Makefile
+index cfa637c..e5da053 100644
+--- a/installer-pkgs-modified/rootskel-gtk/src/usr/share/themes/Makefile
++++ b/installer-pkgs-modified/rootskel-gtk/src/usr/share/themes/Makefile
+@@ -2,6 +2,7 @@ dir = usr/share/themes
+ 
+ files = \
+ 	Clearlooks/gtk-2.0/gtkrc \
++	ClearlooksGreen/gtk-2.0/gtkrc \
+ 	dark/gtk-2.0/gtkrc
+ 
+ #  I should put Makefiles in all intermediate directories, let's get lazy

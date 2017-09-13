@@ -70,7 +70,7 @@
  * @see create_banner()
  */
 #define LOGO_IMAGE_PATH \
-    BASE_IMAGE_PATH "/logo_installer.png"
+    BASE_IMAGE_PATH "/logo_untangle.png"
 #define LOGO_DARK_IMAGE_PATH \
     BASE_IMAGE_PATH "/logo_installer_dark.png"
 
