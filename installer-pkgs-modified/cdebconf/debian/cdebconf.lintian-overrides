@@ -1,0 +1,3 @@
+# cdebconf frontend name and descritions are stored in the templates
+cdebconf binary: malformed-prompt-in-templates
+cdebconf binary: unused-debconf-template

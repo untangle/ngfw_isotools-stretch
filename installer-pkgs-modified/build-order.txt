@@ -1,0 +1,4 @@
+base-installer		stretch
+cdebconf 		stretch
+pkgsel 			stretch
+rootskel-gtk 		stretch

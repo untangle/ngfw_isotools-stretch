@@ -1,0 +1,5 @@
+# In cdebconf itself, templates are used to store translations
+# Therefore it's normal for the package to have no config file
+# and the templates to appear unused
+cdebconf-gtk binary: no-debconf-config
+cdebconf-gtk binary: unused-debconf-template
