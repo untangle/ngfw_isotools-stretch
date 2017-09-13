@@ -53,14 +53,14 @@ installer-clean:
 
 patch-installer: patch-installer-stamp
 patch-installer-stamp:
-	patch -p2 < $(DEBIAN_INSTALLER_PATCH)
-	patch -p2 < $(DEBIAN_CD_PATCH)
+	patch -p0 < $(DEBIAN_INSTALLER_PATCH)
+	patch -p0 < $(DEBIAN_CD_PATCH)
 	touch $@
 
 unpatch-installer:
 	if [ -f patch-installer-stamp ] ; then \
-	  patch -p2 -R < $(DEBIAN_INSTALLER_PATCH) ; \
-	  patch -p2 -R < $(DEBIAN_CD_PATCH) ; \
+	  patch -p0 -R < $(DEBIAN_INSTALLER_PATCH) ; \
+	  patch -p0 -R < $(DEBIAN_CD_PATCH) ; \
 	  rm -f patch-installer-stamp ; \
 	fi
 
