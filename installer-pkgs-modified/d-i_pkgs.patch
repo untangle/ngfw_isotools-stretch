@@ -1,0 +1,160 @@
+diff -u -r /tmp/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h /tmp/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h
+--- /tmp/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h	2008-12-11 09:36:23.000000000 -0800
++++ /tmp/cdebconf/src/modules/frontend/gtk/cdebconf_gtk.h	2008-12-11 09:36:17.000000000 -0800
+@@ -72,6 +72,6 @@
+  * @see create_banner()
+  */
+ #define LOGO_IMAGE_PATH \
+-    BASE_IMAGE_PATH "/logo_installer.png"
++    BASE_IMAGE_PATH "/logo_untangle.png"
+ #define LOGO_DARK_IMAGE_PATH \
+     BASE_IMAGE_PATH "/logo_installer_dark.png"
+
+diff -u -r /tmp/rootskel-gtk/src/etc/gtk-2.0/gtkrc /tmp/rootskel-gtk/src/etc/gtk-2.0/gtkrc
+--- /tmp/rootskel-gtk/src/etc/gtk-2.0/gtkrc	2008-12-11 09:40:09.000000000 -0800
++++ /tmp/rootskel-gtk/src/etc/gtk-2.0/gtkrc	2008-12-11 09:40:16.000000000 -0800
+@@ -1,2 +1,2 @@
+-gtk-theme-name = "Clearlooks"
++gtk-theme-name = "ClearlooksGreen"
+ gtk-font-name="DejaVu Sans 9"
+diff -u -r /tmp/rootskel-gtk/src/usr/share/graphics/Makefile /tmp/rootskel-gtk/src/usr/share/graphics/Makefile
+--- /tmp/rootskel-gtk/src/usr/share/graphics/Makefile	2008-12-11 09:40:09.000000000 -0800
++++ /tmp/rootskel-gtk/src/usr/share/graphics/Makefile	2008-12-11 09:40:16.000000000 -0800
+@@ -3,6 +3,7 @@
+ files = \
+ 	logo_debian.png \
+ 	logo_debian_dark.png \
++	logo_untangle.png \
+ 	note_icon.png \
+ 	warning_icon.png
+ 
+diff -u -r /tmp/rootskel-gtk/src/usr/share/themes/Makefile /tmp/rootskel-gtk/src/usr/share/themes/Makefile
+--- /tmp/rootskel-gtk/src/usr/share/themes/Makefile	2008-12-11 09:40:09.000000000 -0800
++++ /tmp/rootskel-gtk/src/usr/share/themes/Makefile	2008-12-11 09:40:16.000000000 -0800
+@@ -2,6 +2,7 @@
+ 
+ files = \
+ 	Clearlooks/gtk-2.0/gtkrc \
++	ClearlooksGreen/gtk-2.0/gtkrc \
+ 	dark/gtk-2.0/gtkrc
+ 
+ #  I should put Makefiles in all intermediate directories, let's get lazy
+diff -u -r /tmp/base-installer/library.sh /tmp/base-installer/library.sh
+--- /tmp/base-installer/library.sh	(revision 21615)
++++ /tmp/base-installer/library.sh	(working copy)
+@@ -18,7 +18,7 @@
+ KERNEL_LIST=/tmp/available_kernels.txt
+ KERNEL_MAJOR="$(uname -r | cut -d . -f 1,2)"
+ KERNEL_VERSION="$(uname -r | cut -d - -f 1)"
+-KERNEL_ABI="$(uname -r | cut -d - -f 1,2)"
++KERNEL_ABI="$(uname -r | cut -d - -f 1,2)-untangle"
+ KERNEL_FLAVOUR=$(uname -r | cut -d - -f 3-)
+ MACHINE="$(uname -m)"
+ NUMCPUS=$(cat /var/numcpus 2>/dev/null) || true
+diff -u -r /tmp/cdebconf/src/modules/frontend/gtk/go.c /tmp/cdebconf/src/modules/frontend/gtk/go.c
+--- /tmp/cdebconf/src/modules/frontend/gtk/go.c	2009-04-16 14:43:06.000000000 +0200
++++ /tmp/cdebconf/src/modules/frontend/gtk/go.c	2009-04-16 14:44:53.000000000 +0200
+@@ -488,7 +488,8 @@
+ {
+     struct frontend_data * fe_data = fe->data;
+     GtkWidget * question_box;
++    GtkWidget * screenshot_button = NULL;
+     struct question * question;
+     int ret;
+ 
+     if (NULL == fe->questions) {
+@@ -500,7 +501,7 @@
+ #ifdef DI_UDEB
+     /* XXX: rename */
+     cdebconf_gtk_di_run_dialog(fe);
+-    cdebconf_gtk_create_screenshot_button(fe);
++    screenshot_button = cdebconf_gtk_create_screenshot_button(fe);
+ #endif /* DI_UDEB */
+     if (NULL != fe_data->progress_data) {
+         cdebconf_gtk_hide_progress(fe);
+@@ -521,6 +522,7 @@
+     }
+     cdebconf_gtk_show_target_box(fe);
+     cdebconf_gtk_show_buttons(fe);
++    gtk_widget_hide(GTK_WIDGET(screenshot_button));
+     gdk_threads_leave();
+ 
+     /* frontend blocked here until a button has been pressed */
+diff -u -r /tmp/netcfg/debian/netcfg.postinst netcfg/debian/netcfg.postinst
+--- /tmp/netcfg/debian/netcfg.postinst	2010-03-12 03:06:14.000000000 -0800
++++ /tmp/netcfg/debian/netcfg.postinst	2010-03-26 07:52:35.000000000 -0700
+@@ -1,2 +1,11 @@
+ #!/bin/sh
+-exec netcfg
++if grep -q netboot /proc/cmdline ; then
++  exec netcfg
++else
++  echo -e 'auto lo\niface lo inet loopback' > /etc/network/interfaces
++  echo -e '127.0.0.1\tlocalhost' > /etc/hosts
++  ip link set lo up
++  ip addr flush dev lo
++  ip addr add 127.0.0.1/8 dev lo
++fi
++exit 0
+diff -u -r /tmp/netcfg/debian/netcfg-static.postinst netcfg/debian/netcfg-static.postinst
+--- /tmp/netcfg/debian/netcfg-static.postinst	2010-03-12 03:06:14.000000000 -0800
++++ /tmp/netcfg/debian/netcfg-static.postinst	2010-03-26 07:52:44.000000000 -0700
+@@ -1,2 +1,11 @@
+ #!/bin/sh
+-exec netcfg
++if grep -q netboot /proc/cmdline ; then
++  exec netcfg
++else
++  echo -e 'auto lo\niface lo inet loopback' > /etc/network/interfaces
++  echo -e '127.0.0.1\tlocalhost' > /etc/hosts
++  ip link set lo up
++  ip addr flush dev lo
++  ip addr add 127.0.0.1/8 dev lo
++fi
++exit 0
+diff --git /tmp/pkgsel/debian/postinst /tmp/pkgsel/debian/postinst
+index 027eb76..bf9d462 100755
+--- /tmp/pkgsel/debian/postinst
++++ /tmp/pkgsel/debian/postinst
+@@ -167,4 +167,6 @@ fi
+ db_progress STEP 30
+ db_progress STOP
+ 
++touch /target/etc/default/google-chrome
++
+ load_install_cd
+diff --git a/installer-pkgs-modified/base-installer/debian/source/format b/installer-pkgs-modified/base-installer/debian/source/format
+index 89ae9db..163aaf8 100644
+--- a/installer-pkgs-modified/base-installer/debian/source/format
++++ b/installer-pkgs-modified/base-installer/debian/source/format
+@@ -1 +1 @@
+-3.0 (native)
++3.0 (quilt)
+diff --git a/installer-pkgs-modified/cdebconf/debian/source/format b/installer-pkgs-modified/cdebconf/debian/source/format
+index 89ae9db..163aaf8 100644
+--- a/installer-pkgs-modified/cdebconf/debian/source/format
++++ b/installer-pkgs-modified/cdebconf/debian/source/format
+@@ -1 +1 @@
+-3.0 (native)
++3.0 (quilt)
+diff --git a/installer-pkgs-modified/netcfg/debian/source/format b/installer-pkgs-modified/netcfg/debian/source/format
+index 89ae9db..163aaf8 100644
+--- a/installer-pkgs-modified/netcfg/debian/source/format
++++ b/installer-pkgs-modified/netcfg/debian/source/format
+@@ -1 +1 @@
+-3.0 (native)
++3.0 (quilt)
+diff --git a/installer-pkgs-modified/pkgsel/debian/source/format b/installer-pkgs-modified/pkgsel/debian/source/format
+index 89ae9db..163aaf8 100644
+--- a/installer-pkgs-modified/pkgsel/debian/source/format
++++ b/installer-pkgs-modified/pkgsel/debian/source/format
+@@ -1 +1 @@
+-3.0 (native)
++3.0 (quilt)
+diff --git a/installer-pkgs-modified/rootskel-gtk/debian/source/format b/installer-pkgs-modified/rootskel-gtk/debian/source/format
+index 89ae9db..163aaf8 100644
+--- a/installer-pkgs-modified/rootskel-gtk/debian/source/format
++++ b/installer-pkgs-modified/rootskel-gtk/debian/source/format
+@@ -1 +1 @@
+-3.0 (native)
++3.0 (quilt)
