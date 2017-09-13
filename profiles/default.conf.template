@@ -1,0 +1,30 @@
+# debian-cd from SVN
+debian_cd_dir="+ISOTOOLS_DIR+/debian-cd"
+
+# non-free (sun-java)
+mirror_components="main non-free"
+#mirror_components_extra="main upstream premium"
+
+# custom installer
+custom_installer="+ISOTOOLS_DIR+/d-i/build/dest"
+export DI_DIR="+ISOTOOLS_DIR+/d-i/build/dest"
+
+# Don't include the manual or release notes
+export OMIT_MANUAL=1
+export OMIT_RELEASE_NOTES=1
+export OMIT_DOC_TOOLS=1
+
+# Don't generate JIGDO files
+export DOJIGDO=0
+
+export MAXISOS=1
+
+export NONFREE=1
+export CONTRIB=0
+export COPYLINKS=0
+export MKISOFS_OPTS="-r -A 000000"
+
+# Define the CD label
+export DISKINFO="Untangle"
+
+#do_mirror="false"
