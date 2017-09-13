@@ -1,0 +1,72 @@
+diff --git a/isotools-jessie/d-i/build/config/amd64/hd-media.cfg b/isotools-jessie/d-i/build/config/amd64/hd-media.cfg
+index 9e1e49c..e3ace1d 100644
+--- a/isotools-jessie/d-i/build/config/amd64/hd-media.cfg
++++ b/isotools-jessie/d-i/build/config/amd64/hd-media.cfg
+@@ -4,7 +4,7 @@ FLAVOUR_SUPPORTED = "" gtk
+ # netinst iso in (being able to fit the full CD on it is just a bonus..),
+ # and small enough to fit on a low-end memory stick, such as those
+ # advertised as being 1 gigabyte in size.
+-FLOPPY_SIZE = 976560
++FLOPPY_SIZE = 750000
+ 
+ DISK_LABEL = "bootable drive"
+ MEDIA_TYPE = bootable drive
+diff --git a/isotools-jessie/d-i/build/config/common b/isotools-jessie/d-i/build/config/common
+index 9145ead..cac37e4 100644
+--- a/isotools-jessie/d-i/build/config/common
++++ b/isotools-jessie/d-i/build/config/common
+@@ -93,7 +93,7 @@ LSB_DISTRIB_RELEASE="$(DEBIAN_VERSION) - installer build $(BUILD_DATE)"
+ 
+ # This keyring is only used to verify udeb downloads using apt. Since the
+ # build process does not run as root, apt cannot read /etc/apt/trusted.gpg.
+-KEYRING=/usr/share/keyrings/debian-archive-keyring.gpg
++KEYRING=/usr/share/keyrings/untangle-archive-keyring.gpg
+ 
+ # All images that include cdebconf should include symbols needed by these
+ # plugins.
+diff --git a/isotools-jessie/d-i/build/config/i386/hd-media.cfg b/isotools-jessie/d-i/build/config/i386/hd-media.cfg
+index 9e1e49c..e3ace1d 100644
+--- a/isotools-jessie/d-i/build/config/i386/hd-media.cfg
++++ b/isotools-jessie/d-i/build/config/i386/hd-media.cfg
+@@ -4,7 +4,7 @@ FLAVOUR_SUPPORTED = "" gtk
+ # netinst iso in (being able to fit the full CD on it is just a bonus..),
+ # and small enough to fit on a low-end memory stick, such as those
+ # advertised as being 1 gigabyte in size.
+-FLOPPY_SIZE = 976560
++FLOPPY_SIZE = 750000
+ 
+ DISK_LABEL = "bootable drive"
+ MEDIA_TYPE = bootable drive
+diff --git a/isotools-jessie/d-i/build/boot/x86/gtk.cfg b/isotools-jessie/d-i/build/boot/x86/gtk.cfg
+index a0592c4..330edd4 100644
+--- a/isotools-jessie/d-i/build/boot/x86/gtk.cfg
++++ b/isotools-jessie/d-i/build/boot/x86/gtk.cfg
+@@ -1,4 +1,5 @@
+ label installgui
+ 	menu label ^Graphical install
++	menu default
+ 	kernel ${KERNEL}
+ 	append desktop=%desktop% ${VIDEO_MODE_GTK} initrd=${INITRD_GTK} --- quiet ${CONSOLE}
+diff --git a/isotools-jessie/d-i/build/boot/x86/txt.cfg b/isotools-jessie/d-i/build/boot/x86/txt.cfg
+index 04adb7d..22cecea 100644
+--- a/isotools-jessie/d-i/build/boot/x86/txt.cfg
++++ b/isotools-jessie/d-i/build/boot/x86/txt.cfg
+@@ -1,6 +1,5 @@
+ default install
+ label install
+ 	menu label ^Install
+-	menu default
+ 	kernel ${KERNEL}
+ 	append desktop=%desktop% ${VIDEO_MODE} initrd=${INITRD} --- quiet ${CONSOLE}
+diff --git a/d-i/build/config/i386.cfg b/d-i/build/config/i386.cfg
+--- a/isotools-jessie/d-i/build/config/i386.cfg
++++ b/isotools-jessie/d-i/build/config/i386.cfg
+@@ -3,7 +3,7 @@ MEDIUM_SUPPORTED_EXTRA = monolithic
+ 
+ # The version of the kernel to use.
+ BASEVERSION = $(LINUX_KERNEL_ABI)
+-KERNELVERSION = $(BASEVERSION)-586
++KERNELVERSION = $(BASEVERSION)-686-pae
+ KERNELMAJOR = 2.6
+ KERNELNAME = vmlinuz
+ 
