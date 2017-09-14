@@ -96,3 +96,31 @@ index cfa637c..e5da053 100644
  	dark/gtk-2.0/gtkrc
  
  #  I should put Makefiles in all intermediate directories, let's get lazy
+diff --git a/installer-pkgs-modified/base-installer/debian/source/format b/installer-pkgs-modified/base-installer/debian/source/format
+index 89ae9db..163aaf8 100644
+--- a/installer-pkgs-modified/base-installer/debian/source/format
++++ b/installer-pkgs-modified/base-installer/debian/source/format
+@@ -1 +1 @@
+-3.0 (native)
++3.0 (quilt)
+diff --git a/installer-pkgs-modified/cdebconf/debian/source/format b/installer-pkgs-modified/cdebconf/debian/source/format
+index 89ae9db..163aaf8 100644
+--- a/installer-pkgs-modified/cdebconf/debian/source/format
++++ b/installer-pkgs-modified/cdebconf/debian/source/format
+@@ -1 +1 @@
+-3.0 (native)
++3.0 (quilt)
+diff --git a/installer-pkgs-modified/pkgsel/debian/source/format b/installer-pkgs-modified/pkgsel/debian/source/format
+index 89ae9db..163aaf8 100644
+--- a/installer-pkgs-modified/pkgsel/debian/source/format
++++ b/installer-pkgs-modified/pkgsel/debian/source/format
+@@ -1 +1 @@
+-3.0 (native)
++3.0 (quilt)
+diff --git a/installer-pkgs-modified/rootskel-gtk/debian/source/format b/installer-pkgs-modified/rootskel-gtk/debian/source/format
+index 89ae9db..163aaf8 100644
+--- a/installer-pkgs-modified/rootskel-gtk/debian/source/format
++++ b/installer-pkgs-modified/rootskel-gtk/debian/source/format
+@@ -1 +1 @@
+-3.0 (native)
++3.0 (quilt)
