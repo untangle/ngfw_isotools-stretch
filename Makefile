@@ -87,13 +87,13 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	$(eval iso_dir := /tmp/untangle-images-$(flavor))
 	mkdir -p $(iso_dir)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
-	export MIRROR=$(shell mktemp -d /tmp/isotools-$(REPOSITORY)-XXXXXX) CDNAME=$(flavor) ; \
+	export TMP_DIR=$(shell mktemp -d /tmp/isotools-$(REPOSITORY)-XXXXXX) CDNAME=$(flavor) ; \
 	export CODENAME=$(REPOSITORY) DEBVERSION=$(DEBVERSION) OUT=$(iso_dir) ; \
-	cp -R profiles debian-cd cd-root $$MIRROR ; \
-	cd $$MIRROR ; \
+	cp -R profiles cd-root $$TMP_DIR ; \
+	cd $$TMP_DIR ; \
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose --logfile /tmp/simplecdd.log ; \
 	cd $(ISOTOOLS_DIR) ; \
-	rm -fr $$MIRROR ; \
+	rm -fr $$TMP_DIR ; \
 	mv $(iso_dir)/$(flavor)-$(DEBVERSION)*-$(ARCH)-CD-1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
 
 iso/%-clean: installer-clean
