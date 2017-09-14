@@ -1,4 +1,5 @@
-base-installer		stretch
-cdebconf 		stretch
 pkgsel 			stretch
+cdebconf 		stretch
+$sleep 40
 rootskel-gtk 		stretch
+base-installer		stretch
