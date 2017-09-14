@@ -90,6 +90,7 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	export MIRROR=$(shell mktemp -d /tmp/isotools-$(REPOSITORY)-XXXXXX) CDNAME=$(flavor) ; \
 	export CODENAME=$(REPOSITORY) DEBVERSION=$(DEBVERSION) OUT=$(iso_dir) ; \
 	cd $$MIRROR ; \
+	cp -R $(ISOTOOLS_DIR)/{profiles,debian-cd,cd-root} ./ ; \
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) ; \
 	cd $(ISOTOOLS_DIR) ; \
 	rm -fr $$MIRROR ; \
