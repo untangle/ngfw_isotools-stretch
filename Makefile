@@ -88,7 +88,7 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	mkdir -p $(iso_dir)
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
 	export CDNAME=$(flavor) CODENAME=$(REPOSITORY) DEBVERSION=$(DEBVERSION) OUT=$(iso_dir) ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) -g --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) ; \
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY) --security-mirror http://package-server/public/$(REPOSITORY) --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) ; \
 	mv $(iso_dir)/$(flavor)-$(shell cut -d. -f 1 /etc/debian_version).*-$(ARCH)-CD-1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
 
 iso/%-clean: installer-clean
