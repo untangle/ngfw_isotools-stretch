@@ -75,7 +75,7 @@ repoint-stable:
 
 iso-conf:
 	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'$(REPOSITORY)'|' $(ISOTOOLS_DIR)/d-i.sources.template >| $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
-	perl -pe 's|\+ISOTOOLS_DIR\+|'`pwd`/$(ISOTOOLS_DIR)'|g' $(CONF_FILE_TEMPLATE) >| $(CONF_FILE)
+	perl -pe 's|\+ISOTOOLS_DIR\+|$(ISOTOOLS_DIR)'|g' $(CONF_FILE_TEMPLATE) >| $(CONF_FILE)
 
 	cat $(COMMON_PRESEED) $(AUTOPARTITION_PRESEED) $(NETBOOT_PRESEED_EXTRA) $(UNTANGLE_PRESEED) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+ARCH\+|'$(ARCH)'|g ; s|\+REPOSITORY\+|'$(REPOSITORY)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g ; s/^(d-i preseed\/early_command string anna-install.*)/#$1/' >| $(NETBOOT_PRESEED_FINAL)
 	cat $(COMMON_PRESEED) $(AUTOPARTITION_PRESEED) $(DEFAULT_PRESEED_EXTRA) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+REPOSITORY\+|'$(REPOSITORY)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g' >| $(DEFAULT_PRESEED_FINAL)
@@ -92,7 +92,7 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	export MIRROR=$${TMP_DIR}/tmp/mirror ; \
 	cp -R profiles cd-root $$TMP_DIR ; \
 	cd $$TMP_DIR ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose --logfile /tmp/simplecdd.log ; \
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose --logfile $$TMP_DIR/simplecdd.log ; \
 	cd $(ISOTOOLS_DIR) ; \
 	rm -fr $$TMP_DIR ; \
 	mv $(iso_dir)/$(flavor)-$(DEBVERSION)*-$(ARCH)-CD-1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
