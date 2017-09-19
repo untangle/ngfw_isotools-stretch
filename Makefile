@@ -86,12 +86,12 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	$(eval flavor := $(patsubst iso/%-image,%,$*))
 	$(eval iso_dir := /tmp/untangle-images-$(flavor))
 	mkdir -p $(iso_dir)
+	cd $$TMP_DIR ; \
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
 	export TMP_DIR=$(shell mktemp -d /tmp/isotools-$(REPOSITORY)-XXXXXX) CDNAME=$(flavor) ; \
 	export CODENAME=$(REPOSITORY) DEBVERSION=$(DEBVERSION) OUT=$(iso_dir) ; \
 	export MIRROR=$${TMP_DIR}/tmp/mirror ; \
-	cp -R profiles cd-root $$TMP_DIR ; \
-	cd $$TMP_DIR ; \
+	cp -R $(ISOTOOLS_DIR)/profiles $(ISOTOOLS_DIR)/cd-root . ; \
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose --logfile /tmp/simplecdd.log ; \
 	cd $(ISOTOOLS_DIR) ; \
 	rm -fr $$TMP_DIR ; \
