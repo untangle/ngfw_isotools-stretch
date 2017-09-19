@@ -86,9 +86,9 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	$(eval flavor := $(patsubst iso/%-image,%,$*))
 	$(eval iso_dir := /tmp/untangle-images-$(flavor))
 	mkdir -p $(iso_dir)
+	export TMP_DIR=$(shell mktemp -d /tmp/isotools-$(REPOSITORY)-XXXXXX) CDNAME=$(flavor) ; \
 	cd $$TMP_DIR ; \
 	. $(ISOTOOLS_DIR)/debian-cd/CONF.sh ; \
-	export TMP_DIR=$(shell mktemp -d /tmp/isotools-$(REPOSITORY)-XXXXXX) CDNAME=$(flavor) ; \
 	export CODENAME=$(REPOSITORY) DEBVERSION=$(DEBVERSION) OUT=$(iso_dir) ; \
 	export MIRROR=$${TMP_DIR}/tmp/mirror ; \
 	cp -R $(ISOTOOLS_DIR)/profiles $(ISOTOOLS_DIR)/cd-root . ; \
