@@ -1,5 +1,8 @@
-grub-pc
+busyboy
+console-setup
+deboostrap
 grub-efi
+grub-pc
 isolinux
 syslinux
 syslinux-common
