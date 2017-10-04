@@ -92,10 +92,10 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	export CODENAME=$(REPOSITORY) DEBVERSION=$(DEBVERSION) OUT=$(iso_dir) ; \
 	export MIRROR=$${TMP_DIR}/tmp/mirror DISKTYPE=CD700 ; \
 	cp -R $(ISOTOOLS_DIR)/profiles $(ISOTOOLS_DIR)/cd-root . ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose --logfile /tmp/simplecdd.log ; \
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,flavor,expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose --logfile $$TMP_DIR/simplecdd.log ; \
 	cd $(ISOTOOLS_DIR) ; \
-	mv $(iso_dir)/$(flavor)-$(DEBVERSION)*-$(ARCH)-CD-1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
-#	rm -fr $$TMP_DIR ; \
+	rm -fr $$TMP_DIR ; \
+	mv $(iso_dir)/$(flavor)-$(DEBVERSION)*-$(ARCH)-CD*1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
 
 iso/%-clean: installer-clean
 	$(eval flavor := $(patsubst iso/%-clean,%,$*))
