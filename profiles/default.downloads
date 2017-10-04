@@ -6,3 +6,5 @@ grub-pc
 isolinux
 syslinux
 syslinux-common
+perl-openssl-defaults
+dbus-x11
