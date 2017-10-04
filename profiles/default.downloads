@@ -1,6 +1,6 @@
-busyboy
+busybox
 console-setup
-deboostrap
+debootstrap
 grub-efi
 grub-pc
 isolinux
