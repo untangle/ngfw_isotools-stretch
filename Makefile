@@ -22,7 +22,7 @@ VERSION = $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 ISO_IMAGE := +FLAVOR+-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(shell date --iso-8601=seconds)_$(shell hostname -s).iso
 USB_IMAGE := $(subst .iso,.img,$(ISO_IMAGE))
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
-MOUNT_SCRIPT := $(IMAGES_DIR)/mounts.py
+MOUNT_SCRIPT := /data/image-manager/mounts.py
 NETBOOT_DIR_TXT := $(ISOTOOLS_DIR)/d-i/build/dest/netboot/debian-installer/$(ARCH)
 NETBOOT_DIR_GTK := $(ISOTOOLS_DIR)/d-i/build/dest/netboot/gtk/debian-installer/$(ARCH)
 NETBOOT_INITRD_TXT := $(NETBOOT_DIR_TXT)/initrd.gz
