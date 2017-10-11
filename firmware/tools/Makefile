@@ -41,7 +41,7 @@ clean:
 
 download-vendor-rootfs: $(VENDOR_REFERENCE_NAME)
 $(VENDOR_REFERENCE_NAME):
-	curl -s -o $@ $(VENDOR_REFERENCE_URL)
+	curl -f -v -o $@ $(VENDOR_REFERENCE_URL)
 
 $(TMP_DIR):
 	mkdir -p $@
