@@ -36,7 +36,7 @@ clean:
 	rm -fr *-stamp $(VMDK_REFERENCE_NAME) $(QCOW2_NAME) $(VMDK_NAME) *.ova
 
 $(VMDK_REFERENCE_NAME):
-	curl -s -o $@ $(VMDK_REFERENCE_URL)
+	curl -v -f -o $@ $(VMDK_REFERENCE_URL)
 
 vmdk: $(VMDK_NAME)
 $(VMDK_NAME): $(VMDK_REFERENCE_NAME)
