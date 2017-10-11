@@ -90,7 +90,7 @@ done
 if [ $NEED_ORIGINAL_ROOTFS = "yes" ] ; then
   ROOTFS_DEST_DIR="${CHROOT_DIR}/var/lib/${NAME}-rootfs"
   mkdir -p $ROOTFS_DEST_DIR
-  tar -C $ROOTFS_DEST_DIR -xajf ${VENDOR_DIR}/${ROOTFS}
+  tar -C $ROOTFS_DEST_DIR -xaf ${VENDOR_DIR}/${ROOTFS}
 fi
 
 # copy 2nd stage install script in chroot, and run it
