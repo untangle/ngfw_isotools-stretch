@@ -7,6 +7,7 @@
 # d-i netcfg/get_netmask string 255.255.255.255
 # d-i netcfg/get_gateway string 10.100.100.100
 # d-i netcfg/confirm_static boolean true
+d-i netcfg/get_domain string untangle.int
 d-i mirror/http/hostname string netboot-server
 d-i mirror/http/directory string /untangle-images-+REPOSITORY+/+VERSION+/untangle-+VERSION+-+ARCH+
 #d-i apt-setup/use_mirror boolean false
