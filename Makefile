@@ -45,7 +45,7 @@ CONF_FILE := $(PROFILES_DIR)/default.conf
 CONF_FILE_TEMPLATE := $(CONF_FILE).template
 DEBIAN_INSTALLER_PATCH := $(ISOTOOLS_DIR)/d-i.patch
 DEBIAN_CD_PATCH := $(ISOTOOLS_DIR)/debian-cd.patch
-CUSTOMSIZE := $(shell echo $(( 760 * 1000000 / 2048 )) ) # 760MB
+CUSTOMSIZE := $(shell echo $$(( 760 * 1000000 / 2048 )) ) # 760MB
 
 all:
 
