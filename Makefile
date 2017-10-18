@@ -45,6 +45,7 @@ CONF_FILE := $(PROFILES_DIR)/default.conf
 CONF_FILE_TEMPLATE := $(CONF_FILE).template
 DEBIAN_INSTALLER_PATCH := $(ISOTOOLS_DIR)/d-i.patch
 DEBIAN_CD_PATCH := $(ISOTOOLS_DIR)/debian-cd.patch
+CUSTOMSIZE := $(shell echo $(( 760 * 1000000 / 2048 )) ) # 760MB
 
 all:
 
@@ -90,8 +91,8 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	cd $${TMP_DIR} ; \
 	cp -rl $(ISOTOOLS_DIR)/* . ; \
 	export CODENAME=$(REPOSITORY) DEBVERSION=$(DEBVERSION) OUT=$(iso_dir) ; \
-	export CDNAME=untangle DISKTYPE=CD700 ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,$(flavor),expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose # ; \	rm -fr $${TMP_DIR}
+	export CDNAME=untangle DISKTYPE=CUSTOM CUSTOMSIZE=$(CUSTOMSIZE) ; \
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,$(flavor),expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose $${TMP_DIR}/simplecdd.log # ; \	rm -fr $${TMP_DIR}
 	mv $(iso_dir)/$(flavor)-$(DEBVERSION)*-$(ARCH)-CD*1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
 
 iso/%-clean: installer-clean
