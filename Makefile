@@ -50,7 +50,8 @@ CUSTOMSIZE := $(shell echo $$(( 760 * 1000000 / 2048 )) ) # 760MB
 all:
 
 installer-clean:
-	true
+	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules clean
+	rm debian-installer-stamp
 
 patch-installer: patch-installer-stamp
 patch-installer-stamp:
@@ -95,7 +96,7 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,$(flavor),expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose --logfile $${TMP_DIR}/simplecdd.log # ; \	rm -fr $${TMP_DIR}
 	mv $(iso_dir)/$(flavor)-$(DEBVERSION)*-$(ARCH)-*1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
 
-iso/%-clean: installer-clean
+iso/%-clean:
 	$(eval flavor := $(patsubst iso/%-clean,%,$*))
 	$(eval iso_dir := /tmp/untangle-images-$(flavor))
 	rm -fr $(ISOTOOLS_DIR)/tmp $(iso_dir)
