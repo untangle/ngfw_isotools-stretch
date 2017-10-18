@@ -50,8 +50,8 @@ CUSTOMSIZE := $(shell echo $$(( 760 * 1000000 / 2048 )) ) # 760MB
 all:
 
 installer-clean:
-	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules clean
-	rm debian-installer-stamp
+	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules clean ; cd ..
+	rm debian-installer-stamp debian-installer*.deb debian-installer*.tar.gz
 
 patch-installer: patch-installer-stamp
 patch-installer-stamp:
