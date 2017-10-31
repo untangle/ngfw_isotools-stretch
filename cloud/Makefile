@@ -19,7 +19,7 @@ VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 TMP_DIR := $(CWD)/tmp-$(FLAVOR)
 AMI_LOG := $(TMP_DIR)/ami.log
 TMP_IMAGE := $(TMP_DIR)/ami.raw
-NETBOOT_HOST := $(shell dig +short @10.112.0.1 netboot-server.untangle.int)
+NETBOOT_HOST := netboot-server.untangle.int
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 # FIXME: find device dynamically, and then derive its ID
 EBS_DEVICE := /dev/xvdf
