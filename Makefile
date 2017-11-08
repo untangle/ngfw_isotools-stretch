@@ -106,6 +106,13 @@ ova/%-push:
 ova/%-clean:
 	make -C $(ISOTOOLS_DIR)/ova clean
 
+cloud/%-image:
+	make -C $(ISOTOOLS_DIR)/cloud $(patsubst cloud/%-image,%,$*)-image
+cloud/%-push:
+	make -C $(ISOTOOLS_DIR)/cloud $(patsubst cloud/%-image,%,$*)-push
+cloud/%-clean:
+	make -C $(ISOTOOLS_DIR)/cloud clean
+
 iso/%-push: # pushes the most recent images
 	$(eval flavor := $(patsubst iso/%-push,%,$*))
 	$(eval iso_dir := /tmp/untangle-images-$(flavor))
