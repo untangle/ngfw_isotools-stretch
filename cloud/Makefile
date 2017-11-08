@@ -38,7 +38,7 @@ $(TMP_DIR):
 
 # FIXME: extract AMI ID once done
 aws-image: $(TMP_DIR)
-	fai-diskimage --config $(CWD) --hostname untangle-image --size 3G --class DEBIAN,JESSIE,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE $(TMP_IMAGE)
+	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,JESSIE,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	bash volume-to-ami.sh $(EBS_ID) | tee $(AMI_LOG)
 
