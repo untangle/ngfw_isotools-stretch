@@ -1,4 +1,4 @@
-CWD := $(shell dirname $(MAKEFILE_LIST))
+CWD := $(shell dirname $(shell readlink -f MAKEFILE_LIST))
 NAME := $(shell basename $(shell readlink -f $(CWD)))
 
 PKGTOOLS_DIR := $(CWD)/../../ngfw_pkgtools
