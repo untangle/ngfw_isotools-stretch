@@ -22,11 +22,6 @@ BASE_TMP_DIR="/tmp/tmp.vmdk-chroot-${FLAVOR}-${DISTRIBUTION}"
 CHROOT_DIR=$(mktemp -d ${BASE_TMP_DIR}.XXXXX)
 TMP_VMDK="/tmp/${FLAVOR}.vmdk"
 
-NBD_DEV="/dev/nbd0"
-while [[ -e $NBD_DEV ]] ; do
-  NBD_DEV="/dev/nbd"$(( ${NBD_DEV/\/dev\/nbd} + 2 ))
-done
-
 # clean up if something went wrong during previous run, but make
 # sure we do it in the right order, or we'll mess up the host system
 # since those were bind mounts
@@ -40,7 +35,12 @@ fi
 
 # NBD support
 rmmod nbd || true
-modprobe nbd max_part=16
+modprobe nbd max_part=32
+
+NBD_DEV="/dev/nbd0"
+while [[ -e $NBD_DEV ]] ; do
+  NBD_DEV="/dev/nbd"$(( ${NBD_DEV/\/dev\/nbd} + 1 ))
+done
 
 # convert to qcow2
 qemu-img convert -O qcow2 ${ORIGINAL_VMDK} ${QCOW2}
