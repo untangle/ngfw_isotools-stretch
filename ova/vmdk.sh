@@ -1,8 +1,5 @@
 #! /bin/bash
 
-# This scripts requires the installation of virtualbox/wheezy and
-# qemu-util/wheezy-backports
-
 set -e
 
 # constants
@@ -25,14 +22,10 @@ BASE_TMP_DIR="/tmp/tmp.vmdk-chroot-${FLAVOR}"
 CHROOT_DIR=$(mktemp -d ${BASE_TMP_DIR}.XXXXX)
 TMP_VMDK="/tmp/${FLAVOR}.vmdk"
 
-case $FLAVOR in
-  untangle)
-    NBD_DEV="/dev/nbd0" ;;
-  apc)
-    NBD_DEV="/dev/nbd1" ;;
-  adtran)
-    NBD_DEV="/dev/nbd2" ;;
-esac
+NBD_DEV="/dev/nbd0"
+while [[ -e $NBD_DEV ]] ; do
+  NBD_DEV="/dev/nbd"$(( ${NBD_DEV/\/dev\/nbd} + 2 ))
+done
 
 # clean up if something went wrong during previous run, but make
 # sure we do it in the right order, or we'll mess up the host system
@@ -69,7 +62,7 @@ extraPackagesFile=${CURRENT_DIR}/extra-packages.txt
 if [ -f $extraPackagesFile ] ; then
   cp $extraPackagesFile ${CHROOT_DIR}/tmp/
 fi
-chroot ${CHROOT_DIR} /tmp/${SETUP_SCRIPT} ${REPOSITORY} ${DISTRIBUTION} ${ARCH} ${EXTRA_PACKAGES}
+chroot ${CHROOT_DIR} /tmp/${SETUP_SCRIPT} ${REPOSITORY} ${DISTRIBUTION} ${ARCH} ${NBD_DEV} ${EXTRA_PACKAGES}
 
 # umount PFS
 for pfs in sys proc dev/pts dev ; do
