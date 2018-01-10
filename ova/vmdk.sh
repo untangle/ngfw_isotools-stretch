@@ -18,7 +18,7 @@ EXTRA_PACKAGES=$@
 
 ## main
 QCOW2=${VMDK/.vmdk/.qcow2}
-BASE_TMP_DIR="/tmp/tmp.vmdk-chroot-${FLAVOR}"
+BASE_TMP_DIR="/tmp/tmp.vmdk-chroot-${FLAVOR}-${DISTRIBUTION}"
 CHROOT_DIR=$(mktemp -d ${BASE_TMP_DIR}.XXXXX)
 TMP_VMDK="/tmp/${FLAVOR}.vmdk"
 
