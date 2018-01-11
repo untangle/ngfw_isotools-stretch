@@ -1,8 +1,5 @@
 #! /bin/bash
 
-# This scripts requires the installation of virtualbox/wheezy and
-# qemu-util/wheezy-backports
-
 set -e
 
 # constants
@@ -21,18 +18,9 @@ EXTRA_PACKAGES=$@
 
 ## main
 QCOW2=${VMDK/.vmdk/.qcow2}
-BASE_TMP_DIR="/tmp/tmp.vmdk-chroot-${FLAVOR}"
+BASE_TMP_DIR="/tmp/tmp.vmdk-chroot-${FLAVOR}-${DISTRIBUTION}"
 CHROOT_DIR=$(mktemp -d ${BASE_TMP_DIR}.XXXXX)
 TMP_VMDK="/tmp/${FLAVOR}.vmdk"
-
-case $FLAVOR in
-  untangle)
-    NBD_DEV="/dev/nbd0" ;;
-  apc)
-    NBD_DEV="/dev/nbd1" ;;
-  adtran)
-    NBD_DEV="/dev/nbd2" ;;
-esac
 
 # clean up if something went wrong during previous run, but make
 # sure we do it in the right order, or we'll mess up the host system
@@ -47,7 +35,13 @@ fi
 
 # NBD support
 rmmod nbd || true
-modprobe nbd max_part=16
+modprobe nbd max_part=32
+
+NUM=0
+while [[ -e /var/lock/qemu-nbd-nbd${NUM} ]] ; do
+  NUM=$(( NUM + 1 ))
+done
+NBD_DEV="/dev/nbd${NUM}"
 
 # convert to qcow2
 qemu-img convert -O qcow2 ${ORIGINAL_VMDK} ${QCOW2}
@@ -69,7 +63,7 @@ extraPackagesFile=${CURRENT_DIR}/extra-packages.txt
 if [ -f $extraPackagesFile ] ; then
   cp $extraPackagesFile ${CHROOT_DIR}/tmp/
 fi
-chroot ${CHROOT_DIR} /tmp/${SETUP_SCRIPT} ${REPOSITORY} ${DISTRIBUTION} ${ARCH} ${EXTRA_PACKAGES}
+chroot ${CHROOT_DIR} /tmp/${SETUP_SCRIPT} ${REPOSITORY} ${DISTRIBUTION} ${ARCH} ${NBD_DEV} ${EXTRA_PACKAGES}
 
 # umount PFS
 for pfs in sys proc dev/pts dev ; do

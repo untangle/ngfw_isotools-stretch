@@ -11,7 +11,8 @@ APT_OPTIONS="--allow-unauthenticated --yes --force-yes"
 REPOSITORY=$1
 DISTRIBUTION=$2
 ARCH=$3
-shift 3
+NBD_DEV=$4
+shift 4
 EXTRA_PACKAGES=$@
 
 # disable starting of services
@@ -68,8 +69,8 @@ rm /etc/ssh/ssh_host_*key*
 DEBIAN_FRONTEND=noninteractive dpkg-reconfigure openssh-server
 
 # fix / and swap
-ROOT_UUID=$(blkid -o value /dev/nbd0p1 | head -1)
-SWAP_UUID=$(blkid -o value /dev/nbd0p2 | head -1)
+ROOT_UUID=$(blkid -o value ${NBD_DEV}p1 | head -1)
+SWAP_UUID=$(blkid -o value ${NBD_DEV}p2 | head -1)
 perl -i -pe 's/(UUID=[^\s]+|\/dev\/nbd0p1)/UUID='${ROOT_UUID}'/' /boot/grub/grub.cfg
 perl -i -pe 's|UUID=[^\s]+\s+/|UUID='${ROOT_UUID}'\t/|' /etc/fstab
 perl -i -pe 's|UUID=[^\s]+\s+none\s+swap|UUID='${SWAP_UUID}'\tnone\tswap|' /etc/fstab
