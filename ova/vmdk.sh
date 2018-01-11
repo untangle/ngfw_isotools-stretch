@@ -37,10 +37,11 @@ fi
 rmmod nbd || true
 modprobe nbd max_part=32
 
-NBD_DEV="/dev/nbd0"
-while [[ -e $NBD_DEV ]] ; do
-  NBD_DEV="/dev/nbd"$(( ${NBD_DEV/\/dev\/nbd} + 1 ))
+NUM=0
+while [[ -e /var/lock/qemu-nbd-nbd${NUM} ]] ; do
+  NUM=$(( NUM + 1 ))
 done
+NBD_DEV="/dev/nbd${NUM}"
 
 # convert to qcow2
 qemu-img convert -O qcow2 ${ORIGINAL_VMDK} ${QCOW2}
