@@ -1,8 +1,8 @@
 diff --git debian-cd/tools/boot/jessie/boot-x86 b/isotools-jessie/debian-cd/tools/boot/jessie/boot-x86
 index c6d397c..b523270 100644
---- debian-cd/tools/boot/jessie/boot-x86
-+++ debian-cd/tools/boot/jessie/boot-x86
-@@ -429,6 +429,11 @@ if [ -n "$KERNEL_PARAMS" ]; then
+--- debian-cd/tools/boot/stretch/boot-x86
++++ debian-cd/tools/boot/stretch/boot-x86
+@@ -449,6 +449,11 @@ if [ -n "$KERNEL_PARAMS" ]; then
      done
  fi
  
