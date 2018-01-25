@@ -15,6 +15,9 @@ NBD_DEV=$4
 shift 4
 EXTRA_PACKAGES=$@
 
+# resize root partition right away
+resize2fs ${NBD_DEV}p1
+
 # disable starting of services
 echo exit 101 > /usr/sbin/policy-rc.d
 chmod +x /usr/sbin/policy-rc.d
