@@ -10,10 +10,9 @@ SETUP_SCRIPT="chroot-setup.sh"
 REPOSITORY=$1
 DISTRIBUTION=$2
 ARCH=$3
-QCOW2=$4
-VMDK=$5
-FLAVOR=$6
-shift 6
+VMDK=$4
+FLAVOR=$5
+shift 5
 EXTRA_PACKAGES=$@
 
 ## main
@@ -46,6 +45,18 @@ while [[ -e /var/lock/qemu-nbd-nbd${NUM} ]] ; do
   NUM=$(( NUM + 1 ))
 done
 NBD_DEV="/dev/nbd${NUM}"
+
+# create qcow2
+vmdebootstrap --arch $ARCH \
+              --distribution $REPOSITORY \
+              --mirror http://deb.debian.org/debian \
+              --size 80GB \
+              --verbose \
+              --root-password passwd \
+              --sparse \
+	      --grub \
+	      --package curl
+              --image $QCOW2
 
 # attach and mount
 qemu-nbd -d ${NBD_DEV} || true
