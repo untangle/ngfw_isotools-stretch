@@ -19,8 +19,8 @@ NETBOOT_HOST := netboot-server
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 MOUNT_SCRIPT := /data/image-manager/mounts.py
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
-VMDK_REFERENCE_NAME := $(REPOSITORY).vmdk
-VMDK_REFERENCE_URL := $(NETBOOT_HOST)/$(VMDK_REFERENCE_NAME)
+QCOW2_REFERENCE_NAME := $(REPOSITORY).qcow2
+QCOW2_REFERENCE_URL := $(NETBOOT_HOST)/$(QCOW2_REFERENCE_NAME)
 VMDK_NAME := $(FLAVOR).vmdk
 QCOW2_NAME := $(FLAVOR).qcow2
 OVF_FILE := untangle.ovf
@@ -33,13 +33,13 @@ FULL_NAME := $(FLAVOR)-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(
 all: vmdk image
 
 clean:
-	rm -fr *-stamp $(VMDK_REFERENCE_NAME) $(QCOW2_NAME) $(VMDK_NAME) *.ova
+	rm -fr *-stamp $(QCOW2_REFERENCE_NAME) $(QCOW2_NAME) $(VMDK_NAME) *.ova
 
-$(VMDK_REFERENCE_NAME):
-	curl -v -f -o $@ $(VMDK_REFERENCE_URL)
+$(QCOW2_REFERENCE_NAME):
+	curl -v -f -o $@ $(QCOW2_REFERENCE_URL)
 
 vmdk: $(VMDK_NAME)
-$(VMDK_NAME): $(VMDK_REFERENCE_NAME)
+$(VMDK_NAME): $(QCOW2_REFERENCE_NAME)
 	$(OVA_DIR)/vmdk.sh $(REPOSITORY) $(DISTRIBUTION) $(ARCH) $< $@ $(FLAVOR) $(shell xargs < ../profiles/$(FLAVOR).packages)
 
 image: $(OVA_NAME)

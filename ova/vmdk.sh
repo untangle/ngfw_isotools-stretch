@@ -10,14 +10,13 @@ SETUP_SCRIPT="chroot-setup.sh"
 REPOSITORY=$1
 DISTRIBUTION=$2
 ARCH=$3
-ORIGINAL_VMDK=$4
+QCOW2=$4
 VMDK=$5
 FLAVOR=$6
 shift 6
 EXTRA_PACKAGES=$@
 
 ## main
-QCOW2=${VMDK/.vmdk/.qcow2}
 BASE_TMP_DIR="/tmp/tmp.vmdk-chroot-${FLAVOR}-${DISTRIBUTION}"
 CHROOT_DIR=$(mktemp -d ${BASE_TMP_DIR}.XXXXX)
 TMP_VMDK="/tmp/${FLAVOR}.vmdk"
@@ -47,9 +46,6 @@ while [[ -e /var/lock/qemu-nbd-nbd${NUM} ]] ; do
   NUM=$(( NUM + 1 ))
 done
 NBD_DEV="/dev/nbd${NUM}"
-
-# convert to qcow2
-qemu-img convert -O qcow2 ${ORIGINAL_VMDK} ${QCOW2}
 
 # attach and mount
 qemu-nbd -d ${NBD_DEV} || true
