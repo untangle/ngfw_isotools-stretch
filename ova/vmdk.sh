@@ -57,7 +57,6 @@ vmdebootstrap --arch $ARCH \
               --root-password passwd \
               --sparse \
 	      --grub \
-	      --package curl \
               --image $QCOW2
 
 # attach and mount
