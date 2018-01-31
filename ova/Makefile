@@ -4,7 +4,7 @@ PKGTOOLS_DIR := $(OVA_DIR)/../../ngfw_pkgtools
 
 ## overridables
 # repository
-REPOSITORY ?= jessie
+REPOSITORY ?= stretch
 # distribution to draw packages from
 DISTRIBUTION ?= current
 # architecture
@@ -19,7 +19,7 @@ NETBOOT_HOST := netboot-server
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 MOUNT_SCRIPT := /data/image-manager/mounts.py
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
-VMDK_REFERENCE_NAME := jessie.vmdk
+VMDK_REFERENCE_NAME := $(REPOSITORY).vmdk
 VMDK_REFERENCE_URL := $(NETBOOT_HOST)/$(VMDK_REFERENCE_NAME)
 VMDK_NAME := $(FLAVOR).vmdk
 QCOW2_NAME := $(FLAVOR).qcow2
@@ -28,9 +28,9 @@ OVA_NAME := $(FLAVOR).ova
 FULL_NAME := $(FLAVOR)-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST).ova
 
 ## targets
-.PHONY: all clean download-jessie-vmdk vmdk ova push
+.PHONY: all clean download-vmdk vmdk ova push
 
-all: download-jessie-vmdk vmdk image
+all: vmdk image
 
 clean:
 	rm -fr *-stamp $(VMDK_REFERENCE_NAME) $(QCOW2_NAME) $(VMDK_NAME) *.ova
