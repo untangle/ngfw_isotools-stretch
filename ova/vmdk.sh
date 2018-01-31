@@ -1,6 +1,7 @@
 #! /bin/bash
 
 set -e
+set -x
 
 # constants
 CURRENT_DIR=$(dirname $0)
@@ -16,6 +17,7 @@ shift 5
 EXTRA_PACKAGES=$@
 
 ## main
+QCOW2=${VMDK/vmdk/qcow2}
 BASE_TMP_DIR="/tmp/tmp.vmdk-chroot-${FLAVOR}-${DISTRIBUTION}"
 CHROOT_DIR=$(mktemp -d ${BASE_TMP_DIR}.XXXXX)
 TMP_VMDK="/tmp/${FLAVOR}.vmdk"
