@@ -5,7 +5,10 @@ set -x
 
 # constants
 CURRENT_DIR=$(dirname $0)
-SETUP_SCRIPT="chroot-setup.sh"
+OVA_PACKAGES_FILE="${CURRENT_DIR}/default.packages"
+PROFILES_DIR="${CURRENT_DIR}/../profiles"
+UNTANGLE_PACKAGES_FILE="${PROFILES_DIR}/untangle.packages"
+UNTANGLE_DOWNLOADS_FILE="${PROFILES_DIR}/untangle.downloads"
 
 # CL args
 REPOSITORY=$1
@@ -17,12 +20,10 @@ FLAVOR=$5
 ## main
 QCOW2=${VMDK/vmdk/qcow2}
 TMP_VMDK="/tmp/${FLAVOR}.vmdk"
-UNTANGLE_PACKAGES_FILE="${CURRENT_DIR}/../profiles/untangle.packages"
-UNTANGLE_DOWNLOADS_FILE="${CURRENT_DIR}/../profiles/untangle.downloads"
-FLAVOR_PACKAGES_FILE="${CURRENT_DIR}/../profiles/${FLAVOR}.packages"
+FLAVOR_PACKAGES_FILE="${PROFILES_DIR}/${FLAVOR}.packages"
 
 # create comma-separated list of extra packages
-extraPackages=$(grep -h -vE '^#' ${CURRENT_DIR}/extra-packages.txt $FLAVOR_PACKAGES_FILE $UNTANGLE_PACKAGES_FILE $UNTANGLE_DOWNLOADS_FILE | xargs)
+extraPackages=$(grep -h -vE '^#' $OVA_PACKAGES_FILE $FLAVOR_PACKAGES_FILE $UNTANGLE_PACKAGES_FILE $UNTANGLE_DOWNLOADS_FILE | xargs)
 extraPackages=${extraPackages// /,}
 
 # install latest untangle-development-kernel's ut-mkimage
@@ -32,11 +33,11 @@ DEBIAN_FRONTEND=noninteractive apt install --yes untangle-development-kernel
 # remove previous image if present
 rm -f $QCOW2
 
-# FIXME: stable is usually the branch; as a 1st step, we prolly want
-# to case $DISTRIBUTION and infer suite name.
-# This will however not work if we maintain 3 branches at the same
-# (which happened with master=14.0 + release-13.2 + release-13.1 for a
-# while)
+# FIXME: stable is usually the release-x.y branch; as a 1st step, we
+# prolly want to case $DISTRIBUTION and infer suite name accordingly.
+# This will however not work if we ever need to maintain 3 branches at
+# the same (which happened with master=14.0 + release-13.2 +
+# release-13.1 for a while)
 ut-qemu-mkimage -u -r $REPOSITORY -d stable -s 80G -p $extraPackages -f $QCOW2
 
 # convert back to an ESX-compatible VMDK
