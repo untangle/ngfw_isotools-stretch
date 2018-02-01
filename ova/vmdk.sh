@@ -17,10 +17,12 @@ FLAVOR=$5
 ## main
 QCOW2=${VMDK/vmdk/qcow2}
 TMP_VMDK="/tmp/${FLAVOR}.vmdk"
+UNTANGLE_PACKAGES_FILE="${CURRENT_DIR}/../profiles/untangle.packages"
+UNTANGLE_DOWNLOADS_FILE="${CURRENT_DIR}/../profiles/untangle.downloads"
 FLAVOR_PACKAGES_FILE="${CURRENT_DIR}/../profiles/${FLAVOR}.packages"
 
 # create comma-separated list of extra packages
-extraPackages=$(grep -h -vE '^#' ${CURRENT_DIR}/extra-packages.txt $FLAVOR_PACKAGES_FILE | xargs)
+extraPackages=$(grep -h -vE '^#' ${CURRENT_DIR}/extra-packages.txt $FLAVOR_PACKAGES_FILE $UNTANGLE_PACKAGES_FILE $UNTANGLE_DOWNLOADS_FILE | xargs)
 extraPackages=${extraPackages// /,}
 
 # install latest untangle-development-kernel's ut-mkimage
