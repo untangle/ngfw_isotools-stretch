@@ -26,8 +26,8 @@ extraPackages=$(grep -h -vE '^#' ${CURRENT_DIR}/extra-packages.txt $FLAVOR_PACKA
 extraPackages=${extraPackages// /,}
 
 # install latest untangle-development-kernel's ut-mkimage
-apt-get update
-apt-get install --yes untangle-development-kernel
+apt update
+DEBIAN_FRONTEND=noninteractive apt install --yes untangle-development-kernel
 
 # remove previous image if present
 rm -f $QCOW2
