@@ -23,9 +23,13 @@ FLAVOR_PACKAGES_FILE="${CURRENT_DIR}/../profiles/${FLAVOR}.packages"
 extraPackages=$(grep -h -vE '^#' ${CURRENT_DIR}/extra-packages.txt $FLAVOR_PACKAGES_FILE | xargs)
 extraPackages=${extraPackages// /,}
 
-# create qcow2 by using latest untangle-development-kernel's ut-mkimage
+# install latest untangle-development-kernel's ut-mkimage
 apt-get update
 apt-get install --yes untangle-development-kernel
+
+# remove previous image if present
+rm -f $QCOW2
+
 # FIXME: stable is usually the branch; as a 1st step, we prolly want
 # to case $DISTRIBUTION and infer suite name.
 # This will however not work if we maintain 3 branches at the same
