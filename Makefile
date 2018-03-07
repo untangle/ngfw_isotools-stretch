@@ -85,7 +85,7 @@ iso-conf:
 	cat $(COMMON_PRESEED) $(DEFAULT_PRESEED_EXTRA) | perl -pe 's|\+VERSION\+|'$(VERSION)'|g ; s|\+KERNELS\+|'$(KERNELS_$(ARCH))'|g' >| $(DEFAULT_PRESEED_EXPERT)
 
 iso/%-image: debian-installer iso-conf repoint-stable
-	$(eval flavor := $(patsubst iso/%-image,%,$*))
+	$(eval flavor := $*)
 	$(eval iso_dir := /tmp/untangle-images-$(flavor))
 	mkdir -p $(iso_dir)
 	export TMP_DIR=$(shell mktemp -d /tmp/isotools-stretch-$(flavor)-XXXXXX) ; \
@@ -98,33 +98,30 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	mv $(iso_dir)/$(flavor)-$(DEBVERSION)*-$(ARCH)-*1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
 
 iso/%-clean:
-	$(eval flavor := $(patsubst iso/%-clean,%,$*))
-	$(eval iso_dir := /tmp/untangle-images-$(flavor))
-	rm -fr $(ISOTOOLS_DIR)/tmp $(iso_dir)
+	rm -fr $(ISOTOOLS_DIR)/tmp /tmp/untangle-images-$*
 
 usb/%-image:
-	$(eval flavor := $(patsubst usb/%-image,%,$*))
+	$(eval flavor := $*)
 	$(eval iso_dir := /tmp/untangle-images-$(flavor))
 	$(eval iso_image := $(shell ls --sort=time $(iso_dir)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
 	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG) $(iso_image) $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(USB_IMAGE)) $(flavor)
 
 ova/%-image:
-	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$(patsubst ova/%-image,%,$*) image
+	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$* image
 ova/%-push:
-	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$(patsubst ova/%-push,%,$*) push
+	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$* push
 ova/%-clean:
-	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$(patsubst ova/%-clean,%,$*) clean
+	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$* clean
 
 cloud/%-image:
-	make -C $(ISOTOOLS_DIR)/cloud $(patsubst cloud/%-image,%,$*)-image
+	make -C $(ISOTOOLS_DIR)/cloud FLAVOR=$* image
 cloud/%-push:
-	make -C $(ISOTOOLS_DIR)/cloud $(patsubst cloud/%-image,%,$*)-push
+	make -C $(ISOTOOLS_DIR)/cloud FLAVOR=$* push
 cloud/%-clean:
-	make -C $(ISOTOOLS_DIR)/cloud clean
+	make -C $(ISOTOOLS_DIR)/cloud FLAVOR=$* clean
 
 iso/%-push: # pushes the most recent images
-	$(eval flavor := $(patsubst iso/%-push,%,$*))
-	$(eval iso_dir := /tmp/untangle-images-$(flavor))
+	$(eval iso_dir := /tmp/untangle-images-$*)
 	$(eval iso_image := $(shell ls --sort=time $(iso_dir)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
 	$(eval usb_image := $(shell ls --sort=time $(iso_dir)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.img | head -1))
 	$(eval timestamp := $(shell echo $(iso_image) | perl -pe 's/.*(\d{4}(-\d{2}){2}T(\d{2}:?){3}).*/$$1/'))
