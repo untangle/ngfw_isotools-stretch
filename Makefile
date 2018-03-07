@@ -113,7 +113,7 @@ ova/%-image:
 ova/%-push:
 	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$(patsubst ova/%-push,%,$*) push
 ova/%-clean:
-	make -C $(ISOTOOLS_DIR)/ova clean
+	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$(patsubst ova/%-clean,%,$*) clean
 
 cloud/%-image:
 	make -C $(ISOTOOLS_DIR)/cloud $(patsubst cloud/%-image,%,$*)-image
