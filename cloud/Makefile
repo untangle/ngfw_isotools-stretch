@@ -21,6 +21,8 @@ AMI_LOG := $(TMP_DIR)/ami.log
 TMP_IMAGE := $(TMP_DIR)/ami.raw
 NETBOOT_HOST := netboot-server.untangle.int
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
+AWS_FAI_CONF := $(CWD)/class/UNTANGLE.var
+AWS_FAI_CONF_TPL := (AWS_FAI_CONF).tpl
 # FIXME: find device dynamically, and then derive its ID
 EBS_DEVICE := /dev/xvdf
 EBS_ID := vol-06da60b13f650af2a
@@ -31,13 +33,13 @@ FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_current_$(TS)_$(HOST)_$(N
 all: aws-image
 
 clean:
-	rm -fr $(TMP_DIR)
+	rm -fr $(TMP_DIR) $(AWS_FAI_CONF)
 
 $(TMP_DIR):
 	mkdir -p $(TMP_DIR)
 
 aws-image: $(TMP_DIR)
-	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' class/UNTANGLE.var.tpl > class/UNTANGLE.var
+	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(AWS_FAI_CONF_TPL) > $(AWS_FAI_CONF)
 	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,JESSIE,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(AMI_LOG)
