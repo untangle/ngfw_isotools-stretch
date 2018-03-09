@@ -28,7 +28,7 @@ FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_current_$(TS)_$(HOST)_$(N
 
 .PHONY: all clean image push
 
-all: image
+all: aws-image
 
 clean:
 	rm -fr $(TMP_DIR)
@@ -37,6 +37,7 @@ $(TMP_DIR):
 	mkdir -p $(TMP_DIR)
 
 aws-image: $(TMP_DIR)
+	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' class/UNTANGLE.var.tpl > class/UNTANGLE.var
 	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,JESSIE,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(AMI_LOG)
