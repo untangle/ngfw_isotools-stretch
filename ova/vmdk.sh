@@ -15,7 +15,8 @@ REPOSITORY=$1
 DISTRIBUTION=$2
 ARCH=$3
 VMDK=$4
-FLAVOR=$5
+SIZE=$5
+FLAVOR=$6
 
 ## main
 QCOW2=${VMDK/vmdk/qcow2}
@@ -38,7 +39,7 @@ rm -f $QCOW2
 # This will however not work if we ever need to maintain 3 branches at
 # the same (which happened with master=14.0 + release-13.2 +
 # release-13.1 for a while)
-ut-qemu-mkimage -u -r $REPOSITORY -d stable -s 80G -p $extraPackages -f $QCOW2
+ut-qemu-mkimage -u -r $REPOSITORY -d stable -s $SIZE -p $extraPackages -f $QCOW2
 
 # convert back to an ESX-compatible VMDK
 qemu-img convert -O vmdk -o subformat=streamOptimized ${QCOW2} ${TMP_VMDK}
