@@ -39,7 +39,7 @@ rm -f $QCOW2
 # This will however not work if we ever need to maintain 3 branches at
 # the same (which happened with master=14.0 + release-13.2 +
 # release-13.1 for a while)
-ut-qemu-mkimage -u -r $REPOSITORY -d stable -s $SIZE -p $extraPackages -f $QCOW2
+ut-qemu-mkimage -u -r $REPOSITORY -d stable -s ${SIZE}G -p $extraPackages -f $QCOW2
 
 # convert back to an ESX-compatible VMDK
 qemu-img convert -O vmdk -o subformat=streamOptimized ${QCOW2} ${TMP_VMDK}
