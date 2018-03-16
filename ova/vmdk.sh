@@ -45,8 +45,8 @@ ut-qemu-mkimage -u -r $REPOSITORY -d stable -s ${SIZE}G -p $extraPackages -f $QC
 qemu-img convert -O vmdk -o subformat=streamOptimized ${QCOW2} ${TMP_VMDK}
 rm -f $QCOW2
 
-mv $TMP_VMDK $VMDK
-# # FIXME: investigate if this step is still needed with the more recent
-# # QEMU on stretch
-# rm -f ${VMDK}
-# vboxmanage clonehd ${TMP_VMDK} ${VMDK} --format VMDK --variant Stream
+#mv $TMP_VMDK $VMDK
+# FIXME: investigate if this step is still needed with the more recent
+# QEMU on stretch
+vboxmanage clonehd ${TMP_VMDK} ${VMDK} --format VMDK --variant Stream
+rm ${TMP_VMDK}
