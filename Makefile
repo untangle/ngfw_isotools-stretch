@@ -90,10 +90,10 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	mkdir -p $(iso_dir)
 	export TMP_DIR=$(shell mktemp -d /tmp/isotools-stretch-$(flavor)-XXXXXX) ; \
 	cd $${TMP_DIR} ; \
-	cp -rl $(ISOTOOLS_DIR)/* . ; \
+	cp -rl $(ISOTOOLS_DIR)/* . 2> /dev/null ; \
 	export CODENAME=$(REPOSITORY) DEBVERSION=$(DEBVERSION) OUT=$(iso_dir) ; \
 	export CDNAME=$(flavor) DISKTYPE=CUSTOM CUSTOMSIZE=$(CUSTOMSIZE) ; \
-	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,$(flavor),expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose --logfile $${TMP_DIR}/simplecdd.log  ; \
+	build-simple-cdd --keyring /usr/share/keyrings/untangle-archive-keyring.gpg --force-root --auto-profiles default,untangle,$(flavor) --profiles untangle,$(flavor),expert --debian-mirror http://package-server/public/$(REPOSITORY)/ --security-mirror http://package-server/public/$(REPOSITORY)/ --dist $(REPOSITORY) --require-optional-packages --mirror-tools reprepro --extra-udeb-dist $(DISTRIBUTION) --do-mirror --verbose --logfile $(ISOTOOLS_DIR)/simplecdd.log  ; \
 	rm -fr $${TMP_DIR}
 	mv $(iso_dir)/$(flavor)-$(DEBVERSION)*-$(ARCH)-*1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
 
