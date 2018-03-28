@@ -11,10 +11,19 @@ index 9e1e49c..e3ace1d 100644
  
  DISK_LABEL = "bootable drive"
  MEDIA_TYPE = bootable drive
-diff --git d-i/build/config/common b/isotools-stretch/d-i/build/config/common
-index 9145ead..cac37e4 100644
+diff --git a/d-i/build/config/common b/d-i/build/config/common
+index c473b11..3e68d29 100644
 --- d-i/build/config/common
 +++ d-i/build/config/common
+@@ -11,7 +11,7 @@
+ 
+ # Default kernel ABI version to use. Append a kernel flavour to
+ # produce KERNELVERSION.
+-LINUX_KERNEL_ABI ?= 4.9.0-3
++LINUX_KERNEL_ABI ?= 4.9.0-6
+ 
+ # Always "di" these days
+ KERNEL_FLAVOUR ?= di
 @@ -96,7 +96,7 @@ LSB_DISTRIB_RELEASE="$(DEBIAN_VERSION) - installer build $(BUILD_DATE)"
  
  # This keyring is only used to verify udeb downloads using apt. Since the
