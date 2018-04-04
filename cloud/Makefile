@@ -22,7 +22,7 @@ TMP_IMAGE := $(TMP_DIR)/ami.raw
 NETBOOT_HOST := netboot-server.untangle.int
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 AWS_FAI_CONF := $(CWD)/class/UNTANGLE.var
-AWS_FAI_CONF_TPL := (AWS_FAI_CONF).tpl
+AWS_FAI_CONF_TPL := $(AWS_FAI_CONF).tpl
 # FIXME: find device dynamically, and then derive its ID
 EBS_DEVICE := /dev/xvdf
 EBS_ID := vol-06da60b13f650af2a
