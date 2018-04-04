@@ -1,0 +1,23 @@
+#! /bin/bash
+
+# template expansion for sources.list:
+# replace {release} with the value of $release
+# replace {cdn} with the value of $apt_cdn
+
+# $1 is the class name used
+# $2 is the path to the file copied
+
+# check if a variable of the form {varname} was used at all
+grep -q '{' $2 || exit 0
+
+if [ -z "$release" ]; then
+    echo "\$release is undefined. Not substituting in $2."
+else
+    sed -i -e "s#{release}#$release#g" $2
+fi
+
+if [ -z "$apt_cdn" ]; then
+    echo "\$apt_cdn not defined. not substituting in $2."
+else
+    sed -i -e "s#{cdn}#$apt_cdn#g" $2
+fi

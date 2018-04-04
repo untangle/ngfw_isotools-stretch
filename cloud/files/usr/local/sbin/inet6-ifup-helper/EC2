@@ -1,0 +1,35 @@
+#!/bin/bash
+
+test -n "$IFACE" || {
+    echo "Must be run from a post-up or pre-down rule defined in /etc/network/interfaces" >&2
+    exit 1
+}
+
+PIDFILE="/run/dhclient-6.$IFACE.pid"
+LEASESFILE="/var/lib/dhcp/dhclient-6.$IFACE.leases"
+DUIDFILE="/var/lib/dhcp/dhclient-6.$IFACE.leases"
+
+case "$MODE" in
+    start)
+        ip link set $IFACE up
+        /lib/ifupdown/wait-for-ll6.sh || exit 1
+        /sbin/dhclient -v -6 -nw -pf $PIDFILE -lf $LEASESFILE -I -df $DUIDFILE $IFACE
+        ;;
+    stop)
+        test -e $PIDFILE && {
+            /sbin/dhclient -x -pf $PIDFILE
+        }
+        ;;
+    *)
+        echo "Unknown MODE" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
+
+# Local variables:
+# mode: shell-script
+# tab-width: 4
+# indent-tabs-mode: nil
+# end:

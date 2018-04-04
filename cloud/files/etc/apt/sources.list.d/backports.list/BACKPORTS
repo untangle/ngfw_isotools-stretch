@@ -1,0 +1,2 @@
+deb {cdn}/debian {release}-backports main
+deb-src {cdn}/debian {release}-backports main

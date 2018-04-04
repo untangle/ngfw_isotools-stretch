@@ -1,0 +1,3 @@
+deb {cdn}/debian {release} main
+deb http://security.debian.org/ {release}/updates main
+deb {cdn}/debian {release}-updates main

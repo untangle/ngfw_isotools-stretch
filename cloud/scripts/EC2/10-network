@@ -1,0 +1,20 @@
+#!/bin/bash
+
+ainsl -v /etc/network/interfaces 'auto lo'
+ainsl -v /etc/network/interfaces 'iface lo inet loopback'
+ainsl -v /etc/network/interfaces 'auto eth0'
+
+fcopy -m root,root,755 /usr/local/sbin/inet6-ifup-helper
+fcopy -M /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+
+# enable dhcp for up to 8 attached interfaces
+for i in 0 1 2 3 4 5 6 7 8; do
+    ainsl -v /etc/network/interfaces "iface eth${i} inet dhcp"
+    ifclass DISABLE_IPV6 || {
+	echo "allow-hotplug eth${i}" >> "$target"/etc/network/interfaces
+	echo "iface eth${i} inet6 manual" >> "$target"/etc/network/interfaces
+	echo "  up /usr/local/sbin/inet6-ifup-helper" >> "$target"/etc/network/interfaces
+	echo "  down /usr/local/sbin/inet6-ifup-helper" >> "$target"/etc/network/interfaces
+    }
+done
+

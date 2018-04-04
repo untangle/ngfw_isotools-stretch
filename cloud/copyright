@@ -1,0 +1,19 @@
+This configuration space takes files from the FAI 5.2 release, distributed under the following copyright
+Copyright: 1999-2014 Thomas Lange <lange@informatik.uni-koeln.de>
+License: GPL-2+
+Comment:
+    Other contributions copyright by
+    Thomas Gebhardt         <gebhardt@hrz.uni-marburg.de>
+    Henning Glawe           <glaweh@physik.fu-berlin.de>
+    Michael Goetze          <mgoetze@mgoetze.net>
+    Kerim Güney             <kerim@fai-[roject.org>
+    Jonas Hoffmann          <jhoffman@physik.fu-berlin.de>
+    Christian Kern          <kernch@in.tum.de>
+    Holger Levsen           <holger@layer-acht.org>
+    Darshaka Pathirana      <dpat@syn-net.org>
+    Michael Tautschnig      <mt@debian.org>
+    Ingo Wichmann           <iw@linuxhotel.de>
+
+Members of the Debian Cloud Team contributing under the same license include:
+
+Sam Hartman <hartmans@debian.org>

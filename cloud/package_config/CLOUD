@@ -1,0 +1,24 @@
+PACKAGES install
+locales
+openssh-server
+cloud-init
+cloud-utils
+cloud-guest-utils
+sudo
+
+vim
+xz-utils
+mdadm
+
+dbus
+bsd-mailx
+gnupg2
+psmisc
+strace
+lsof
+tcpdump
+
+PACKAGES install JESSIE
+cloud-init/$release-backports
+cloud-utils/$release-backports
+cloud-guest-utils/$release-backports
