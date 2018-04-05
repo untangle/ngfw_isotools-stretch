@@ -128,7 +128,6 @@
       <Item>
         <rasd:AddressOnParent>7</rasd:AddressOnParent>
         <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
-        <rasd:Connection>External</rasd:Connection>
         <rasd:Description>VmxNet3 ethernet adapter on "External"</rasd:Description>
         <rasd:ElementName>External</rasd:ElementName>
         <rasd:InstanceID>12</rasd:InstanceID>
@@ -140,7 +139,6 @@
       <Item>
         <rasd:AddressOnParent>7</rasd:AddressOnParent>
         <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
-        <rasd:Connection>VM Network</rasd:Connection>
         <rasd:Description>VmxNet3 ethernet adapter on "Internal"</rasd:Description>
         <rasd:ElementName>Internal</rasd:ElementName>
         <rasd:InstanceID>13</rasd:InstanceID>
