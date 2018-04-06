@@ -141,7 +141,7 @@
         <vmw:Config ovf:required="false" vmw:key="wakeOnLanEnabled" vmw:value="true" />
       </Item>
       <Item>
-        <rasd:AddressOnParent>7</rasd:AddressOnParent>
+        <rasd:AddressOnParent>8</rasd:AddressOnParent>
         <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
         <rasd:Connection>Internal</rasd:Connection>
         <rasd:Description>VmxNet3 ethernet adapter on "Internal"</rasd:Description>
