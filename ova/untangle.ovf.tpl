@@ -10,8 +10,11 @@
   </DiskSection>
   <NetworkSection>
     <Info>The list of logical networks</Info>
-    <Network ovf:name="VM Network">
-      <Description>The VM Network network</Description>
+    <Network ovf:name="External">
+      <Description>The external network</Description>
+    </Network>
+    <Network ovf:name="Internal">
+      <Description>The internal network</Description>
     </Network>
   </NetworkSection>
   <VirtualSystem ovf:id="Untangle NGFW">
@@ -128,6 +131,7 @@
       <Item>
         <rasd:AddressOnParent>7</rasd:AddressOnParent>
         <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
+        <rasd:Connection>External</rasd:Connection>
         <rasd:Description>VmxNet3 ethernet adapter on "External"</rasd:Description>
         <rasd:ElementName>External</rasd:ElementName>
         <rasd:InstanceID>12</rasd:InstanceID>
@@ -139,6 +143,7 @@
       <Item>
         <rasd:AddressOnParent>7</rasd:AddressOnParent>
         <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
+        <rasd:Connection>Internal</rasd:Connection>
         <rasd:Description>VmxNet3 ethernet adapter on "Internal"</rasd:Description>
         <rasd:ElementName>Internal</rasd:ElementName>
         <rasd:InstanceID>13</rasd:InstanceID>
