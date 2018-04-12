@@ -64,7 +64,13 @@ export LC_ALL=C
 mount -t tmpfs -o size=2000M tmpfs ${CHROOT_DIR}
 
 # debootstrap onto chroot
-debootstrap --arch=$ARCH --variant=minbase --foreign --no-check-gpg $REPOSITORY ${CHROOT_DIR} http://package-server/public/$REPOSITORY
+case $DISTRIBUTION in
+  # FIXME: we this scheme it will be difficult to support more than 2
+  # distributions, unless we try and tag current as "unstable" instead
+  current) CODENAME=testing ;;
+  *) CODENAME=stable ;;
+esac
+debootstrap --arch=$ARCH --variant=minbase --foreign --no-check-gpg $CODENAME ${CHROOT_DIR} http://package-server/public/$REPOSITORY
 
 # arm static binary in chroot
 case $ARCH in
