@@ -10,7 +10,7 @@ CURRENT_DIR=$(dirname $0)
 umountPFS() {
   kill -9 $(lsof ${CHROOT_DIR} | awk '{print $2}' | grep -vE '^PID' | sort -u) || true
   sleep 5
-  lsof $CHROOT_DIR
+  lsof $CHROOT_DIR || true
   for pfs in sys proc dev/pts dev ; do
     umount -l ${CHROOT_DIR}/$pfs || true
   done
@@ -18,7 +18,7 @@ umountPFS() {
 
 umountDirs() {
   umountPFS
-  lsof $CHROOT_DIR
+  lsof $CHROOT_DIR || true
   umount $CHROOT_DIR || true
   umount $MNT_DIR || true
   losetup -d $LOOP_DEVICE || true
