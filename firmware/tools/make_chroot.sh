@@ -8,7 +8,7 @@ CURRENT_DIR=$(dirname $0)
 
 # functions
 umountPFS() {
-  kill $(lsof ${CHROOT_DIR} | awk '{print $2}' | grep -vE '^PID' | sort -u) || true
+  kill -9 $(lsof ${CHROOT_DIR} | awk '{print $2}' | grep -vE '^PID' | sort -u) || true
   sleep 5
   lsof $CHROOT_DIR
   for pfs in sys proc dev/pts dev ; do
