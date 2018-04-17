@@ -9,8 +9,6 @@ CURRENT_DIR=$(dirname $0)
 # functions
 umountPFS() {
   kill -9 $(lsof ${CHROOT_DIR} | awk '{print $2}' | grep -vE '^PID' | sort -u) || true
-  sleep 5
-  lsof $CHROOT_DIR || true
   for pfs in sys proc dev/pts dev ; do
     umount -l ${CHROOT_DIR}/$pfs || true
   done
@@ -18,7 +16,6 @@ umountPFS() {
 
 umountDirs() {
   umountPFS
-  lsof $CHROOT_DIR || true
   umount $CHROOT_DIR || true
   umount $MNT_DIR || true
   losetup -d $LOOP_DEVICE || true
@@ -106,9 +103,6 @@ cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
 chroot ${CHROOT_DIR} /tmp/$(basename ${SECOND_STAGE_SCRIPT}) $REPOSITORY $DISTRIBUTION $NAME
 
 # grab TRX
-ls -l ${CHROOT_DIR}/boot/vmlinu*trx
-ls -ld tmp
-ls -l tmp
 cp ${CHROOT_DIR}/boot/vmlinu*trx tmp/
 
 # umount PFS
