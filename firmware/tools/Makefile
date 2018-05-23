@@ -22,7 +22,7 @@ MOUNT_SCRIPT := /data/image-manager/mounts.py
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 BIN_DIR := $(CWD)/binary
 TMP_DIR := $(CWD)/tmp
-VENDOR_REFERENCE_NAME := $(NAME)-rootfs.tar.xz
+VENDOR_REFERENCE_NAME := $(NAME)-$(DISTRIBUTION)-rootfs.tar.xz
 VENDOR_REFERENCE_URL := $(NETBOOT_HOST)/$(VENDOR_REFERENCE_NAME)
 SQUASHFS_FILE := $(BIN_DIR)/dd-wrt.squashfs
 KERNEL_FILE := $(wildcard $(BIN_DIR)/?Image-untangle)
@@ -30,7 +30,7 @@ VMLINUZ_FILE := $(TMP_DIR)/vmlinuz.lzma
 IMAGE_FILE := $(TMP_DIR)/image.bin
 FIRMWARE_IMG := $(TMP_DIR)/*.trx
 FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME)
-ROOTFS_IMAGE := /tmp/$(NAME).rootfs
+ROOTFS_IMAGE := /tmp/$(NAME)-$(DISTRIBUTION).rootfs
 
 .PHONY: all clean image rootfs push
 
