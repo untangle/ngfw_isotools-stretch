@@ -93,11 +93,11 @@ for pfs in dev dev/pts proc sys ; do
 done
 
 # untar original rootfs into /var/lib/${NAME}-rootfs if necessary
-if [ $NEED_ORIGINAL_ROOTFS = "yes" ] ; then
+if [ "$NEED_ORIGINAL_ROOTFS" = "yes" ] ; then
   ROOTFS_DEST_DIR="${CHROOT_DIR}/var/lib/${NAME}-rootfs"
   mkdir -p $ROOTFS_DEST_DIR
   tar -C $ROOTFS_DEST_DIR -xaf ${VENDOR_DIR}/${VENDOR_REFERENCE_NAME}
-if
+fi
 
 # copy 2nd stage install script in chroot, and run it
 cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
