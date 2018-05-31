@@ -47,7 +47,7 @@ MNT_DIR=$(mktemp -d /tmp/tmp.${NAME}-img.XXXXX)
 SECOND_STAGE_SCRIPT="${CURRENT_DIR}/second_stage.sh"
 
 # traps
-trap cleanup EXIT
+trap cleanup SIGINT SIGQUIT SIGTERM ERR
 
 # we may run via sudo
 export PATH=/sbin:/usr/sbin:${PATH}
