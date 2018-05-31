@@ -28,13 +28,14 @@ removeTmpDirs() {
 cleanup() {
   umountDirs
   removeTmpDirs
+  rm -f $IMAGE
 }
 
 # CL args
 NAME=$1
 REPOSITORY=$2
 DISTRIBUTION=$3
-ROOTFS=$4
+VENDOR_REFERENCE_NAME=$4
 IMAGE=$5
 
 # include vendor-specific configuration
@@ -95,8 +96,8 @@ done
 if [ $NEED_ORIGINAL_ROOTFS = "yes" ] ; then
   ROOTFS_DEST_DIR="${CHROOT_DIR}/var/lib/${NAME}-rootfs"
   mkdir -p $ROOTFS_DEST_DIR
-  tar -C $ROOTFS_DEST_DIR -xaf ${VENDOR_DIR}/${ROOTFS}
-fi
+  tar -C $ROOTFS_DEST_DIR -xaf ${VENDOR_DIR}/${VENDOR_REFERENCE_NAME}
+if
 
 # copy 2nd stage install script in chroot, and run it
 cp ${CURRENT_DIR}/${SECOND_STAGE_SCRIPT} ${CHROOT_DIR}/tmp/
