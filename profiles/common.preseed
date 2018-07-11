@@ -4,7 +4,7 @@
 # debconf & d-i
 debconf debconf/priority string critical
 unknown debconf/priority string critical
-d-i     debconf/priority string critical
+d-i     debconf/priority string high
 
 # snort
 snort snort/address_range string 192.168.0.0/16
