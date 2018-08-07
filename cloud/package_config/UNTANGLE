@@ -1,5 +1,5 @@
 PACKAGES install-norec
-linux-image-4.9.0-6-untangle-amd64
+linux-image-4.9.0-7-untangle-amd64
 untangle-gateway
 untangle-hardware-amazon-ec2
 
