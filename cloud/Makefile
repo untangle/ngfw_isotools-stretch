@@ -26,7 +26,8 @@ AWS_FAI_CONF_TPL := $(AWS_FAI_CONF).tpl
 # FIXME: find device dynamically, and then derive its ID
 EBS_DEVICE := /dev/xvdf
 EBS_ID := vol-06da60b13f650af2a
-FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME).ami.txt
+# FIXME: not necessarily ec2, so handle name in %-push instead
+FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME)_ec2_$(LICENSE).txt
 
 .PHONY: all clean image push
 
