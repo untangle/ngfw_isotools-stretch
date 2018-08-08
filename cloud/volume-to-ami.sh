@@ -164,7 +164,7 @@ if [ -n "$DRY_RUN" ]; then
     echo "Input data:"
     cat "$json_body"
 else
-    json=$(cmd)
+    json="$($cmd)"
     echo $cmd # consumed by caller
     ami_id=$(echo "$json" | jq -r '.ImageId')
     # FIXME: define that list from a command-line switch
