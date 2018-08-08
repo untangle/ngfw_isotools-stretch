@@ -1,7 +1,6 @@
 PACKAGES install-norec
 linux-image-4.9.0-7-untangle-amd64
 untangle-gateway
-untangle-hardware-amazon-payg
 
 PACKAGES install JESSIE
 e2fsprogs/$release-backports

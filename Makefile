@@ -113,12 +113,19 @@ ova/%-push:
 ova/%-clean:
 	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$* clean
 
+# cloud/<provider>/<license> -> make LICENSE=<license> <provider>-image
 cloud/%-image:
-	make -C $(ISOTOOLS_DIR)/cloud $*-image
+	$(eval license := $(shell basename $*))
+	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
+	echo make -C $(ISOTOOLS_DIR)/cloud LICENSE=$(license) $(provider)-image
 cloud/%-push:
-	make -C $(ISOTOOLS_DIR)/cloud $*-push
+	$(eval license := $(shell basename $*))
+	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
+	make -C $(ISOTOOLS_DIR)/cloud LICENSE=LICENSE=$(license) $(provider)-push
 cloud/%-clean:
-	make -C $(ISOTOOLS_DIR)/cloud clean
+	$(eval license := $(shell basename $*))
+	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
+	make -C $(ISOTOOLS_DIR)/cloud LICENSE=LICENSE=$(license) clean
 
 iso/%-push: # pushes the most recent images
 	$(eval iso_dir := /tmp/untangle-images-$(REPOSITORY)-$(DISTRIBUTION)-$*)
