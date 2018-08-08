@@ -165,7 +165,7 @@ if [ -n "$DRY_RUN" ]; then
     cat "$json_body"
 else
     json="$($cmd)"
-    echo $cmd # consumed by caller
+    echo "$json" # consumed by caller
     ami_id=$(echo "$json" | jq -r '.ImageId')
     # FIXME: define that list from a command-line switch
     for account_id in 612726942234 679593333241 684062674729 ; do
