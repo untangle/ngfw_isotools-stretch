@@ -8,15 +8,15 @@ PKGTOOLS_DIR := $(CWD)/../../ngfw_pkgtools
 REPOSITORY ?= stretch
 # distribution to draw packages from
 DISTRIBUTION ?= current
-# flavor
-FLAVOR ?= untangle
+# license
+LICENSE ?= BYOL
 
 # constants
 ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 VERSION := $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
-TMP_DIR := $(CWD)/tmp-$(FLAVOR)
+TMP_DIR := $(CWD)/tmp-$(REPOSITORY)-$(DISTRIBUTION)-$(LICENSE)
 AMI_LOG := $(TMP_DIR)/ami.log
 TMP_IMAGE := $(TMP_DIR)/ami.raw
 NETBOOT_HOST := netboot-server.untangle.int
@@ -26,7 +26,8 @@ AWS_FAI_CONF_TPL := $(AWS_FAI_CONF).tpl
 # FIXME: find device dynamically, and then derive its ID
 EBS_DEVICE := /dev/xvdf
 EBS_ID := vol-06da60b13f650af2a
-FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME).ami.txt
+# FIXME: not necessarily ec2, so handle name in %-push instead
+FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME)_ec2_$(LICENSE).txt
 
 .PHONY: all clean image push
 
@@ -38,11 +39,11 @@ clean:
 $(TMP_DIR):
 	mkdir -p $(TMP_DIR)
 
-aws-image: $(TMP_DIR)
+ec2-image: $(TMP_DIR)
 	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(AWS_FAI_CONF_TPL) > $(AWS_FAI_CONF)
-	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE $(TMP_IMAGE)
+	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(AMI_LOG)
 
-aws-push:
+ec2-push:
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(AMI_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(FULL_NAME)"

@@ -86,7 +86,7 @@ iso-conf:
 
 iso/%-image: debian-installer iso-conf repoint-stable
 	$(eval flavor := $*)
-	$(eval iso_dir := /tmp/untangle-images-$(flavor))
+	$(eval iso_dir := /tmp/untangle-images-$(REPOSITORY)-$(DISTRIBUTION)-$(flavor))
 	mkdir -p $(iso_dir)
 	export TMP_DIR=$(shell mktemp -d /tmp/isotools-stretch-$(flavor)-XXXXXX) ; \
 	cd $${TMP_DIR} ; \
@@ -98,11 +98,11 @@ iso/%-image: debian-installer iso-conf repoint-stable
 	mv $(iso_dir)/$(flavor)-$(DEBVERSION)*-$(ARCH)-*1.iso $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(ISO_IMAGE))
 
 iso/%-clean:
-	rm -fr $(ISOTOOLS_DIR)/tmp /tmp/untangle-images-$*
+	rm -fr $(ISOTOOLS_DIR)/tmp /tmp/untangle-images-$(REPOSITORY)-$(DISTRIBUTION)-$*
 
 usb/%-image:
 	$(eval flavor := $*)
-	$(eval iso_dir := /tmp/untangle-images-$(flavor))
+	$(eval iso_dir := /tmp/untangle-images-$(REPOSITORY)-$(DISTRIBUTION)-$(flavor))
 	$(eval iso_image := $(shell ls --sort=time $(iso_dir)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
 	$(ISOTOOLS_DIR)/make_usb.sh $(BOOT_IMG) $(iso_image) $(iso_dir)/$(subst +FLAVOR+,$(flavor),$(USB_IMAGE)) $(flavor)
 
@@ -113,15 +113,22 @@ ova/%-push:
 ova/%-clean:
 	make -C $(ISOTOOLS_DIR)/ova FLAVOR=$* clean
 
+# cloud/<provider>/<license> -> make LICENSE=<license> <provider>-image
 cloud/%-image:
-	make -C $(ISOTOOLS_DIR)/cloud $*-image
+	$(eval license := $(shell basename $*))
+	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
+	make -C $(ISOTOOLS_DIR)/cloud LICENSE=$(license) $(provider)-image
 cloud/%-push:
-	make -C $(ISOTOOLS_DIR)/cloud $*-push
+	$(eval license := $(shell basename $*))
+	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
+	make -C $(ISOTOOLS_DIR)/cloud LICENSE=$(license) $(provider)-push
 cloud/%-clean:
-	make -C $(ISOTOOLS_DIR)/cloud clean
+	$(eval license := $(shell basename $*))
+	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
+	make -C $(ISOTOOLS_DIR)/cloud LICENSE=$(license) clean
 
 iso/%-push: # pushes the most recent images
-	$(eval iso_dir := /tmp/untangle-images-$*)
+	$(eval iso_dir := /tmp/untangle-images-$(REPOSITORY)-$(DISTRIBUTION)-$*)
 	$(eval iso_image := $(shell ls --sort=time $(iso_dir)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.iso | head -1))
 	$(eval usb_image := $(shell ls --sort=time $(iso_dir)/*$(VERSION)*$(REPOSITORY)*$(ARCH)*$(DISTRIBUTION)*.img | head -1))
 	$(eval timestamp := $(shell echo $(iso_image) | perl -pe 's/.*(\d{4}(-\d{2}){2}T(\d{2}:?){3}).*/$$1/'))

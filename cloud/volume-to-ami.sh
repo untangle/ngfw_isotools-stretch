@@ -91,6 +91,15 @@ snapshot_state() {
         | jq -r '.Snapshots[].State'
 }
 
+share_ami() {
+  local amiid="$1"
+  local snapid="$2"
+  local accountid="$3"
+
+  aws ec2 modify-image-attribute --image-id ${amiid} --launch-permission "Add=[{UserId=${accountid}}]"
+  aws ec2 modify-snapshot-attribute --snapshot-id ${snapid} --attribute createVolumePermission --operation-type add --user-ids ${accountid}
+}
+
 cmd="aws --output json ec2 create-snapshot --volume-id $vol_id"
 if [ -n "$DRY_RUN" ]; then
     echo "Dry run: $cmd"
@@ -155,7 +164,13 @@ if [ -n "$DRY_RUN" ]; then
     echo "Input data:"
     cat "$json_body"
 else
-    $cmd
+    json="$($cmd)"
+    echo "$json" # consumed by caller
+    ami_id=$(echo "$json" | jq -r '.ImageId')
+    # FIXME: define that list from a command-line switch
+    for account_id in 612726942234 679593333241 684062674729 ; do
+      share_ami $ami_id $snap_id $account_id
+    done
 fi
 
 # Local variables:
