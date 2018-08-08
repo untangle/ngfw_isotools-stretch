@@ -121,11 +121,11 @@ cloud/%-image:
 cloud/%-push:
 	$(eval license := $(shell basename $*))
 	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
-	make -C $(ISOTOOLS_DIR)/cloud LICENSE=LICENSE=$(license) $(provider)-push
+	make -C $(ISOTOOLS_DIR)/cloud LICENSE=$(license) $(provider)-push
 cloud/%-clean:
 	$(eval license := $(shell basename $*))
 	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
-	make -C $(ISOTOOLS_DIR)/cloud LICENSE=LICENSE=$(license) clean
+	make -C $(ISOTOOLS_DIR)/cloud LICENSE=$(license) clean
 
 iso/%-push: # pushes the most recent images
 	$(eval iso_dir := /tmp/untangle-images-$(REPOSITORY)-$(DISTRIBUTION)-$*)
