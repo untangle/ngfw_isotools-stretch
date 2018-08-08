@@ -117,7 +117,7 @@ ova/%-clean:
 cloud/%-image:
 	$(eval license := $(shell basename $*))
 	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
-	echo make -C $(ISOTOOLS_DIR)/cloud LICENSE=$(license) $(provider)-image
+	make -C $(ISOTOOLS_DIR)/cloud LICENSE=$(license) $(provider)-image
 cloud/%-push:
 	$(eval license := $(shell basename $*))
 	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
