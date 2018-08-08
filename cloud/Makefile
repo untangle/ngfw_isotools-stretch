@@ -38,7 +38,7 @@ clean:
 $(TMP_DIR):
 	mkdir -p $(TMP_DIR)
 
-aws-image: $(TMP_DIR)
+ec2-image: $(TMP_DIR)
 	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(AWS_FAI_CONF_TPL) > $(AWS_FAI_CONF)
 	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(shell echo $(LICENSE) | tr [a-z] [A-Z]) $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
