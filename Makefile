@@ -54,7 +54,7 @@ installer-clean:
 	rm debian-installer-stamp debian-installer*.deb debian-installer*.tar.gz
 
 patch-installer: patch-installer-stamp
-patch-installer-stamp: d-i/build/config/common d-i/build/config/i386.cfg d-i/build/config/i386/hd-media.cfg d-i/build/config/i386/hd-media.cfg
+patch-installer-stamp:
 	patch -p0 < $(DEBIAN_INSTALLER_PATCH)
 	patch -p0 < $(DEBIAN_CD_PATCH)
 	touch $@
@@ -67,7 +67,7 @@ unpatch-installer:
 	fi
 
 debian-installer: debian-installer-stamp
-debian-installer-stamp: 
+debian-installer-stamp: d-i/build/config/common d-i/build/config/i386.cfg d-i/build/config/i386/hd-media.cfg d-i/build/config/i386/hd-media.cfg
 	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'$(REPOSITORY)'|' $(ISOTOOLS_DIR)/d-i.sources.template >| $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
 	touch $@
