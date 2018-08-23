@@ -54,7 +54,7 @@ installer-clean:
 	rm debian-installer-stamp debian-installer*.deb debian-installer*.tar.gz
 
 patch-installer: patch-installer-stamp
-patch-installer-stamp:
+patch-installer-stamp: d-i/build/config/common d-i/build/config/i386.cfg d-i/build/config/i386/hd-media.cfg d-i/build/config/i386/hd-media.cfg
 	patch -p0 < $(DEBIAN_INSTALLER_PATCH)
 	patch -p0 < $(DEBIAN_CD_PATCH)
 	touch $@
