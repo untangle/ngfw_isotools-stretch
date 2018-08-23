@@ -68,6 +68,12 @@ unpatch-installer:
 
 debian-installer: debian-installer-stamp
 debian-installer-stamp: d-i/build/config/common d-i/build/config/i386.cfg d-i/build/config/i386/hd-media.cfg d-i/build/config/i386/hd-media.cfg
+	echo TARGET
+	ls -l $@
+	echo PREREQS
+	ls -l $^
+	echo NEWER
+	ls -l $?
 	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'$(REPOSITORY)'|' $(ISOTOOLS_DIR)/d-i.sources.template >| $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
 	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules clean binary
 	touch $@
@@ -153,4 +159,4 @@ iso/%-push: # pushes the most recent images
 %-clean:
 	make -C $(ISOTOOLS_DIR)/firmware/$(subst /,-,$*) clean
 
-.PHONY: all
+.PHONY: all debian-installer
