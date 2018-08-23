@@ -67,9 +67,9 @@ unpatch-installer:
 	fi
 
 debian-installer: debian-installer-stamp
-debian-installer-stamp: 
+debian-installer-stamp: d-i/build/config/common d-i/build/config/i386.cfg d-i/build/config/i386/hd-media.cfg d-i/build/config/i386/hd-media.cfg
 	perl -pe 's|\+DISTRIBUTION\+|'$(DISTRIBUTION)'| ; s|\+REPOSITORY\+|'$(REPOSITORY)'|' $(ISOTOOLS_DIR)/d-i.sources.template >| $(ISOTOOLS_DIR)/d-i/build/sources.list.udeb.local
-	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules binary
+	cd $(ISOTOOLS_DIR)/d-i ; sudo fakeroot debian/rules clean binary
 	touch $@
 
 repoint-stable:
