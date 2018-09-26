@@ -69,7 +69,7 @@ unpatch-installer:
 debian-installer: debian-installer-stamp
 debian-installer-stamp: d-i/build/config/common d-i/build/config/i386.cfg d-i/build/config/i386/hd-media.cfg d-i/build/config/i386/hd-media.cfg
 	echo TARGET
-	ls -l $@
+	ls -l $@ || true
 	echo PREREQS
 	ls -l $^
 	echo NEWER
