@@ -1,11 +1,12 @@
-FROM debian:stretch-backports
+FROM debian:buster
 
 USER root
 
 RUN apt-get update
 RUN apt-get install -y fai-server
+RUN apt-get install -y fai-setup-storage
+RUN apt-get install -y qemu-utils
 RUN apt-get install -y build-essential
-RUN apt-get install -y fai-doc
 
 ENV SRC=/home/ngfw/cloud
 RUN mkdir -p ${SRC}
