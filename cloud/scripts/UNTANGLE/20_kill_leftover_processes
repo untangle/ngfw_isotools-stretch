@@ -1,3 +1,5 @@
 #! /bin/sh
 
 kill $(lsof $FAI_ROOT | awk '{print $2}' | sort -u)
+
+exit 0
