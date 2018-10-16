@@ -1,0 +1,3 @@
+#!/bin/sh
+set -eu
+rm -v $FAI_ROOT/etc/apt/trusted.gpg.d/gce-build.asc

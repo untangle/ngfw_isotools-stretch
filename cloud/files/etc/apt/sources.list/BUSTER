@@ -1,0 +1,2 @@
+deb {%apt_cdn%}/debian buster main
+deb-src {%apt_cdn%}/debian buster main

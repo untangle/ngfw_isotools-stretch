@@ -1,0 +1,3 @@
+release=buster
+FAI_DEBOOTSTRAP="$release $apt_cdn/debian/"
+CLASS_BUILD="BUSTER_BUILD"

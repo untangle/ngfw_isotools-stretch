@@ -1,0 +1,29 @@
+#!/bin/sh
+set -eu
+touch $LOGDIR/skip.partition
+
+set -- $disklist
+device=/dev/$1
+device_root="${device}p1"
+
+sfdisk "$device" << EOF
+label: gpt
+unit: sectors
+
+# PReP boot
+p15 : start=2048, size=6144, type=9E1A2D38-C612-4316-AA26-8B49521E5A8B
+# Linux
+p1 : start=8192, type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+EOF
+
+partprobe "$device"
+
+mkfs.ext4 "$device_root"
+tune2fs -c 0 -i 0 "$device_root"
+
+uuid_root=$(blkid -s UUID -o value "$device_root")
+
+cat > "$LOGDIR/fstab" <<EOF
+# /etc/fstab: static file system information
+UUID=${uuid_root} / ext4 rw,discard,errors=remount-ro 0 0
+EOF

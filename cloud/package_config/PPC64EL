@@ -1,0 +1,5 @@
+PACKAGES install-norec LINUX_IMAGE_BASE
+linux-image-powerpc64le
+
+PACKAGES install-norec LINUX_IMAGE_CLOUD
+linux-image-cloud-powerpc64le

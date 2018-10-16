@@ -1,0 +1,1 @@
+FAI_DEBOOTSTRAP_OPTS="--arch arm64"

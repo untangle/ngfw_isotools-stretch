@@ -1,1 +1,3 @@
 release=stretch
+FAI_DEBOOTSTRAP="$release $apt_cdn/debian/"
+CLASS_BUILD="STRETCH_BUILD"

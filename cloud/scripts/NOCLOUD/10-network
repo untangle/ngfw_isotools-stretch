@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ainsl -v /etc/network/interfaces 'auto eth0'
+ainsl -v /etc/network/interfaces 'iface eth0 inet dhcp'

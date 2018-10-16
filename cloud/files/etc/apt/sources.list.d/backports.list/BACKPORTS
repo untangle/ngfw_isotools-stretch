@@ -1,2 +1,1 @@
-deb {cdn}/debian {release}-backports main
-deb-src {cdn}/debian {release}-backports main
+deb {%apt_cdn%}/debian {%release%}-backports main

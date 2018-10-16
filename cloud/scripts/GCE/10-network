@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ainsl -v /etc/network/interfaces 'auto lo'
+ainsl -v /etc/network/interfaces 'iface lo inet loopback'
+ainsl -v /etc/network/interfaces 'auto eth0'
+ainsl -v /etc/network/interfaces 'iface eth0 inet dhcp'

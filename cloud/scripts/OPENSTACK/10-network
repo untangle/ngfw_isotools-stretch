@@ -1,0 +1,25 @@
+#!/bin/bash
+
+echo "# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The normal eth0
+allow-hotplug eth0
+iface eth0 inet dhcp
+
+# Additional interfaces, just in case we're using
+# multiple networks
+allow-hotplug eth1
+iface eth1 inet dhcp
+
+allow-hotplug eth2
+iface eth2 inet dhcp
+
+# Set this one last, so that cloud-init or user can
+# override defaults.
+source /etc/network/interfaces.d/*
+">${target}/etc/network/interfaces

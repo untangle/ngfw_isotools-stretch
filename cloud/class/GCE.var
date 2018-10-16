@@ -1,3 +1,2 @@
-release=jessie
-TIMEZONE=UTC
 NTPSRVS='metadata.google.internal'
+CLOUD_RELEASE_ID=gce

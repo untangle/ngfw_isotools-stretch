@@ -1,0 +1,1 @@
+deb {%apt_cdn%}/debian sid main

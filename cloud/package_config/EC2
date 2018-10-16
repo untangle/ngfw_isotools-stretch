@@ -1,6 +1,6 @@
 PACKAGES install
 apt-transport-https
-sudo
 awscli
 python-boto
 python3-boto
+cloud-init

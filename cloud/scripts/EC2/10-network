@@ -5,7 +5,6 @@ ainsl -v /etc/network/interfaces 'iface lo inet loopback'
 ainsl -v /etc/network/interfaces 'auto eth0'
 
 fcopy -m root,root,755 /usr/local/sbin/inet6-ifup-helper
-fcopy -M /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
 
 # enable dhcp for up to 8 attached interfaces
 for i in 0 1 2 3 4 5 6 7 8; do

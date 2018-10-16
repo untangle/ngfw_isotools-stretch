@@ -1,11 +1,11 @@
-PACKAGES install AMD64
-linux-image-amd64 initramfs-tools
+PACKAGES install-norec GRUB_EFI_AMD64
+grub-efi-amd64
 
-PACKAGES install DHCPC
-isc-dhcp-client
+PACKAGES install-norec GRUB_EFI_ARM64
+grub-efi-arm64
 
-PACKAGES install GRUB_PC
-grub-pc grub-legacy- lilo-
+PACKAGES install-norec GRUB_IEEE1275
+grub-ieee1275
 
-PACKAGES install LVM
-lvm2
+PACKAGES install-norec GRUB_PC
+grub-pc

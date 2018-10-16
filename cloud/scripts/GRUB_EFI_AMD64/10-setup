@@ -1,0 +1,10 @@
+#! /bin/bash
+
+set -euE
+
+if [ -z "$BOOT_DEVICE" ]; then
+    exit 189
+fi
+
+$ROOTCMD grub-install --target=x86_64-efi --removable "$BOOT_DEVICE"
+$ROOTCMD update-grub

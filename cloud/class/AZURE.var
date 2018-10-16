@@ -1,0 +1,3 @@
+apt_cdn=http://deb.debian.org
+security_cdn=http://deb.debian.org
+CLOUD_RELEASE_ID=azure

@@ -1,0 +1,5 @@
+PACKAGES install-norec LINUX_IMAGE_BASE
+linux-image-arm64
+
+PACKAGES install-norec LINUX_IMAGE_CLOUD
+linux-image-cloud-arm64

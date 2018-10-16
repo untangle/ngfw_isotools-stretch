@@ -1,0 +1,3 @@
+release=sid
+FAI_DEBOOTSTRAP="$release $apt_cdn/debian/"
+CLASS_BUILD="SID_BUILD"

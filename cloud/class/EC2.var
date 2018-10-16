@@ -1,4 +1,2 @@
-apt_cdn=http://cloudfront.debian.net
-FAI_DEBOOTSTRAP="$release $apt_cdn/debian/"
-TIMEZONE=UTC
-echo DHCPC
+apt_cdn=http://cdn-aws.deb.debian.org
+CLOUD_RELEASE_ID=ec2

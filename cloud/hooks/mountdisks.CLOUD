@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+touch $LOGDIR/skip.mountdisks
+
+# Set filesystem context if running with SELinux enabled
+options="context=$(cat /proc/self/attr/current 2>/dev/null || :)"
+/usr/lib/fai/mount2dir $FAI_ROOT $LOGDIR/fstab 0 $options || exit 885
