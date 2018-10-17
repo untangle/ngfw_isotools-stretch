@@ -18,7 +18,8 @@ HOST := $(shell hostname -s)
 VERSION ?= $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 TMP_DIR := $(CWD)/tmp-$(REPOSITORY)-$(DISTRIBUTION)-$(LICENSE)
 CLOUD_LOG := $(TMP_DIR)/cloud.log
-TMP_IMAGE := $(TMP_DIR)/cloud.raw
+EC2_TMP_IMAGE := $(TMP_DIR)/cloud.raw
+AZURE_IMAGE := $(TMP_DIR)/cloud.vhdx
 NETBOOT_HOST := netboot-server.untangle.int
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 AWS_FAI_CONF := $(CWD)/class/UNTANGLE.var
@@ -42,8 +43,8 @@ $(TMP_DIR):
 
 ec2-image: $(TMP_DIR)
 	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(AWS_FAI_CONF_TPL) > $(AWS_FAI_CONF)
-	fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE)
-	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
+	fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(EC2_TMP_IMAGE)
+	dd if=$(EC2_TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
 
 ec2-push:
@@ -51,7 +52,7 @@ ec2-push:
 
 azure-image: $(TMP_DIR)
 	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(AWS_FAI_CONF_TPL) > $(AWS_FAI_CONF)
-	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE)
+	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(AZURE_IMAGE)
 
 azure-push:
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(CLOUD_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(AZURE_FULL_NAME)"
