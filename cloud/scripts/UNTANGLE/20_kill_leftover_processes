@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 kill $(lsof $FAI_ROOT | awk '{print $2}' | sort -u)
 
