@@ -18,8 +18,8 @@ HOST := $(shell hostname -s)
 VERSION ?= $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 TMP_DIR := $(CWD)/tmp-$(REPOSITORY)-$(DISTRIBUTION)-$(LICENSE)
 CLOUD_LOG := $(TMP_DIR)/cloud.log
-EC2_TMP_IMAGE := $(TMP_DIR)/cloud.raw
-AZURE_IMAGE := $(TMP_DIR)/cloud.vhdx
+TMP_IMAGE := $(TMP_DIR)/cloud.raw
+AZURE_IMAGE := $(TMP_DIR)/cloud.vhd
 NETBOOT_HOST := netboot-server.untangle.int
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 UNTANGLE_FAI_CONF := $(CWD)/class/UNTANGLE.var
@@ -49,15 +49,19 @@ conf:
 	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(UNTANGLE_FAI_CONF_TPL) > $(UNTANGLE_FAI_CONF)
 
 ec2-image: $(TMP_DIR) conf
-	fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(LICENSE) $(EC2_TMP_IMAGE)
-	dd if=$(EC2_TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
-	bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
+	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size 600M --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(LICENSE),LAST $(TMP_IMAGE)
 
 ec2-push:
+	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
+	bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(CLOUD_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(EC2_FULL_NAME)"
 
 azure-image: $(TMP_DIR) conf
-	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(LICENSE) $(AZURE_IMAGE)
+	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(LICENSE),LAST $(TMP_IMAGE)
+	qemu-img convert -f raw -o subformat=fixed,force_size -O vpc $(TMP_IMAGE) $(AZURE_IMAGE)
+
+cloud-image: $(TMP_DIR)
+	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,GRUB_PC,CLOUD $(TMP_IMAGE)
 
 azure-push:
 	echo $(AZURE_SHORT_NAME) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(AZURE_FULL_NAME)"
