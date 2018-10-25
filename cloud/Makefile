@@ -22,8 +22,8 @@ EC2_TMP_IMAGE := $(TMP_DIR)/cloud.raw
 AZURE_IMAGE := $(TMP_DIR)/cloud.vhdx
 NETBOOT_HOST := netboot-server.untangle.int
 IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
-AWS_FAI_CONF := $(CWD)/class/UNTANGLE.var
-AWS_FAI_CONF_TPL := $(AWS_FAI_CONF).tpl
+UNTANGLE_FAI_CONF := $(CWD)/class/UNTANGLE.var
+UNTANGLE_FAI_CONF_TPL := $(UNTANGLE_FAI_CONF).tpl
 # FIXME: find device dynamically, and then derive its ID
 EBS_DEVICE := /dev/xvdf
 EBS_ID := vol-06da60b13f650af2a
@@ -41,13 +41,15 @@ AZURE_RESOURCE_GROUP := untangledeploy
 all: aws-image
 
 clean:
-	rm -fr $(TMP_DIR) $(AWS_FAI_CONF)
+	rm -fr $(TMP_DIR) $(UNTANGLE_FAI_CONF)
 
 $(TMP_DIR):
 	mkdir -p $(TMP_DIR)
 
-ec2-image: $(TMP_DIR)
-	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(AWS_FAI_CONF_TPL) > $(AWS_FAI_CONF)
+conf:
+	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(UNTANGLE_FAI_CONF_TPL) > $(UNTANGLE_FAI_CONF)
+
+ec2-image: $(TMP_DIR) conf
 	fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(LICENSE) $(EC2_TMP_IMAGE)
 	dd if=$(EC2_TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
@@ -55,8 +57,7 @@ ec2-image: $(TMP_DIR)
 ec2-push:
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(CLOUD_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(EC2_FULL_NAME)"
 
-azure-image: $(TMP_DIR)
-	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(AWS_FAI_CONF_TPL) > $(AWS_FAI_CONF)
+azure-image: $(TMP_DIR) conf
 	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(LICENSE) $(AZURE_IMAGE)
 
 azure-push:
