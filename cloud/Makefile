@@ -30,6 +30,11 @@ EBS_ID := vol-06da60b13f650af2a
 # FIXME: not necessarily ec2, so handle name in %-push instead
 EC2_FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME)_ec2_$(LICENSE).txt
 AZURE_FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME)_azure_$(LICENSE).txt
+AZURE_SHORT_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(TS)
+AZURE_BLOB_NAME := $(AZURE_SHORT_NAME).vhd
+AZURE_ACCOUNT := untangledeploy
+AZURE_CONTAINER := untangle-vhd
+AZURE_RESOURCE_GROUP := untangledeploy
 
 .PHONY: all clean image push
 
@@ -55,4 +60,6 @@ azure-image: $(TMP_DIR)
 	fai-diskimage --cspace $(CWD) --hostname untangle-image --size 3G --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(LICENSE) $(AZURE_IMAGE)
 
 azure-push:
-#	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(CLOUD_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(AZURE_FULL_NAME)"
+	echo $(AZURE_SHORT_NAME) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(AZURE_FULL_NAME)"
+	az storage blob upload --account-name $(AZURE_ACCOUNT) --account-key $(AZURE_ACCOUNT_KEY) --container-name $(AZURE_CONTAINER) --type page --file $(AZURE_IMAGE) --name $(AZURE_BLOB_NAME)
+	az disk create --resource-group $(AZURE_RESOURCE_GROUP) --name $(AZURE_SHORT_NAME)-30GB --source https://$(AZURE_ACCOUNT).blob.core.windows.net/$(AZURE_CONTAINER)/$(AZURE_BLOB_NAME) --size-gb 30
