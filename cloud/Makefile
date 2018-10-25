@@ -68,5 +68,6 @@ azure-push:
 	echo $(AZURE_SHORT_NAME) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(AZURE_FULL_NAME)"
 	az storage blob upload --account-name $(AZURE_ACCOUNT) --account-key $(AZURE_ACCOUNT_KEY) --container-name $(AZURE_CONTAINER) --type page --file $(AZURE_IMAGE) --name $(AZURE_BLOB_NAME)
 	az disk create --resource-group $(AZURE_RESOURCE_GROUP) --name $(AZURE_SHORT_NAME)-30GB --source $(AZURE_BASE_URL)/$(AZURE_CONTAINER)/$(AZURE_BLOB_NAME) --size-gb 30
+	az image create --resource-group $(AZURE_RESOURCE_GROUP) --name $(AZURE_SHORT_NAME)-30GB --source $(AZURE_SHORT_NAME) --os-type Linux
 
 .PHONY: all clean conf ec2-image ec2-push azure-image azure-push
