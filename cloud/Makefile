@@ -36,7 +36,7 @@ AZURE_BLOB_NAME := $(AZURE_SHORT_NAME).vhd
 AZURE_ACCOUNT := untangledeploy
 AZURE_BASE_URL := https://$(AZURE_ACCOUNT).blob.core.windows.net
 AZURE_CONTAINER := untangle-vhd
-AZURE_RESOURCE_GROUP := untangledeploy
+AZURE_RESOURCE_GROUP := UntangleAzureDeploy
 
 all: aws-image
 
