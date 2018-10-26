@@ -1,3 +1,0 @@
-#! /bin/bash
-
-perl -i -pe 's/.*OS.EnableFirewall.*/OS.EnableFirewall=n/' $target/etc/waagent.conf
