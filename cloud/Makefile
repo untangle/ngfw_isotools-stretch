@@ -50,7 +50,7 @@ conf:
 	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(UNTANGLE_FAI_CONF_TPL) > $(UNTANGLE_FAI_CONF)
 
 ec2-image: $(TMP_DIR) conf
-	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(LICENSE) $(TMP_IMAGE)
+	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(LICENSE),LAST $(TMP_IMAGE)
 
 ec2-push:
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
@@ -58,7 +58,7 @@ ec2-push:
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(CLOUD_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(EC2_FULL_NAME)"
 
 azure-image: $(TMP_DIR) conf
-	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(LICENSE) $(TMP_IMAGE)
+	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(LICENSE),LAST $(TMP_IMAGE)
 	qemu-img convert -f raw -o subformat=fixed,force_size -O vpc $(TMP_IMAGE) $(AZURE_IMAGE)
 
 cloud-image: $(TMP_DIR)
