@@ -50,7 +50,7 @@ conf:
 	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(UNTANGLE_FAI_CONF_TPL) > $(UNTANGLE_FAI_CONF)
 
 ec2-image: $(TMP_DIR) conf
-	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(LICENSE),LAST $(TMP_IMAGE)
+	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE)
 
 ec2-push:
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
@@ -58,7 +58,7 @@ ec2-push:
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(CLOUD_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(EC2_FULL_NAME)"
 
 azure-image: $(TMP_DIR) conf
-	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(LICENSE),LAST $(TMP_IMAGE)
+	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE)
 	qemu-img convert -f raw -o subformat=fixed,force_size -O vpc $(TMP_IMAGE) $(AZURE_IMAGE)
 
 cloud-image: $(TMP_DIR)
@@ -68,7 +68,7 @@ azure-push:
 	echo $(AZURE_SHORT_NAME) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(AZURE_FULL_NAME)"
 	az login --service-principal --username $(AZURE_PRINCIPAL_ID) --password $(AZURE_PRINCIPAL_PASSWORD) --tenant $(AZURE_TENANT_ID)
 	az storage blob upload --account-name $(AZURE_ACCOUNT) --account-key $(AZURE_ACCOUNT_KEY) --container-name $(AZURE_CONTAINER) --type page --file $(AZURE_IMAGE) --name $(AZURE_BLOB_NAME)
-	az disk create --resource-group $(AZURE_RESOURCE_GROUP) --size-gb 30 --source $(AZURE_BASE_URL)/$(AZURE_CONTAINER)/$(AZURE_BLOB_NAME) --name $(AZURE_SHORT_NAME)-30GB
-	az image create --resource-group $(AZURE_RESOURCE_GROUP) --os-type Linux --source $(AZURE_SHORT_NAME)-30GB --name $(AZURE_SHORT_NAME)-30GB 
+	az disk create --resource-group $(AZURE_RESOURCE_GROUP) --size-gb 20 --source $(AZURE_BASE_URL)/$(AZURE_CONTAINER)/$(AZURE_BLOB_NAME) --name $(AZURE_SHORT_NAME)-20GB
+	az image create --resource-group $(AZURE_RESOURCE_GROUP) --os-type Linux --source $(AZURE_SHORT_NAME)-20GB --name $(AZURE_SHORT_NAME)-20GB
 
 .PHONY: all clean conf ec2-image ec2-push azure-image azure-push
