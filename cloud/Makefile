@@ -52,9 +52,9 @@ conf:
 ec2-image: $(TMP_DIR) conf
 	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
+	bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
 
 ec2-push:
-	bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(CLOUD_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(EC2_FULL_NAME)"
 
 azure-image: $(TMP_DIR) conf
