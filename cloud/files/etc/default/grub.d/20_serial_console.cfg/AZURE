@@ -1,0 +1,3 @@
+# Add rootdelay required by Azure certification tool
+
+GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX rootdelay=300"
