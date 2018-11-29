@@ -58,7 +58,7 @@ ec2-push:
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(CLOUD_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(EC2_FULL_NAME)"
 
 azure-image: $(TMP_DIR) conf
-	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE)
+	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,AMD64,CLOUD,AZURE,UNTANGLE,UNTANGLE_AZURE_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE)
 	qemu-img convert -f raw -o subformat=fixed,force_size -O vpc $(TMP_IMAGE) $(AZURE_IMAGE)
 
 cloud-image: $(TMP_DIR)
