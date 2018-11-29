@@ -4,3 +4,15 @@ untangle-gateway
 
 PACKAGES install JESSIE
 e2fsprogs/$release-backports
+
+PACKAGES install-norec UNTANGLE_AZURE_BYOL
+untangle-hardware-azure-byol
+
+PACKAGES install-norec UNTANGLE_AZURE_PAYG
+untangle-hardware-azure-payg
+
+PACKAGES install-norec UNTANGLE_EC2_BYOL
+untangle-hardware-ec2-byol
+
+PACKAGES install-norec UNTANGLE_EC2_PAYG
+untangle-hardware-ec2-payg
