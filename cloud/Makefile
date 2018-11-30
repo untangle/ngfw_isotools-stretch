@@ -31,7 +31,7 @@ EBS_ID := vol-06da60b13f650af2a
 # FIXME: not necessarily ec2, so handle name in %-push instead
 EC2_FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME)_ec2_$(LICENSE).txt
 AZURE_FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME)_azure_$(LICENSE).txt
-AZURE_SHORT_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(TS)
+AZURE_SHORT_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(LICENSE)_$(TS)
 AZURE_BLOB_NAME := $(AZURE_SHORT_NAME).vhd
 AZURE_ACCOUNT := untangledeploy
 AZURE_BASE_URL := https://$(AZURE_ACCOUNT).blob.core.windows.net
