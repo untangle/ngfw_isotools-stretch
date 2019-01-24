@@ -1,4 +1,4 @@
 # packages to be installed in all OVA images, regardless of flavor
-#open-vm-tools
+open-vm-tools
 
 
