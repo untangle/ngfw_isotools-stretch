@@ -26,7 +26,7 @@ umount $MNT_DIR
 losetup -d $LOOP_DEVICE
 
 # re-create smaller disk image
-dd if=/dev/zero of=$IMAGE bs=10M count=65
+dd if=/dev/zero of=$IMAGE bs=10M count=67
 fdisk $IMAGE <<EOF
 n
 p
