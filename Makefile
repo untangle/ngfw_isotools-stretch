@@ -123,11 +123,13 @@ ova/%-clean:
 cloud/%-image:
 	$(eval license := $(shell basename $*))
 	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
-	make -C $(ISOTOOLS_DIR)/cloud LICENSE=$(license) $(provider)-image
+	make -C $(ISOTOOLS_DIR)/cloud ARCH=arm64 LICENSE=$(license) $(provider)-image
+	make -C $(ISOTOOLS_DIR)/cloud ARCH=amd64 LICENSE=$(license) $(provider)-image
 cloud/%-push:
 	$(eval license := $(shell basename $*))
 	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
-	make -C $(ISOTOOLS_DIR)/cloud LICENSE=$(license) $(provider)-push
+	make -C $(ISOTOOLS_DIR)/cloud ARCH=arm64 LICENSE=$(license) $(provider)-push
+	make -C $(ISOTOOLS_DIR)/cloud ARCH=amd64 LICENSE=$(license) $(provider)-push
 cloud/%-clean:
 	$(eval license := $(shell basename $*))
 	$(eval provider := $(shell dirname $(subst cloud/,"",$*)))
