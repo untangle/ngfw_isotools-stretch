@@ -7,7 +7,7 @@ index 9e1e49c..e3ace1d 100644
  # and small enough to fit on a low-end memory stick, such as those
  # advertised as being 1 gigabyte in size.
 -FLOPPY_SIZE = 976560
-+FLOPPY_SIZE = 740000
++FLOPPY_SIZE = 750000
  
  DISK_LABEL = "bootable drive"
  MEDIA_TYPE = bootable drive
@@ -42,7 +42,7 @@ index 9e1e49c..e3ace1d 100644
  # and small enough to fit on a low-end memory stick, such as those
  # advertised as being 1 gigabyte in size.
 -FLOPPY_SIZE = 976560
-+FLOPPY_SIZE = 740000
++FLOPPY_SIZE = 750000
  
  DISK_LABEL = "bootable drive"
  MEDIA_TYPE = bootable drive
