@@ -17,6 +17,7 @@ LICENSE ?= BYOL
 TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 VERSION ?= $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
+ARCH_CAPS := $(shell echo $(ARCH) | tr '[a-z]' '[A-Z]')
 TMP_DIR := $(CWD)/tmp-$(REPOSITORY)-$(DISTRIBUTION)-$(ARCH)-$(LICENSE)
 CLOUD_LOG := $(TMP_DIR)/cloud.log
 TMP_IMAGE := $(TMP_DIR)/cloud.raw
@@ -51,7 +52,7 @@ conf:
 	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(UNTANGLE_FAI_CONF_TPL) > $(UNTANGLE_FAI_CONF)
 
 ec2-image: $(TMP_DIR) conf
-	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_$(shell echo $(ARCH) | tr '[a-z]' '[A-Z]'),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE)
+	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,$(ARCH_CAPS),STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	if [ $(ARCH) = amd64 ] ; then \
 	  bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG) ; \
