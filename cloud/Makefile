@@ -53,7 +53,7 @@ conf:
 ec2-image: $(TMP_DIR) conf
 	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_$(shell echo $(ARCH) | tr '[a-z]' '[A-Z]'),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
-	if [ $ARCH = amd64 ] ; then \
+	if [ $(ARCH) = amd64 ] ; then \
 	  bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG) ; \
 	else \
 	  bash volume-to-ami.sh -a arm64 -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG) ; \
@@ -67,12 +67,12 @@ azure-image: $(TMP_DIR) conf
 	qemu-img convert -f raw -o subformat=fixed,force_size -O vpc $(TMP_IMAGE) $(AZURE_IMAGE)
 
 cloud-image: $(TMP_DIR)
-	if [ $ARCH = amd64 ] ; then \
+	if [ $(ARCH) = amd64 ] ; then \
 	  fai-diskimage --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,GRUB_PC,CLOUD $(TMP_IMAGE) ; \
 	fi
 
 azure-push:
-	if [ $ARCH = amd64 ] ; then \
+	if [ $(ARCH) = amd64 ] ; then \
 	  echo $(AZURE_SHORT_NAME) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(AZURE_FULL_NAME)" ; \
 	  az login --service-principal --username $(AZURE_PRINCIPAL_ID) --password $(AZURE_PRINCIPAL_PASSWORD) --tenant $(AZURE_TENANT_ID) ; \
 	  az storage blob upload --account-name $(AZURE_ACCOUNT) --account-key $(AZURE_ACCOUNT_KEY) --container-name $(AZURE_CONTAINER) --type page --file $(AZURE_IMAGE) --name $(AZURE_BLOB_NAME) ; \
