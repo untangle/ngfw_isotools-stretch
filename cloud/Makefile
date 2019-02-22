@@ -53,13 +53,16 @@ conf:
 
 ec2-image: $(TMP_DIR) conf
 	if [ $(ARCH) = amd64 ] ; then \
-	  export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,$(ARCH_CAPS),STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE) ; \
+	  export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; \
+	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,$(ARCH_CAPS),STRETCH,BACKPORTS,GRUB_CLOUD_$(ARCH_CAPS),CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE) ; \
 	  dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M ; \
 	  bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG) ; \
 	else \
-	  export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; export FAI_BASEFILEURL=https://fai-project.org/download/basefiles/ ; fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,$(ARCH_CAPS),STRETCH_ARM64,BACKPORTS,GRUB_EFI_ARM64,CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE) ; \
+	  export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; \
+	  export FAI_BASEFILEURL=https://fai-project.org/download/basefiles/ ; \
+	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,$(ARCH_CAPS),STRETCH_ARM64,BACKPORTS,GRUB_CLOUD_$(ARCH_CAPS),CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE) ; \
 	  dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M ; \
-	  bash volume-to-ami.sh -a arm64 -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG) ; \
+	  bash volume-to-ami.sh -a $(ARCH) -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG) ; \
 	fi
 
 ec2-push:
