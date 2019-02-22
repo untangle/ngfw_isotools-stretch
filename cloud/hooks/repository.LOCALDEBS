@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+mkdir $FAI_ROOT/localdebs
+LOCALDEBS=$FAI_RUNDIR/localdebs
+( cd $LOCALDEBS; apt-ftparchive packages . > Packages )
+mount --bind $LOCALDEBS $FAI_ROOT/localdebs

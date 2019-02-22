@@ -1,5 +1,4 @@
-PACKAGES install-norec LINUX_IMAGE_BASE
-linux-image-arm64
+# Install Linux packages including recommends as every upgrade brings them in anyway
 
-PACKAGES install-norec LINUX_IMAGE_CLOUD
-linux-image-cloud-arm64
+PACKAGES install LINUX_IMAGE_BASE LINUX_IMAGE_CLOUD
+linux-image-arm64

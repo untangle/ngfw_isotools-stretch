@@ -1,5 +1,4 @@
-PACKAGES install-norec LINUX_IMAGE_BASE
-linux-image-powerpc64le
+# Install Linux packages including recommends as every upgrade brings them in anyway
 
-PACKAGES install-norec LINUX_IMAGE_CLOUD
-linux-image-cloud-powerpc64le
+PACKAGES install LINUX_IMAGE_BASE LINUX_IMAGE_CLOUD
+linux-image-powerpc64le

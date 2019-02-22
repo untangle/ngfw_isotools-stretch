@@ -6,6 +6,15 @@ set -- $disklist
 device=/dev/$1
 device_root="${device}p1"
 
+wait_for_device() {
+  for s in $(seq 10); do
+    if [ -e "$1" ]; then
+      break
+    fi
+    sleep 1
+  done
+}
+
 sfdisk "$device" << EOF
 label: gpt
 unit: sectors
@@ -18,6 +27,7 @@ EOF
 
 partprobe "$device"
 
+wait_for_device "$device_root"
 mkfs.ext4 "$device_root"
 tune2fs -c 0 -i 0 "$device_root"
 

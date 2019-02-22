@@ -24,6 +24,7 @@ class CloudRelease(collections.OrderedDict):
     env = [
         ('id', 'CLOUD_RELEASE_ID'),
         ('version', 'CLOUD_RELEASE_VERSION'),
+        ('azure_version', 'CLOUD_RELEASE_VERSION_AZURE'),
         ('build_info_url', 'CI_JOB_URL'),
     ]
 
@@ -41,10 +42,20 @@ class CloudRelease(collections.OrderedDict):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--basename',
-        help='(default: $CLOUD_BUILD_BASENAME)',
+    parser.add_argument('--info',
+        help='(default: $CLOUD_BUILD_INFO)',
         action=ActionEnv,
-        env='CLOUD_BUILD_BASENAME',
+        env='CLOUD_BUILD_INFO',
+    )
+    parser.add_argument('--name',
+        help='(default: $CLOUD_BUILD_NAME)',
+        action=ActionEnv,
+        env='CLOUD_BUILD_NAME',
+    )
+    parser.add_argument('--output-dir',
+        help='(default: $CLOUD_BUILD_OUTPUT_DIR)',
+        action=ActionEnv,
+        env='CLOUD_BUILD_OUTPUT_DIR',
     )
     parser.add_argument('--root',
         help='(default: $FAI_ROOT)',
@@ -60,9 +71,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     cloud_release = CloudRelease()
+    package_versions = {}
     manifest = {
+        '_meta': {
+            'name': args.name,
+            'stage': 'build',
+        },
+        'build_info': json.loads(args.info),
         'cloud_release': cloud_release,
-        'package_versions': {},
+        'package_versions': package_versions,
     }
 
     with subprocess.Popen(
@@ -71,9 +88,9 @@ if __name__ == '__main__':
     ) as f:
         for l in f.stdout:
             package, version = l.decode().strip().split()
-            manifest['package_versions'][package] = version
+            package_versions[package] = version
 
-    with open('{}.build.json'.format(args.basename), 'w') as f:
+    with open('{}/{}.build.json'.format(args.output_dir, args.name), 'w') as f:
         json.dump(manifest, f, indent=4, separators=(',', ': '), sort_keys=True)
 
     if args.write:

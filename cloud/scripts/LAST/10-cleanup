@@ -13,5 +13,6 @@ rm -rf $target/var/lib/apt/lists/*
 rm -f $target/var/lib/dpkg/available*
 
 touch $target/etc/machine-id
+touch $target/var/lib/dpkg/available
 
 shred --remove $target/etc/ssh/ssh_host_*

@@ -1,17 +1,2 @@
-# The GCE Linux guest environment currently comes from Google Cloud
-# repositories and includes the necessary scripts and daemons to properly
-# integrate with GCE. The following packages are installed to satisfy the
-# default GCE end user experience. The Linux guest environment includes python2
-# and python3 libraries which some users depend on. We therefore install both
-# packages until python2 support is officially ended. Documentation and source
-# is maintained in the following github repo.
-# https://github.com/GoogleCloudPlatform/compute-image-packages
-PACKAGES install
-google-cloud-packages-archive-keyring
-cloud-guest-utils
-gdisk
-google-cloud-sdk
+PACKAGES install-norec
 google-compute-engine
-python-crcmod
-python-google-compute-engine
-python3-google-compute-engine
