@@ -1,6 +1,9 @@
 #! /bin/bash
 
 set -euE
+set -x
+
+exec > /tmp/log 2>&1
 
 $ROOTCMD grub-install --target=arm64-efi --removable
 $ROOTCMD update-grub
