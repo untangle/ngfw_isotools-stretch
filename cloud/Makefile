@@ -53,10 +53,10 @@ conf:
 ec2-image: $(TMP_DIR) conf
 	if [ $(ARCH) = amd64 ] ; then \
 	  export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; \
-	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,$(ARCH_CAPS),STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE) ; \
+	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE) ; \
 	else \
 	  export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; \
-	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,$(ARCH_CAPS),STRETCH,BACKPORTS,GRUB_EFI_$(ARCH_CAPS),CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE) ; \
+	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_EFI_$(ARCH_CAPS),CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE) ; \
 	fi
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	bash volume-to-ami.sh -a $(ARCH) -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
