@@ -152,7 +152,8 @@ cat > "$json_body" <<EOF
             }
         }
     ], 
-    "VirtualizationType": "$AMI_VIRT_TYPE"
+    "VirtualizationType": "$AMI_VIRT_TYPE",
+    "EnaSupport": true
 }
 EOF
 
