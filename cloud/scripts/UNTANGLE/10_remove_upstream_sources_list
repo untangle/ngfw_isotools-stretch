@@ -2,4 +2,6 @@
 
 rm $target/etc/apt/sources.list
 rm $target/etc/apt/sources.list.d/backports.list
+
+cat $target/etc/apt/sources.list.d/untangle.list
 $ROOTCMD apt-get update
