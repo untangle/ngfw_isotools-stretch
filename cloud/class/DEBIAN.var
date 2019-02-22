@@ -1,9 +1,9 @@
+release=stretch
 apt_cdn=http://deb.debian.org
 security_cdn=http://security.debian.org
+FAI_DEBOOTSTRAP="$release $apt_cdn/debian/"
 KEYMAP=utf-8
 CONSOLEFONT=
 # errors in tasks greater than this value will cause the installation to stop
-STOP_ON_ERROR=400
+STOP_ON_ERROR=500
 TIMEZONE=UTC
-FAI_DISABLE_PACKAGE_NAME_CHECK=1
-FCOPY_NOBACKUP=1

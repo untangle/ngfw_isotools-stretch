@@ -1,4 +1,0 @@
-# Install Linux packages including recommends as every upgrade brings them in anyway
-
-PACKAGES install LINUX_IMAGE_BASE LINUX_IMAGE_CLOUD
-linux-image-powerpc64le

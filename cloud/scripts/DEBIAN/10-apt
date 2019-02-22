@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# check all subdirectories in /etc/apt if there's something to copy
+fcopy -r -iM /etc/apt
+

@@ -1,5 +1,10 @@
-PACKAGES install-norec
+PACKAGES install
+apt-transport-https
 awscli
 python-boto
 python3-boto
 cloud-init
+locales
+
+PACKAGES install JESSIE
+cloud-init/$release-backports

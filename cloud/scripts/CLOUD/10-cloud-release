@@ -1,0 +1,3 @@
+#!/bin/bash
+
+fcopy -SBMi /etc/cloud-release

@@ -1,4 +1,0 @@
-auto $INTERFACE
-allow-hotplug $INTERFACE
-
-iface $INTERFACE inet dhcp

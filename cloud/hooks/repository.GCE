@@ -1,4 +1,0 @@
-#!/bin/sh
-set -eu
-fcopy -SBMi -v /etc/apt/sources.list.d/gce.list
-cp -v $FAI/package_config/GCE.asc $FAI_ROOT/etc/apt/trusted.gpg.d/gce-build.asc

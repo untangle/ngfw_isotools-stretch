@@ -1,9 +1,0 @@
-#! /bin/bash
-
-set -euE
-
-set -- $disklist
-device="/dev/${1}p15"
-
-$ROOTCMD grub-install --target=powerpc-ieee1275 $device
-$ROOTCMD update-grub

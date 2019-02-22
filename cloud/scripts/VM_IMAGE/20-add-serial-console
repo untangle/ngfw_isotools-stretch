@@ -1,0 +1,8 @@
+#!/bin/bash
+
+error=0; trap 'error=$(($?>$error?$?:$error))' ERR # save maximum error code
+
+# add a serial console for easier debugging, and that does not harm
+# the general use case
+fcopy -M /etc/default/grub.d/20_add_extra_serial_console.cfg
+$ROOTCMD update-grub

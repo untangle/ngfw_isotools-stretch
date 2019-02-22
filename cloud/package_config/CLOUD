@@ -8,6 +8,9 @@ libpam-systemd
 
 unattended-upgrades
 
-# # We're going with chrony as our default ntp client in light of
-# # https://lwn.net/Articles/735211/
-# chrony
+# We're going with chrony as our default ntp client in light of
+# https://lwn.net/Articles/735211/
+chrony
+
+PACKAGES install-norec JESSIE
+cloud-guest-utils/$release-backports

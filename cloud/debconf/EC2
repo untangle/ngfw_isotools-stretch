@@ -1,3 +1,5 @@
+# Linux command line:
+grub-pc grub2/linux_cmdline string quiet elevator=noop console=tty console=ttyS0 net.ifnames=0
 # GRUB timeout; for internal use
 grub-pc grub-pc/timeout string 0
 cloud-init      cloud-init/datasources  multiselect        Ec2

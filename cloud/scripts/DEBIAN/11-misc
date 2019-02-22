@@ -12,5 +12,5 @@ if ifclass DISABLE_IPV6; then
 fi
 $ROOTCMD shadowconfig on
 sed -i -e 's/^#PasswordAuthentication yes/PasswordAuthentication no/' $target/etc/ssh/sshd_config
-sed -i -e 's/^PermitRootLogin .*/PermitRootLogin without-password/' $target/etc/ssh/sshd_config
-ainsl /etc/ssh/sshd_config 'ClientAliveInterval 120'
+sed -i -e 's/^PermitRootLogin .*/PermitRootLogin no/' $target/etc/ssh/sshd_config
+ainsl /etc/ssh/sshd_config 'ClientAliveInterval 420'

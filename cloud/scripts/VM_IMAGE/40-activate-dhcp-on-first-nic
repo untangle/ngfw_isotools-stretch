@@ -1,0 +1,9 @@
+#!/bin/bash
+
+error=0; trap 'error=$(($?>$error?$?:$error))' ERR # save maximum error code
+
+ainsl -a -v /etc/network/interfaces '#generated via fai-diskimage'
+ainsl -v /etc/network/interfaces 'auto lo'
+ainsl -v /etc/network/interfaces 'iface lo inet loopback'
+ainsl -v /etc/network/interfaces 'auto eth0'
+ainsl -v /etc/network/interfaces "iface eth0 inet dhcp"

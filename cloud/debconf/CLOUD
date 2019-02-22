@@ -1,3 +1,3 @@
 # Linux command line:
 grub-pc grub2/linux_cmdline_default string
-grub-pc grub2/linux_cmdline string consoleblank=0
+grub-pc grub2/linux_cmdline string console=tty0 console=ttyS0,115200 earlyprintk=ttyS0,115200 consoleblank=0 elevator=noop systemd.show_status=true net.ifnames=0

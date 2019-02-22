@@ -1,7 +1,0 @@
-# Install Linux packages including recommends as every upgrade brings them in anyway
-
-PACKAGES install LINUX_IMAGE_BASE
-linux-image-amd64
-
-PACKAGES install LINUX_IMAGE_CLOUD
-linux-image-cloud-amd64

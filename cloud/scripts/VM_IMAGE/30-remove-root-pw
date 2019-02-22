@@ -1,0 +1,3 @@
+#!/bin/sh
+#$ROOTCMD echo root:vagrant | chpasswd
+$ROOTCMD passwd --delete root

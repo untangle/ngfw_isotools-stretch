@@ -1,7 +1,0 @@
-#!/bin/sh
-set -eu
-touch $LOGDIR/skip.repository
-cp -v /etc/resolv.conf $FAI_ROOT/etc
-cp -v /etc/hosts $FAI_ROOT/etc
-fcopy -SBM -c $CLASS_BUILD -v /etc/apt/sources.list
-fcopy -SBMir -v /etc/apt/preferences.d /etc/apt/sources.list.d

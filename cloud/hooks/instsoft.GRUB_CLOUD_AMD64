@@ -1,4 +1,0 @@
-#!/bin/sh
-set -eu
-mkdir -p $FAI_ROOT/etc/grub.d
-touch $FAI_ROOT/etc/grub.d/enable_cloud

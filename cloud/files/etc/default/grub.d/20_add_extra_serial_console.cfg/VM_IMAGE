@@ -1,0 +1,6 @@
+# Add a serial console on default and rescue mode
+# Ease debugging, and does not harm the general use case (we 
+# still have boot messages and login on the virtual VGA display)
+
+GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX console=tty0 console=ttyS0,115200n8"
+GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT console=tty0 console=ttyS0,115200n8"
