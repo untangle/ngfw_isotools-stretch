@@ -8,12 +8,11 @@ PKGTOOLS_DIR := $(CWD)/../../ngfw_pkgtools
 REPOSITORY ?= stretch
 # distribution to draw packages from
 DISTRIBUTION ?= current
-# arch
-ARCH ?= amd64
 # license
 LICENSE ?= BYOL
 
 # constants
+ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 TS := $(shell date +"%Y-%m-%dT%H%M%S")
 HOST := $(shell hostname -s)
 VERSION ?= $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
@@ -55,15 +54,12 @@ ec2-image: $(TMP_DIR) conf
 	if [ $(ARCH) = amd64 ] ; then \
 	  export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; \
 	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,$(ARCH_CAPS),STRETCH,BACKPORTS,GRUB_CLOUD_$(ARCH_CAPS),CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE) ; \
-	  dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M ; \
-	  bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG) ; \
 	else \
 	  export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; \
-	  export FAI_BASEFILEURL=https://fai-project.org/download/basefiles/ ; \
-	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,$(ARCH_CAPS),STRETCH_ARM64,BACKPORTS,GRUB_EFI_$(ARCH_CAPS),CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE) ; \
-	  dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M ; \
-	  bash volume-to-ami.sh -a $(ARCH) -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG) ; \
+	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,$(ARCH_CAPS),STRETCH,BACKPORTS,GRUB_EFI_$(ARCH_CAPS),CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]'),LAST $(TMP_IMAGE) ; \
 	fi
+	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
+	bash volume-to-ami.sh -a $(ARCH) -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
 
 ec2-push:
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(CLOUD_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(EC2_FULL_NAME)"
