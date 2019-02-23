@@ -36,6 +36,7 @@ else
   EBS_DEVICE := /dev/nvme1n1
   EBS_ID := vol-0f2da0bfbc58e5a49
   FAI_GRUB_CLASS := GRUB_EFI_ARM64
+  FAI_ARCH_CLASS := ARM64
   AMI_ARCH := $(ARCH)
 endif
 # FIXME: not necessarily ec2, so handle name in %-push instead
@@ -61,7 +62,7 @@ conf:
 
 ec2-image: $(TMP_DIR) conf
 	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; \
-	fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,CLOUD,EC2,$(FAI_GRUB_CLASS),UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE)
+	fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,$(FAI_ARCH_CLASS),BACKPORTS,CLOUD,EC2,$(FAI_GRUB_CLASS),UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
 	bash volume-to-ami.sh -a $(AMI_ARCH) -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
 
