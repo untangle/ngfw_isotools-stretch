@@ -27,8 +27,13 @@ IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 UNTANGLE_FAI_CONF := $(CWD)/class/UNTANGLE.var
 UNTANGLE_FAI_CONF_TPL := $(UNTANGLE_FAI_CONF).tpl
 # FIXME: find device dynamically, and then derive its ID
-EBS_DEVICE := /dev/xvdf
-EBS_ID := vol-06da60b13f650af2a
+ifeq ($(origin ARCH), amd64)
+  EBS_DEVICE := /dev/xvdf
+  EBS_ID := vol-06da60b13f650af2a
+else
+  EBS_DEVICE := /dev/nvme1n1
+  EBS_ID := vol-0f2da0bfbc58e5a49
+endif
 # FIXME: not necessarily ec2, so handle name in %-push instead
 EC2_FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME)_ec2_$(LICENSE).txt
 AZURE_FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME)_azure_$(LICENSE).txt
