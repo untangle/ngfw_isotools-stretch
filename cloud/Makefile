@@ -30,9 +30,13 @@ UNTANGLE_FAI_CONF_TPL := $(UNTANGLE_FAI_CONF).tpl
 ifeq ($(origin ARCH), amd64)
   EBS_DEVICE := /dev/xvdf
   EBS_ID := vol-06da60b13f650af2a
+  FAI_GRUB_CLASS := GRUB_PC
+  AMI_ARCH := x86_64
 else
   EBS_DEVICE := /dev/nvme1n1
   EBS_ID := vol-0f2da0bfbc58e5a49
+  FAI_GRUB_CLASS := GRUB_EFI_$(ARCH)
+  AMI_ARCH := $(ARCH)
 endif
 # FIXME: not necessarily ec2, so handle name in %-push instead
 EC2_FULL_NAME := untangle-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(TS)_$(HOST)_$(NAME)_ec2_$(LICENSE).txt
@@ -56,15 +60,10 @@ conf:
 	perl -pe 's/\+UNTANGLE_REPOSITORY\+/'$(REPOSITORY)'/ ; s/\+UNTANGLE_RELEASE\+/'$(DISTRIBUTION)'/' $(UNTANGLE_FAI_CONF_TPL) > $(UNTANGLE_FAI_CONF)
 
 ec2-image: $(TMP_DIR) conf
-	if [ $(ARCH) = amd64 ] ; then \
-	  export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; \
-	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,GRUB_PC,CLOUD,EC2,UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE) ; \
-	else \
-	  export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; \
-	  fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,CLOUD,EC2,GRUB_EFI_$(ARCH_CAPS),UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE) ; \
-	fi
+	export CLOUD_BUILD_BASENAME=$(TMP_IMAGE) ; \
+	fai-diskimage -v --cspace $(CWD) --hostname untangle-image --size $(IMAGE_SIZE) --class DEBIAN,STRETCH,BACKPORTS,CLOUD,EC2,$(FAI_GRUB_CLASS),UNTANGLE,UNTANGLE_$(ARCH_CAPS),UNTANGLE_EC2_$(shell echo $(LICENSE) | tr '[a-z]' '[A-Z]') $(TMP_IMAGE)
 	dd if=$(TMP_IMAGE) of=$(EBS_DEVICE) bs=300M
-	bash volume-to-ami.sh -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
+	bash volume-to-ami.sh -a $(AMI_ARCH) -r $(REPOSITORY)-$(VERSION) $(EBS_ID) | tee $(CLOUD_LOG)
 
 ec2-push:
 	awk '/"ImageId":/ { gsub(/"/,"",$$2); print $$2 }' $(CLOUD_LOG) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(EC2_FULL_NAME)"
