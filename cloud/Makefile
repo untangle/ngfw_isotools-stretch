@@ -36,7 +36,7 @@ else
   EBS_DEVICE := /dev/nvme1n1
   EBS_ID := vol-0f2da0bfbc58e5a49
   FAI_GRUB_CLASS := GRUB_EFI_ARM64
-  FAI_ARCH_CLASS := ARM64
+  FAI_ARCH_CLASS := BACKPORTS # fixme
   AMI_ARCH := $(ARCH)
 endif
 # FIXME: not necessarily ec2, so handle name in %-push instead
