@@ -11,7 +11,7 @@
 
 # Default kernel ABI version to use. Append a kernel flavour to
 # produce KERNELVERSION.
-LINUX_KERNEL_ABI ?= 4.9.0-7
+LINUX_KERNEL_ABI ?= 4.9.0-3
 
 # Always "di" these days
 KERNEL_FLAVOUR ?= di
@@ -96,7 +96,7 @@ LSB_DISTRIB_RELEASE="$(DEBIAN_VERSION) - installer build $(BUILD_DATE)"
 
 # This keyring is only used to verify udeb downloads using apt. Since the
 # build process does not run as root, apt cannot read /etc/apt/trusted.gpg.
-KEYRING=/usr/share/keyrings/untangle-archive-keyring.gpg
+KEYRING=/usr/share/keyrings/debian-archive-keyring.gpg
 
 # All images that include cdebconf should include symbols needed by these
 # plugins.

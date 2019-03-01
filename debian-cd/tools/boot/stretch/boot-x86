@@ -449,11 +449,6 @@ if [ -n "$KERNEL_PARAMS" ]; then
     done
 fi
 
-rm -f boot$N/isolinux/{*txt,*cat,ad*,exit*,prompt*,rq*,spk*}
-cp -f ../../../cd-root/isolinux/* boot$N/isolinux/
-rm -fr CD$N/README.*
-cp -r ../../../cd-root/* CD$N/
-
 set_default_desktop
 rm -rf cdrom
 
