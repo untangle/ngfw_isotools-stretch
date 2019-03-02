@@ -45,7 +45,7 @@ case $DISTRIBUTION in
   current) CODENAME=testing ;;
   *) CODENAME=stable ;;
 esac
-ut-qemu-mkimage -u -r $REPOSITORY -d $CODENAME -s ${SIZE}G -p $extraPackages -f $QCOW2
+ut-qemu-mkimage -u -r $REPOSITORY -d $CODENAME -s ${SIZE}G -k 4.9.0-7 -p $extraPackages -f $QCOW2
 
 # convert back to an ESX-compatible VMDK
 qemu-img convert -O vmdk -o subformat=streamOptimized ${QCOW2} ${TMP_VMDK}
