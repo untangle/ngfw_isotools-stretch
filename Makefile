@@ -17,8 +17,8 @@ NETBOOT_HOST := netboot-server
 # constants
 ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 DEBVERSION := 9.0
-KERNELS_i386 := "linux-image-4.9.0-8-untangle-686-pae"
-KERNELS_amd64 := "linux-image-4.9.0-8-untangle-amd64"
+KERNELS_i386 := "linux-image-4.9.0-9-untangle-686-pae"
+KERNELS_amd64 := "linux-image-4.9.0-9-untangle-amd64"
 VERSION = $(shell cat $(PKGTOOLS_DIR)/resources/VERSION)
 ISO_IMAGE := +FLAVOR+-$(VERSION)_$(REPOSITORY)_$(ARCH)_$(DISTRIBUTION)_$(shell date --iso-8601=seconds)_$(shell hostname -s).iso
 USB_IMAGE := $(subst .iso,.img,$(ISO_IMAGE))
