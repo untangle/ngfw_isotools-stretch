@@ -27,7 +27,7 @@ IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 UNTANGLE_FAI_CONF := $(CWD)/class/UNTANGLE.var
 UNTANGLE_FAI_CONF_TPL := $(UNTANGLE_FAI_CONF).tpl
 # FIXME: find device dynamically, and then derive its ID
-ifeq ($(origin ARCH), amd64)
+ifeq ($(ARCH), amd64)
   EBS_DEVICE := /dev/xvdf
   EBS_ID := vol-06da60b13f650af2a
   FAI_GRUB_CLASS := GRUB_PC
