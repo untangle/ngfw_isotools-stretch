@@ -83,7 +83,6 @@ azure-push:
 	  echo $(AZURE_SHORT_NAME) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(AZURE_FULL_NAME)" ; \
 	  az login --service-principal --username $(AZURE_PRINCIPAL_ID) --password $(AZURE_PRINCIPAL_PASSWORD) --tenant $(AZURE_TENANT_ID) ; \
 	  az storage blob upload --account-name $(AZURE_ACCOUNT) --account-key $(AZURE_ACCOUNT_KEY) --container-name $(AZURE_CONTAINER) --type page --file $(AZURE_IMAGE) --name $(AZURE_BLOB_NAME) ; \
-	# az disk create --resource-group $(AZURE_RESOURCE_GROUP) --size-gb 20 --source $(AZURE_BASE_URL)/$(AZURE_CONTAINER)/$(AZURE_BLOB_NAME) --name $(AZURE_SHORT_NAME)-20GB
 	  az image create --resource-group $(AZURE_RESOURCE_GROUP) --os-type Linux --source $(AZURE_BASE_URL)/$(AZURE_CONTAINER)/$(AZURE_BLOB_NAME) --name $(AZURE_SHORT_NAME) ; \
 	fi
 
