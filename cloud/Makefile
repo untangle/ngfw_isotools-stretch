@@ -27,7 +27,7 @@ IMAGES_DIR := /data/untangle-images-$(REPOSITORY)
 UNTANGLE_FAI_CONF := $(CWD)/class/UNTANGLE.var
 UNTANGLE_FAI_CONF_TPL := $(UNTANGLE_FAI_CONF).tpl
 # FIXME: find device dynamically, and then derive its ID
-ifeq ($(origin ARCH), amd64)
+ifeq ($(ARCH), amd64)
   EBS_DEVICE := /dev/xvdf
   EBS_ID := vol-06da60b13f650af2a
   FAI_GRUB_CLASS := GRUB_PC
@@ -83,7 +83,6 @@ azure-push:
 	  echo $(AZURE_SHORT_NAME) | ssh $(NETBOOT_HOST) "cat > $(IMAGES_DIR)/$(VERSION)/$(AZURE_FULL_NAME)" ; \
 	  az login --service-principal --username $(AZURE_PRINCIPAL_ID) --password $(AZURE_PRINCIPAL_PASSWORD) --tenant $(AZURE_TENANT_ID) ; \
 	  az storage blob upload --account-name $(AZURE_ACCOUNT) --account-key $(AZURE_ACCOUNT_KEY) --container-name $(AZURE_CONTAINER) --type page --file $(AZURE_IMAGE) --name $(AZURE_BLOB_NAME) ; \
-	# az disk create --resource-group $(AZURE_RESOURCE_GROUP) --size-gb 20 --source $(AZURE_BASE_URL)/$(AZURE_CONTAINER)/$(AZURE_BLOB_NAME) --name $(AZURE_SHORT_NAME)-20GB
 	  az image create --resource-group $(AZURE_RESOURCE_GROUP) --os-type Linux --source $(AZURE_BASE_URL)/$(AZURE_CONTAINER)/$(AZURE_BLOB_NAME) --name $(AZURE_SHORT_NAME) ; \
 	fi
 
