@@ -1,4 +1,5 @@
 #!/bin/sh
 set -eu
 fcopy -SBMi -v /etc/apt/sources.list.d/untangle.list
+rm $FAI_ROOT/etc/apt/sources.list $FAI_ROOT/etc/apt/sources.list.d/backports.list
 cp -v $FAI/package_config/UNTANGLE.asc $FAI_ROOT/etc/apt/trusted.gpg.d/untangle.asc
