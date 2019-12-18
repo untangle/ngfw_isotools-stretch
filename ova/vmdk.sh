@@ -9,7 +9,6 @@ OVA_PACKAGES_FILE="${CURRENT_DIR}/default.packages"
 PROFILES_DIR="${CURRENT_DIR}/../profiles"
 UNTANGLE_PACKAGES_FILE="${PROFILES_DIR}/untangle.packages"
 UNTANGLE_DOWNLOADS_FILE="${PROFILES_DIR}/untangle.downloads"
-KERNEL_VERSION="4.9.0-9"
 
 # CL args
 REPOSITORY=$1
@@ -46,7 +45,7 @@ case $DISTRIBUTION in
   current) CODENAME=testing ;;
   *) CODENAME=stable ;;
 esac
-ut-qemu-mkimage -u -r $REPOSITORY -d $CODENAME -k $KERNEL_VERSION -s ${SIZE}G -p $extraPackages -f $QCOW2
+ut-qemu-mkimage -u -r $REPOSITORY -d $CODENAME -s ${SIZE}G -p $extraPackages -f $QCOW2
 
 # convert back to an ESX-compatible VMDK
 qemu-img convert -O vmdk -o subformat=streamOptimized ${QCOW2} ${TMP_VMDK}
